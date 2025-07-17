@@ -61,4 +61,80 @@ class PeminjamanController extends Controller
         // Redirect ke halaman verifikasi OTP
         return redirect()->route('peminjaman.verifikasiOtp')->with('info', 'Kode OTP telah dikirim ke email Anda.');
     }
+
+    public function verifikasiOtpForm(): \Illuminate\Contracts\View\View
+    {
+        return view('verifikasi_otp');
+    }
+
+    public function verifikasiOtp(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'kode_otp' => 'required|digits:6',
+        ]);
+        $formData = session('peminjaman_form');
+        if (!$formData) {
+            return redirect()->route('peminjaman.form')->with('error', 'Data peminjaman tidak ditemukan.');
+        }
+        $otpRow = \DB::table('otps')
+            ->where('email', $formData['email'])
+            ->where('kode_otp', $request->kode_otp)
+            ->where('expired_at', '>=', now())
+            ->first();
+        if (!$otpRow) {
+            return back()->withErrors(['kode_otp' => 'Kode OTP salah atau sudah kadaluarsa.']);
+        }
+        // Jika OTP valid, simpan data peminjaman
+        $kodeUnik = strtoupper(Str::random(8));
+        $peminjaman = Peminjaman::create([
+            'nama' => $formData['nama'],
+            'unit' => $formData['unit'],
+            'email' => $formData['email'],
+            'no_telp' => $formData['no_telp'],
+            'tanggal_mulai' => $formData['tanggal_mulai'],
+            'tanggal_selesai' => $formData['tanggal_selesai'],
+            'keperluan' => $formData['keperluan'],
+            'bukti' => $formData['bukti'],
+            'status' => 'menunggu',
+            'kode_unik' => $kodeUnik,
+        ]);
+        // Simpan detail barang yang dipinjam
+        foreach ($formData['cart'] as $item) {
+            DetailPeminjaman::create([
+                'peminjaman_id' => $peminjaman->id,
+                'barang_id' => $item['id'],
+                'jumlah' => $item['qty'],
+            ]);
+            // Kurangi stok barang
+            $barang = Barang::find($item['id']);
+            if ($barang) {
+                $barang->stok = max(0, $barang->stok - $item['qty']);
+                $barang->save();
+            }
+        }
+        // Hapus session dan OTP
+        session()->forget('cart');
+        session()->forget('peminjaman_form');
+        DB::table('otps')->where('email', $formData['email'])->delete();
+        // Kirim kode unik ke email user
+        Mail::to($formData['email'])->send(new \App\Mail\OtpMail($kodeUnik, $formData['email']));
+        return redirect()->route('dashboard')->with('success', 'Peminjaman berhasil diajukan! Kode unik telah dikirim ke email Anda.');
+    }
+
+    public function cekStatusForm(): \Illuminate\Contracts\View\View
+    {
+        return view('cek_status_form');
+    }
+
+    public function cekStatus(Request $request): \Illuminate\Contracts\View\View
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'kode_unik' => 'required|string',
+        ]);
+        $peminjaman = \App\Models\Peminjaman::where('email', $request->email)
+            ->where('kode_unik', $request->kode_unik)
+            ->first();
+        return view('cek_status_hasil', compact('peminjaman'));
+    }
 } 

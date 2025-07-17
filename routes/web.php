@@ -17,6 +17,10 @@ Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('
 Route::post('/keranjang/hapus/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
 Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');
 Route::post('/peminjaman/ajukan', [PeminjamanController::class, 'ajukan'])->name('peminjaman.ajukan');
+Route::get('/peminjaman/verifikasi-otp', [PeminjamanController::class, 'verifikasiOtpForm'])->name('peminjaman.verifikasiOtp');
+Route::post('/peminjaman/verifikasi-otp', [PeminjamanController::class, 'verifikasiOtp'])->name('peminjaman.verifikasiOtp.submit');
+Route::get('/cek-status', [PeminjamanController::class, 'cekStatusForm'])->name('cekStatus.form');
+Route::post('/cek-status', [PeminjamanController::class, 'cekStatus'])->name('cekStatus.submit');
 
 // Route login admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');

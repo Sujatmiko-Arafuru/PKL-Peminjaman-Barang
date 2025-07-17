@@ -2,11 +2,20 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="dashboard-title">Form Pengajuan Peminjaman</h1>
+    <h1 class="dashboard-title mb-3"><i class="bi bi-journal-plus me-2"></i>Form Pengajuan Peminjaman</h1>
     <div class="mb-3">
-        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary">&larr; Kembali ke Keranjang</a>
+        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali ke Keranjang</a>
     </div>
-    <form action="{{ route('peminjaman.ajukan') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    <form action="{{ route('peminjaman.ajukan') }}" method="POST" enctype="multipart/form-data" class="mb-4 bg-white p-4 rounded shadow-sm">
         @csrf
         <div class="row mb-3">
             <div class="col-md-6 mb-3">
@@ -42,9 +51,9 @@
                 <input type="file" name="bukti" class="form-control" accept="application/pdf" required>
             </div>
         </div>
-        <h5 class="mb-2">Barang yang Dipinjam:</h5>
+        <h5 class="mb-2"><i class="bi bi-box-seam"></i> Barang yang Dipinjam:</h5>
         <div class="table-responsive mb-3">
-            <table class="table align-middle">
+            <table class="table align-middle table-bordered bg-light">
                 <thead class="table-primary">
                     <tr>
                         <th>Nama Barang</th>
@@ -62,7 +71,7 @@
             </table>
         </div>
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-biru">Ajukan Peminjaman</button>
+            <button type="submit" class="btn btn-success"><i class="bi bi-send-check"></i> Ajukan Peminjaman</button>
         </div>
     </form>
 </div>
