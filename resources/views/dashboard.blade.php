@@ -21,8 +21,17 @@
         @forelse($barangs as $barang)
         <div class="col">
             <div class="card h-100 shadow-sm border-0">
-                @if($barang->foto)
-                <img src="{{ asset('storage/' . $barang->foto) }}" alt="{{ $barang->nama }}" class="card-img-top" style="max-height:180px;object-fit:cover;">
+                @php
+                    $foto = null;
+                    if ($barang->foto) {
+                        $fotoArr = json_decode($barang->foto, true);
+                        if (is_array($fotoArr) && count($fotoArr) > 0) {
+                            $foto = $fotoArr[0];
+                        }
+                    }
+                @endphp
+                @if($foto)
+                <img src="{{ asset('storage/' . $foto) }}" alt="{{ $barang->nama }}" class="card-img-top" style="max-height:180px;object-fit:cover;">
                 @else
                 <div class="d-flex align-items-center justify-content-center bg-light" style="height:180px;border-radius:.5rem;">
                     <i class="bi bi-image text-secondary" style="font-size:2.5rem;"></i>
