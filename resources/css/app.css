@@ -1,0 +1,60 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Custom biru modern */
+.dashboard-title {
+    color: #1565c0;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+.card-barang {
+    border: 1px solid #1976d2;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(21,101,192,0.08);
+    background: #fff;
+    transition: box-shadow 0.2s;
+}
+.card-barang:hover {
+    box-shadow: 0 4px 16px rgba(21,101,192,0.16);
+}
+.btn-biru {
+    background: #1976d2;
+    color: #fff;
+    border-radius: 0.5rem;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-biru:hover {
+    background: #1565c0;
+}
+.badge-status {
+    padding: 0.3em 0.8em;
+    border-radius: 0.7em;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+.badge-tersedia {
+    background: #e3f0ff;
+    color: #1565c0;
+}
+.badge-tidak {
+    background: #bdbdbd;
+    color: #fff;
+}
+.grid-barang {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.5rem;
+}
