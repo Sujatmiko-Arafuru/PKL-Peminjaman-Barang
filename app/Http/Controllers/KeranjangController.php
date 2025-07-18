@@ -7,24 +7,33 @@ use App\Models\Barang;
 
 class KeranjangController extends Controller
 {
-    public function tambah(Request $request): \Illuminate\Http\JsonResponse
+    public function tambah(Request $request)
     {
         $id = $request->input('barang_id');
         $barang = Barang::findOrFail($id);
         $cart = session()->get('cart', []);
+        $jumlah = (int) $request->input('jumlah', 1);
         if(isset($cart[$id])) {
-            $cart[$id]['qty'] += 1;
+            $cart[$id]['qty'] += $jumlah;
         } else {
+            // Ambil foto utama (pertama) dari array JSON
+            $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
+            $fotoUtama = $fotoArray && count($fotoArray) > 0 ? $fotoArray[0] : null;
             $cart[$id] = [
                 'id' => $barang->id,
                 'nama' => $barang->nama,
-                'foto' => $barang->foto,
+                'foto' => $fotoUtama,
                 'stok' => $barang->stok,
                 'status' => $barang->status,
-                'qty' => 1
+                'qty' => $jumlah
             ];
         }
         session(['cart' => $cart]);
+        // Jika request dari form biasa, redirect ke keranjang dengan flash message
+        if (!$request->expectsJson()) {
+            return redirect()->route('keranjang.index')->with('success', 'Barang "' . $barang->nama . '" (' . $jumlah . ') berhasil ditambahkan ke keranjang!');
+        }
+        // Jika request AJAX/JSON
         return response()->json(['success' => true, 'cart_count' => count($cart)]);
     }
 

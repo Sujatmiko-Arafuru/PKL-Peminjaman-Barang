@@ -32,6 +32,12 @@
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-cart3 me-2"></i>Keranjang Peminjaman</h1>
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
             
             @if(count($cart) > 0)
             <div class="card shadow-sm border-0">
@@ -55,8 +61,18 @@
                                 @foreach($cart as $item)
                                 <tr>
                                     <td style="width:80px">
-                                        @if($item['foto'])
-                                        <img src="{{ asset('storage/' . $item['foto']) }}" alt="{{ $item['nama'] }}" class="rounded" style="max-width:60px;max-height:60px;">
+                                        @php
+                                            $fotoUtama = null;
+                                            if(isset($item['foto'])) {
+                                                if(is_array($item['foto'])) {
+                                                    $fotoUtama = count($item['foto']) > 0 ? $item['foto'][0] : null;
+                                                } else {
+                                                    $fotoUtama = $item['foto'];
+                                                }
+                                            }
+                                        @endphp
+                                        @if($fotoUtama)
+                                        <img src="{{ asset('storage/' . $fotoUtama) }}" alt="{{ $item['nama'] }}" class="rounded" style="max-width:60px;max-height:60px;">
                                         @else
                                         <span class="text-muted"><i class="bi bi-image"></i></span>
                                         @endif

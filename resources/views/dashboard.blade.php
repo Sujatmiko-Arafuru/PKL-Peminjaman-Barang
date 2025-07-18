@@ -71,7 +71,7 @@
                             <p>Status: <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($barang->status) }}</span></p>
                             <div class="mt-auto d-flex gap-2">
                                 <a href="{{ route('barang.detail', $barang->id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-info-circle"></i> Detail</a>
-                                <button type="button" class="btn btn-success btn-sm btn-keranjang" data-id="{{ $barang->id }}" data-nama="{{ $barang->nama }}"><i class="bi bi-cart-plus"></i> Tambah</button>
+                                <a href="{{ route('barang.detail', $barang->id) }}" class="btn btn-success btn-sm"><i class="bi bi-cart-plus"></i> Tambah</a>
                             </div>
                         </div>
                     </div>
@@ -86,27 +86,81 @@
     </div>
 </div>
 
+<!-- Modal Tambah ke Keranjang -->
+<div class="modal fade" id="modalTambahKeranjang" tabindex="-1" aria-labelledby="modalTambahKeranjangLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTambahKeranjangLabel">Tambah ke Keranjang</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-3">
+          <img id="modalFotoBarang" src="" alt="Foto" style="max-width:180px;max-height:180px;border-radius:0.5rem;object-fit:cover;">
+        </div>
+        <h5 id="modalNamaBarang" class="text-primary mb-2"></h5>
+        <div class="mb-2"><span id="modalDeskripsiBarang"></span></div>
+        <div class="mb-2">Stok: <span id="modalStokBarang" class="fw-bold"></span></div>
+        <div class="mb-2">Status: <span id="modalStatusBarang" class="badge"></span></div>
+        <div class="mb-2">
+          <label class="form-label">Jumlah</label>
+          <input type="number" id="modalJumlahBarang" class="form-control" min="1" value="1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="btnKonfirmasiTambah">Tambah ke Keranjang</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        let selectedBarang = {};
+        var modalTambah = new bootstrap.Modal(document.getElementById('modalTambahKeranjang'));
         document.querySelectorAll('.btn-keranjang').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const nama = this.getAttribute('data-nama');
-                fetch("{{ route('keranjang.tambah') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ barang_id: id })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        document.getElementById('cart-count').innerText = data.cart_count;
-                        alert('Barang "' + nama + '" ditambahkan ke keranjang!');
-                    }
-                });
+                selectedBarang = {
+                    id: this.getAttribute('data-id'),
+                    nama: this.getAttribute('data-nama'),
+                    foto: this.getAttribute('data-foto'),
+                    deskripsi: this.getAttribute('data-deskripsi'),
+                    stok: this.getAttribute('data-stok'),
+                    status: this.getAttribute('data-status')
+                };
+                document.getElementById('modalFotoBarang').src = selectedBarang.foto;
+                document.getElementById('modalNamaBarang').innerText = selectedBarang.nama;
+                document.getElementById('modalDeskripsiBarang').innerText = selectedBarang.deskripsi;
+                document.getElementById('modalStokBarang').innerText = selectedBarang.stok;
+                let statusSpan = document.getElementById('modalStatusBarang');
+                statusSpan.innerText = selectedBarang.status.charAt(0).toUpperCase() + selectedBarang.status.slice(1);
+                statusSpan.className = 'badge ' + (selectedBarang.status === 'tersedia' ? 'bg-success' : 'bg-secondary');
+                let jumlahInput = document.getElementById('modalJumlahBarang');
+                jumlahInput.value = 1;
+                jumlahInput.max = selectedBarang.stok;
+                modalTambah.show();
+            });
+        });
+        document.getElementById('btnKonfirmasiTambah').addEventListener('click', function() {
+            let jumlah = parseInt(document.getElementById('modalJumlahBarang').value);
+            if(isNaN(jumlah) || jumlah < 1) jumlah = 1;
+            if(jumlah > parseInt(selectedBarang.stok)) jumlah = parseInt(selectedBarang.stok);
+            fetch("{{ route('keranjang.tambah') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ barang_id: selectedBarang.id, jumlah: jumlah })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    document.getElementById('cart-count').innerText = data.cart_count;
+                    modalTambah.hide();
+                    alert('Barang "' + selectedBarang.nama + '" ('+jumlah+') ditambahkan ke keranjang!');
+                }
             });
         });
     });

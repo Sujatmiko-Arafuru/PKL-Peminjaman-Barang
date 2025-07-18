@@ -14,8 +14,9 @@
             <option value="">Semua Status</option>
             <option value="menunggu" {{ request('status')=='menunggu'?'selected':'' }}>Menunggu</option>
             <option value="disetujui" {{ request('status')=='disetujui'?'selected':'' }}>Disetujui</option>
-            <option value="ditolak" {{ request('status')=='ditolak'?'selected':'' }}>Ditolak</option>
+            <option value="pengembalian_diajukan" {{ request('status')=='pengembalian_diajukan'?'selected':'' }}>Pengembalian Diajukan</option>
             <option value="dikembalikan" {{ request('status')=='dikembalikan'?'selected':'' }}>Dikembalikan</option>
+            <option value="ditolak" {{ request('status')=='ditolak'?'selected':'' }}>Ditolak</option>
             <option value="pengembalian ditolak" {{ request('status')=='pengembalian ditolak'?'selected':'' }}>Pengembalian Ditolak</option>
         </select>
     </div>
@@ -70,8 +71,21 @@
                 <td>{{ Str::limit($p->tujuan, 20) }}</td>
                 <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
                 <td>
-                    <span class="badge {{ $p->status == 'dikembalikan' ? 'bg-success' : ($p->status == 'disetujui' ? 'bg-primary' : ($p->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">
-                        {{ ucfirst($p->status) }}
+                    <span class="badge
+                        @if($p->status == 'dikembalikan') bg-success
+                        @elseif($p->status == 'disetujui') bg-primary
+                        @elseif($p->status == 'pengembalian_diajukan') bg-warning text-dark
+                        @elseif($p->status == 'ditolak' || $p->status == 'pengembalian ditolak') bg-danger
+                        @else bg-secondary
+                        @endif
+                    ">
+                        @if($p->status == 'pengembalian_diajukan')
+                            Pengembalian Diajukan
+                        @elseif($p->status == 'pengembalian ditolak')
+                            Pengembalian Ditolak
+                        @else
+                            {{ ucfirst($p->status) }}
+                        @endif
                     </span>
                 </td>
                 <td>

@@ -44,7 +44,7 @@
                             @endphp
                             @if(count($fotoArray) > 0)
                             <div class="mb-2 text-center">
-                                <img id="mainFoto" src="{{ asset('storage/' . $fotoArray[0]) }}" class="w-100" style="border-radius:1rem;max-height:260px;object-fit:cover;max-width:320px;" alt="Foto utama">
+                                <img class="main-foto-barang w-100" src="{{ asset('storage/' . $fotoArray[0]) }}" style="border-radius:1rem;max-height:260px;object-fit:cover;max-width:320px;" alt="Foto utama">
                             </div>
                             <div class="d-flex justify-content-center gap-2">
                                 @foreach($fotoArray as $i => $foto)
@@ -74,9 +74,17 @@
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <button type="button" class="btn btn-primary btn-lg btn-keranjang-detail" data-nama="{{ $barang->nama }}">
-                                    <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
-                                </button>
+                                <form action="{{ route('keranjang.tambah') }}" method="POST" class="d-flex flex-column align-items-start gap-2">
+                                    @csrf
+                                    <div class="input-group mb-2" style="max-width:200px;">
+                                        <span class="input-group-text">Jumlah</span>
+                                        <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok }}" value="1" required>
+                                    </div>
+                                    <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -86,25 +94,29 @@
     </div>
 </div>
 
+<!-- Toast Notifikasi -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+  <div id="toastKeranjang" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toastKeranjangMsg">
+        Barang berhasil ditambahkan ke keranjang!
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var btn = document.querySelector('.btn-keranjang-detail');
-        if(btn) {
-            btn.addEventListener('click', function() {
-                const nama = this.getAttribute('data-nama');
-                alert('Barang "' + nama + '" ditambahkan ke keranjang! (simulasi UI)');
-            });
-        }
-        // Interaksi thumbnail: klik thumbnail ganti gambar utama
-        var mainFoto = document.getElementById('mainFoto');
-        var thumbs = document.querySelectorAll('.selector-foto');
-        thumbs.forEach(function(thumb) {
-            thumb.addEventListener('click', function() {
-                thumbs.forEach(t => t.style.border = '');
-                this.style.border = '2px solid #0d6efd';
-                if(mainFoto) mainFoto.src = this.getAttribute('data-foto');
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    // Interaksi thumbnail
+    document.querySelectorAll('.selector-foto').forEach(function(thumb) {
+        thumb.addEventListener('click', function() {
+            document.querySelectorAll('.selector-foto').forEach(t => t.style.border = '');
+            this.style.border = '2px solid #0d6efd';
+            var mainFoto = document.querySelector('.main-foto-barang');
+            if(mainFoto) mainFoto.setAttribute('src', this.getAttribute('data-foto'));
         });
     });
+});
 </script>
 @endsection 
