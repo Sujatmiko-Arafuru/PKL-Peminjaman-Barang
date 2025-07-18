@@ -12,11 +12,13 @@ return new class extends Migration {
             $table->string('nama');
             $table->string('unit');
             $table->string('no_telp');
+            $table->string('nama_kegiatan');
+            $table->string('tujuan');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
-            $table->string('keperluan');
             $table->string('bukti');
             $table->string('status')->default('menunggu');
+            $table->string('kode_peminjaman')->unique();
             $table->timestamps();
         });
     }

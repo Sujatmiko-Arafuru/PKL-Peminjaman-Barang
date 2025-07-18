@@ -19,47 +19,90 @@
         <button class="btn btn-biru w-100">Filter</button>
     </div>
 </form>
-<div class="table-responsive">
-    <table class="table align-middle">
-        <thead class="table-primary">
-            <tr>
-                <th>Nama</th>
-                <th>No HP</th>
-                <th>Unit/Jurusan</th>
-                <th>Tgl Pinjam</th>
-                <th>Keperluan</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($peminjamans as $p)
-            <tr>
-                <td>{{ $p->nama }}</td>
-                <td>{{ $p->no_telp }}</td>
-                <td>{{ $p->unit }}</td>
-                <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
-                <td>{{ Str::limit($p->keperluan, 30) }}</td>
-                <td><span class="badge bg-warning text-dark">{{ ucfirst($p->status) }}</span></td>
-                <td>
-                    <a href="{{ route('admin.peminjaman.show', $p->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
-                    <form action="{{ route('admin.peminjaman.approve', $p->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button class="btn btn-success btn-sm" onclick="return confirm('Approve peminjaman?')">Approve</button>
-                    </form>
-                    <form action="{{ route('admin.peminjaman.reject', $p->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Tolak peminjaman?')">Reject</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="7" class="text-center">Tidak ada peminjaman menunggu approve.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+
+<!-- Tabel Menunggu Approve -->
+<div class="mb-5">
+    <h4 class="mb-3">Menunggu Persetujuan</h4>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Nama</th>
+                    <th>No HP</th>
+                    <th>Unit/Jurusan</th>
+                    <th>Nama Kegiatan</th>
+                    <th>Tujuan</th>
+                    <th>Tgl Pinjam</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($menunggu as $p)
+                <tr>
+                    <td>{{ $p->nama }}</td>
+                    <td>{{ $p->no_telp }}</td>
+                    <td>{{ $p->unit }}</td>
+                    <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
+                    <td>{{ Str::limit($p->tujuan, 20) }}</td>
+                    <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
+                    <td><span class="badge bg-warning text-dark">{{ ucfirst($p->status) }}</span></td>
+                    <td>
+                        <a href="{{ route('admin.peminjaman.show', $p->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
+                        <form action="{{ route('admin.peminjaman.approve', $p->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn btn-success btn-sm" onclick="return confirm('Approve peminjaman?')">Approve</button>
+                        </form>
+                        <form action="{{ route('admin.peminjaman.reject', $p->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Tolak peminjaman?')">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="8" class="text-center">Tidak ada peminjaman menunggu approve.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
-<div class="mt-3">
-    {{ $peminjamans->withQueryString()->links() }}
+
+<!-- Tabel Sedang Berlangsung -->
+<div>
+    <h4 class="mb-3">Sedang Berlangsung</h4>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-success">
+                <tr>
+                    <th>Nama</th>
+                    <th>No HP</th>
+                    <th>Unit/Jurusan</th>
+                    <th>Nama Kegiatan</th>
+                    <th>Tujuan</th>
+                    <th>Tgl Pinjam</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($sedang_berlangsung as $p)
+                <tr>
+                    <td>{{ $p->nama }}</td>
+                    <td>{{ $p->no_telp }}</td>
+                    <td>{{ $p->unit }}</td>
+                    <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
+                    <td>{{ Str::limit($p->tujuan, 20) }}</td>
+                    <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
+                    <td><span class="badge bg-primary">{{ ucfirst($p->status) }}</span></td>
+                    <td>
+                        <a href="{{ route('admin.peminjaman.show', $p->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="8" class="text-center">Tidak ada peminjaman sedang berlangsung.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection 

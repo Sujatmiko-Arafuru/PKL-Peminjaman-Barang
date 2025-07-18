@@ -17,10 +17,13 @@ Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('
 Route::post('/keranjang/hapus/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
 Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');
 Route::post('/peminjaman/ajukan', [PeminjamanController::class, 'ajukan'])->name('peminjaman.ajukan');
-Route::get('/peminjaman/verifikasi-otp', [PeminjamanController::class, 'verifikasiOtpForm'])->name('peminjaman.verifikasiOtp');
-Route::post('/peminjaman/verifikasi-otp', [PeminjamanController::class, 'verifikasiOtp'])->name('peminjaman.verifikasiOtp.submit');
+Route::post('/pengembalian/ajukan/{id}', [PeminjamanController::class, 'ajukanPengembalian'])->name('pengembalian.ajukan');
 Route::get('/cek-status', [PeminjamanController::class, 'cekStatusForm'])->name('cekStatus.form');
 Route::post('/cek-status', [PeminjamanController::class, 'cekStatus'])->name('cekStatus.submit');
+Route::get('/cek-status/search', [PeminjamanController::class, 'searchByKegiatan'])->name('cekStatus.search');
+Route::get('/cek-status/detail/{id}', [PeminjamanController::class, 'detailPeminjaman'])->name('cekStatus.detail');
+Route::get('/list-peminjam', [PeminjamanController::class, 'listPeminjam'])->name('list.peminjam');
+Route::get('/list-peminjam/detail/{id}', [PeminjamanController::class, 'detailPeminjamPublic'])->name('list.peminjam.detail');
 
 // Route login admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
@@ -29,9 +32,7 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 
 // Route group admin dengan middleware
 Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function() {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     // CRUD Inventaris
     Route::resource('inventaris', InventarisController::class);
     // Kelola Peminjaman
@@ -48,3 +49,8 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
 });
+
+// Export PDF arsip (berdasarkan filter)
+Route::get('admin/arsip/export', [ArsipController::class, 'exportPdf'])->name('admin.arsip.export');
+// Export PDF per peminjaman
+Route::get('admin/arsip/{id}/export', [ArsipController::class, 'exportSinglePdf'])->name('admin.arsip.exportSingle');

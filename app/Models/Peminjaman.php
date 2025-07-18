@@ -9,8 +9,11 @@ use App\Models\DetailPeminjaman;
 class Peminjaman extends Model
 {
     use HasFactory;
+    
+    protected $table = 'peminjamans';
+    
     protected $fillable = [
-        'nama', 'unit', 'no_telp', 'tanggal_mulai', 'tanggal_selesai', 'keperluan', 'bukti', 'status'
+        'nama', 'unit', 'no_telp', 'nama_kegiatan', 'tujuan', 'tanggal_mulai', 'tanggal_selesai', 'bukti', 'status', 'kode_peminjaman'
     ];
     public function details()
     {

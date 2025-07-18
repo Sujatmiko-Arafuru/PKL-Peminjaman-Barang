@@ -8,6 +8,7 @@ use App\Models\Peminjaman;
 use App\Models\Barang;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ArsipController extends Controller
 {
@@ -34,11 +35,9 @@ class ArsipController extends Controller
         $peminjamans = $query->with('details.barang')->paginate(15);
 
         // Statistik barang terlaris/tidak pernah dipinjam
-        $barangStats = Barang::withCount(['details as total_dipinjam' => function($q) {
-            $q->select(DB::raw('sum(jumlah)'));
-        }])->get();
-        $terlaris = $barangStats->sortByDesc('total_dipinjam')->first();
-        $tidakPernah = $barangStats->where('total_dipinjam', null)->all();
+        $barangStats = Barang::withCount('details')->get();
+        $terlaris = $barangStats->sortByDesc('details_count')->first();
+        $tidakPernah = $barangStats->where('details_count', 0)->all();
 
         return view('admin.arsip.index', compact('peminjamans', 'terlaris', 'tidakPernah'));
     }
@@ -47,5 +46,37 @@ class ArsipController extends Controller
     {
         $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
         return view('admin.arsip.show', compact('peminjaman'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = Peminjaman::query();
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal_mulai', '>=', $request->tanggal_mulai);
+        }
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate('tanggal_selesai', '<=', $request->tanggal_selesai);
+        }
+        if ($request->filled('urut')) {
+            $query->orderBy('created_at', $request->urut == 'terbaru' ? 'desc' : 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+        $peminjamans = $query->with('details.barang')->get();
+        $pdf = Pdf::loadView('admin.arsip.export_pdf', compact('peminjamans'));
+        return $pdf->download('arsip_peminjaman.pdf');
+    }
+
+    public function exportSinglePdf($id)
+    {
+        $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+        $pdf = Pdf::loadView('admin.arsip.export_single_pdf', compact('peminjaman'));
+        return $pdf->download('arsip_peminjaman_'.$peminjaman->id.'.pdf');
     }
 } 

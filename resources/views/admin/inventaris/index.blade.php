@@ -9,7 +9,7 @@
     <div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 <div class="mb-3 d-flex justify-content-between align-items-center">
-    <a href="{{ route('admin.inventaris.create') }}" class="btn btn-biru">+ Tambah Barang</a>
+    <a href="{{ route('admin.inventaris.create') }}" class="btn btn-biru"><i class="bi bi-plus-lg"></i> Tambah Barang</a>
     <div>
         <span class="badge bg-primary">Total Barang: {{ $barangs->count() }}</span>
         <span class="badge bg-info text-dark ms-2">Total Stok: {{ $barangs->sum('stok') }}</span>
@@ -34,10 +34,14 @@
             <tr>
                 <td>{{ $barang->nama }}</td>
                 <td>
-                    @if($barang->foto && count(json_decode($barang->foto, true)) > 0)
-                        <img src="{{ asset('storage/' . json_decode($barang->foto, true)[0]) }}" alt="{{ $barang->nama }}" style="max-width:60px;max-height:60px;border-radius:0.5rem;">
+                    @php
+                        $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
+                        $fotoUtama = $fotoArray && count($fotoArray) > 0 ? $fotoArray[0] : null;
+                    @endphp
+                    @if($fotoUtama)
+                        <img src="{{ asset('storage/' . $fotoUtama) }}" alt="{{ $barang->nama }}" style="max-width:60px;max-height:60px;border-radius:0.5rem;">
                     @else
-                        <span class="text-muted">-</span>
+                        <span class="text-muted"><i class="bi bi-image"></i></span>
                     @endif
                 </td>
                 <td>{{ $barang->stok }}</td>
@@ -46,7 +50,7 @@
                 <td>{{ Str::limit($barang->deskripsi, 40) }}</td>
                 <td>
                     <a href="{{ route('admin.inventaris.show', $barang->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
-                    <a href="{{ route('admin.inventaris.edit', $barang->id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                    <a href="{{ route('admin.inventaris.edit', $barang->id) }}" class="btn btn-outline-primary btn-sm border"><i class="bi bi-pencil"></i> Edit</a>
                     <form action="{{ route('admin.inventaris.destroy', $barang->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus barang?')">
                         @csrf
                         @method('DELETE')

@@ -2,22 +2,141 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="dashboard-title mb-3"><i class="bi bi-clipboard-data me-2"></i>Hasil Cek Status Peminjaman</h1>
-    @if($peminjaman)
-        <div class="alert alert-success"><i class="bi bi-check-circle"></i> Data peminjaman ditemukan.</div>
-        <ul class="list-group mb-3 shadow-sm">
-            <li class="list-group-item"><b>Nama:</b> {{ $peminjaman->nama }}</li>
-            <li class="list-group-item"><b>Email:</b> {{ $peminjaman->email }}</li>
-            <li class="list-group-item"><b>No. Telepon:</b> {{ $peminjaman->no_telp }}</li>
-            <li class="list-group-item"><b>Unit/Jurusan:</b> {{ $peminjaman->unit }}</li>
-            <li class="list-group-item"><b>Tanggal Pinjam:</b> {{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</li>
-            <li class="list-group-item"><b>Keperluan:</b> {{ $peminjaman->keperluan }}</li>
-            <li class="list-group-item"><b>Status:</b> <span class="badge {{ $peminjaman->status == 'dikembalikan' ? 'bg-success' : ($peminjaman->status == 'disetujui' ? 'bg-primary' : ($peminjaman->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">{{ ucfirst($peminjaman->status) }}</span></li>
-            <li class="list-group-item"><b>Kode Unik:</b> <span class="badge bg-dark">{{ $peminjaman->kode_unik }}</span></li>
-        </ul>
-    @else
-        <div class="alert alert-danger"><i class="bi bi-x-circle"></i> Data peminjaman tidak ditemukan. Pastikan email dan kode unik benar.</div>
-    @endif
-    <a href="{{ route('cekStatus.form') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Cek Data Lain</a>
+    <div class="row">
+        <!-- Sidebar Menu -->
+        <div class="col-md-3 col-lg-2">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3"><i class="bi bi-list"></i> Menu</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-box-seam me-2"></i>List Barang
+                        </a>
+                        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary position-relative">
+                            <i class="bi bi-cart3 me-2"></i>Keranjang
+                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ session('cart') ? count(session('cart')) : 0 }}
+                            </span>
+                        </a>
+                        <a href="{{ route('list.peminjam') }}" class="btn btn-outline-info">
+                            <i class="bi bi-people me-2"></i>List Peminjam
+                        </a>
+                        <a href="{{ route('cekStatus.form') }}" class="btn btn-success {{ request()->routeIs('cekStatus.*') ? 'active' : '' }}">
+                            <i class="bi bi-arrow-repeat me-2"></i>Pengembalian
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="dashboard-title mb-0"><i class="bi bi-clipboard-data me-2"></i>Hasil Cek Status Peminjaman</h1>
+                <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali</a>
+            </div>
+            
+            @if($peminjaman)
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle me-2"></i> Data peminjaman ditemukan.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Data Peminjam</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Nama:</strong></span>
+                                        <span>{{ $peminjaman->nama }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>No. Telepon:</strong></span>
+                                        <span>{{ $peminjaman->no_telp }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Unit/Jurusan:</strong></span>
+                                        <span>{{ $peminjaman->unit }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Nama Kegiatan:</strong></span>
+                                        <span>{{ $peminjaman->nama_kegiatan }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Tujuan:</strong></span>
+                                        <span>{{ $peminjaman->tujuan }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Tanggal Pinjam:</strong></span>
+                                        <span>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Status:</strong></span>
+                                        <span class="badge {{ $peminjaman->status == 'dikembalikan' ? 'bg-success' : ($peminjaman->status == 'disetujui' ? 'bg-primary' : ($peminjaman->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">
+                                            {{ ucfirst($peminjaman->status) }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Bukti:</strong></span>
+                                        <span>
+                                            @if($peminjaman->bukti)
+                                                <a href="{{ asset('storage/' . $peminjaman->bukti) }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                                    <i class="bi bi-file-earmark"></i> Lihat File
+                                                </a>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Daftar Barang yang Dipinjam</h5>
+                            </div>
+                            <div class="card-body">
+                                @if($peminjaman->details->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Nama Barang</th>
+                                                    <th>Jumlah</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($peminjaman->details as $detail)
+                                                    <tr>
+                                                        <td>{{ $detail->barang->nama ?? '-' }}</td>
+                                                        <td><span class="badge bg-primary">{{ $detail->jumlah }}</span></td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning mb-0">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        Tidak ada barang yang dipinjam.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-danger">
+                    <i class="bi bi-x-circle me-2"></i> Data peminjaman tidak ditemukan. Pastikan kode peminjaman benar.
+                </div>
+            @endif
+        </div>
+    </div>
 </div>
 @endsection 

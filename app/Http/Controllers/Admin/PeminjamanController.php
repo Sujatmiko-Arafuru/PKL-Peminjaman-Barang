@@ -21,8 +21,9 @@ class PeminjamanController extends Controller
         } else {
             $query->orderBy('created_at', 'asc');
         }
-        $peminjamans = $query->where('status', 'menunggu')->paginate(10);
-        return view('admin.peminjaman.index', compact('peminjamans'));
+        $menunggu = (clone $query)->where('status', 'menunggu')->get();
+        $sedang_berlangsung = (clone $query)->where('status', 'disetujui')->get();
+        return view('admin.peminjaman.index', compact('menunggu', 'sedang_berlangsung'));
     }
 
     public function show($id): \Illuminate\View\View

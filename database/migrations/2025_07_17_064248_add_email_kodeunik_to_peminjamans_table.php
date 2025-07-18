@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('peminjamans', function (Blueprint $table) {
-            $table->string('email')->nullable()->after('unit');
-            $table->string('kode_unik')->nullable()->unique()->after('status');
         });
     }
 
@@ -23,8 +21,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('peminjamans', function (Blueprint $table) {
-            $table->dropColumn('email');
-            $table->dropColumn('kode_unik');
         });
     }
 };

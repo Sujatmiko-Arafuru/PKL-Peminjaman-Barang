@@ -1,7 +1,10 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<h2 class="mb-4">Arsip Peminjaman & Pengembalian</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Arsip Peminjaman & Pengembalian</h2>
+    <a href="{{ route('admin.arsip.export', request()->all()) }}" class="btn btn-danger"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+</div>
 <form method="GET" class="row g-2 mb-3">
     <div class="col-md-3">
         <input type="text" name="search" class="form-control" placeholder="Cari nama user..." value="{{ request('search') }}">
@@ -33,7 +36,7 @@
     </div>
 </form>
 <div class="mb-3">
-    <span class="badge bg-primary">Barang Terlaris: {{ $terlaris ? $terlaris->nama . ' (' . ($terlaris->total_dipinjam ?? 0) . 'x)' : '-' }}</span>
+    <span class="badge bg-primary">Barang Terlaris: {{ $terlaris ? $terlaris->nama . ' (' . ($terlaris->details_count ?? 0) . 'x)' : '-' }}</span>
     <span class="badge bg-secondary ms-2">Barang Tidak Pernah Dipinjam: 
         @if($tidakPernah && count($tidakPernah) > 0)
             {{ implode(', ', array_map(fn($b) => $b->nama, $tidakPernah)) }}
@@ -49,10 +52,12 @@
                 <th>Nama</th>
                 <th>No HP</th>
                 <th>Unit/Jurusan</th>
+                <th>Nama Kegiatan</th>
+                <th>Tujuan</th>
                 <th>Tgl Pinjam</th>
-                <th>Keperluan</th>
                 <th>Status</th>
                 <th>Barang</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -61,17 +66,25 @@
                 <td>{{ $p->nama }}</td>
                 <td>{{ $p->no_telp }}</td>
                 <td>{{ $p->unit }}</td>
+                <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
+                <td>{{ Str::limit($p->tujuan, 20) }}</td>
                 <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
-                <td>{{ Str::limit($p->keperluan, 30) }}</td>
-                <td><span class="badge {{ $p->status == 'dikembalikan' ? 'bg-success' : ($p->status == 'disetujui' ? 'bg-primary' : ($p->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">{{ ucfirst($p->status) }}</span></td>
+                <td>
+                    <span class="badge {{ $p->status == 'dikembalikan' ? 'bg-success' : ($p->status == 'disetujui' ? 'bg-primary' : ($p->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">
+                        {{ ucfirst($p->status) }}
+                    </span>
+                </td>
                 <td>
                     @foreach($p->details as $detail)
                         <span class="badge bg-info text-dark mb-1">{{ $detail->barang->nama ?? '-' }} ({{ $detail->jumlah }})</span>
                     @endforeach
                 </td>
+                <td>
+                    <a href="{{ route('admin.arsip.exportSingle', $p->id) }}" class="btn btn-sm btn-danger" title="Download PDF"><i class="bi bi-file-earmark-pdf"></i></a>
+                </td>
             </tr>
             @empty
-            <tr><td colspan="7" class="text-center">Tidak ada data arsip.</td></tr>
+            <tr><td colspan="8" class="text-center">Tidak ada data arsip.</td></tr>
             @endforelse
         </tbody>
     </table>

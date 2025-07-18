@@ -28,9 +28,10 @@
             <textarea name="deskripsi" class="form-control" rows="2">{{ old('deskripsi') }}</textarea>
         </div>
         <div class="col-md-12 mb-3">
-            <label class="form-label fw-bold">Foto Barang (max 4, jpg/png)</label>
-            <input type="file" name="foto[]" class="form-control" accept="image/*" multiple required onchange="previewImages(event)">
-            <div class="mt-2" id="preview"></div>
+            <label class="form-label fw-bold">Foto Barang <span class="text-danger">(wajib 3 foto, jpg/png)</span></label>
+            <input type="file" name="foto[]" class="form-control" accept="image/*" multiple required onchange="previewImages(event)" id="fotoInput">
+            <div class="form-text">Pilih 3 foto sekaligus dengan Ctrl/Shift atau drag & drop (preview otomatis muncul di bawah)</div>
+            <div class="mt-2 d-flex gap-2" id="preview"></div>
         </div>
     </div>
     <div class="d-flex justify-content-end">
@@ -42,20 +43,21 @@ function previewImages(event) {
     const preview = document.getElementById('preview');
     preview.innerHTML = '';
     const files = event.target.files;
-    if(files.length > 4) {
-        alert('Maksimal 4 foto!');
+    if(files.length !== 3) {
+        alert('Wajib upload 3 foto!');
         event.target.value = '';
         return;
     }
-    Array.from(files).forEach(file => {
+    Array.from(files).slice(0,3).forEach(file => {
         const reader = new FileReader();
         reader.onload = e => {
             const img = document.createElement('img');
             img.src = e.target.result;
-            img.style.maxWidth = '80px';
-            img.style.maxHeight = '80px';
-            img.style.marginRight = '8px';
+            img.style.maxWidth = '100px';
+            img.style.maxHeight = '100px';
             img.style.borderRadius = '0.5rem';
+            img.style.objectFit = 'cover';
+            img.style.border = '1px solid #ddd';
             preview.appendChild(img);
         };
         reader.readAsDataURL(file);

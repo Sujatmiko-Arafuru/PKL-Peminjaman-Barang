@@ -27,8 +27,17 @@ class InventarisController extends Controller
             'deskripsi' => 'nullable|string',
             'stok' => 'required|integer|min:0',
             'status' => 'required|in:tersedia,tidak tersedia',
-            'foto.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'required',
+            'foto.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'foto.required' => 'Wajib upload 3 foto barang.',
+            'foto.*.image' => 'File harus berupa gambar.',
+            'foto.*.mimes' => 'Format foto harus jpg/jpeg/png.',
+            'foto.*.max' => 'Ukuran foto maksimal 2MB.',
         ]);
+        if (count($request->file('foto', [])) !== 3) {
+            return back()->withInput()->withErrors(['foto' => 'Wajib upload 3 foto barang.']);
+        }
         $fotoPaths = [];
         if ($request->hasFile('foto')) {
             foreach ($request->file('foto') as $foto) {
@@ -66,6 +75,9 @@ class InventarisController extends Controller
         $keep = $request->input('keep_foto', []);
         $fotoPaths = array_values(array_intersect($fotoPaths, $keep));
         if ($request->hasFile('foto')) {
+            if (count($request->file('foto')) !== 3) {
+                return back()->withInput()->withErrors(['foto' => 'Wajib upload 3 foto barang.']);
+            }
             foreach ($request->file('foto') as $foto) {
                 $fotoPaths[] = $foto->store('barang_foto', 'public');
             }

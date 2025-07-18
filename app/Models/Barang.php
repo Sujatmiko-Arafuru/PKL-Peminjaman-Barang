@@ -13,4 +13,9 @@ class Barang extends Model
     protected $fillable = [
         'nama', 'deskripsi', 'stok', 'status', 'foto'
     ];
+    
+    public function details()
+    {
+        return $this->hasMany(DetailPeminjaman::class);
+    }
 } 

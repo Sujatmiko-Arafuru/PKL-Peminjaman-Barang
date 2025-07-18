@@ -34,7 +34,7 @@
         <p class="mb-1">Stok Dipinjam: <span class="fw-bold">{{ $barang->getOriginal('stok') - $barang->stok }}</span></p>
         <p class="mb-1">Status: <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($barang->status) }}</span></p>
         <p class="mb-2">Deskripsi: <br>{{ $barang->deskripsi }}</p>
-        <a href="{{ route('admin.inventaris.edit', $barang->id) }}" class="btn btn-biru">Edit Barang</a>
+        <a href="{{ route('admin.inventaris.edit', $barang->id) }}" class="btn btn-outline-primary border"><i class="bi bi-pencil"></i> Edit Barang</a>
     </div>
 </div>
 @endsection 

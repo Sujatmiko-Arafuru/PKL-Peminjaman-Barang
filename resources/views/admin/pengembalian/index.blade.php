@@ -26,8 +26,9 @@
                 <th>Nama</th>
                 <th>No HP</th>
                 <th>Unit/Jurusan</th>
+                <th>Nama Kegiatan</th>
+                <th>Tujuan</th>
                 <th>Tgl Pinjam</th>
-                <th>Keperluan</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>
@@ -38,8 +39,9 @@
                 <td>{{ $p->nama }}</td>
                 <td>{{ $p->no_telp }}</td>
                 <td>{{ $p->unit }}</td>
+                <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
+                <td>{{ Str::limit($p->tujuan, 20) }}</td>
                 <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
-                <td>{{ Str::limit($p->keperluan, 30) }}</td>
                 <td><span class="badge bg-success">{{ ucfirst($p->status) }}</span></td>
                 <td>
                     <a href="{{ route('admin.pengembalian.show', $p->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
@@ -54,7 +56,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="7" class="text-center">Tidak ada pengembalian menunggu approve.</td></tr>
+            <tr><td colspan="8" class="text-center">Tidak ada pengembalian menunggu approve.</td></tr>
             @endforelse
         </tbody>
     </table>

@@ -33,15 +33,10 @@
         <h4 class="mb-4">SarPras Admin</h4>
         <ul class="nav nav-pills flex-column mb-auto">
             <li><a href="{{ route('admin.dashboard') }}" class="nav-link{{ request()->routeIs('admin.dashboard') ? ' active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-            <li><a href="#" class="nav-link"><i class="bi bi-box-seam"></i> Inventaris</a></li>
-            <li>
-                <a href="#" class="nav-link"><i class="bi bi-gear"></i> Kelola</a>
-                <ul class="nav flex-column ms-3">
-                    <li><a href="#" class="nav-link">Peminjaman</a></li>
-                    <li><a href="#" class="nav-link">Pengembalian</a></li>
-                </ul>
-            </li>
-            <li><a href="#" class="nav-link"><i class="bi bi-archive"></i> Arsip</a></li>
+            <li><a href="{{ route('admin.inventaris.index') }}" class="nav-link{{ request()->routeIs('admin.inventaris.*') ? ' active' : '' }}"><i class="bi bi-box-seam"></i> Inventaris</a></li>
+            <li><a href="{{ route('admin.peminjaman.index') }}" class="nav-link{{ request()->routeIs('admin.peminjaman.*') ? ' active' : '' }}"><i class="bi bi-journal-plus"></i> Peminjaman</a></li>
+            <li><a href="{{ route('admin.pengembalian.index') }}" class="nav-link{{ request()->routeIs('admin.pengembalian.*') ? ' active' : '' }}"><i class="bi bi-arrow-repeat"></i> Pengembalian</a></li>
+            <li><a href="{{ route('admin.arsip.index') }}" class="nav-link{{ request()->routeIs('admin.arsip.*') ? ' active' : '' }}"><i class="bi bi-archive"></i> Arsip</a></li>
             <li>
                 <form action="{{ route('admin.logout') }}" method="POST" class="mt-3">
                     @csrf

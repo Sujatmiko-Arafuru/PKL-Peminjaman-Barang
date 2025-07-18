@@ -22,7 +22,7 @@ class PengembalianController extends Controller
         } else {
             $query->orderBy('created_at', 'asc');
         }
-        $peminjamans = $query->where('status', 'disetujui')->paginate(10);
+        $peminjamans = $query->where('status', 'pengembalian_diajukan')->paginate(10);
         return view('admin.pengembalian.index', compact('peminjamans'));
     }
 
