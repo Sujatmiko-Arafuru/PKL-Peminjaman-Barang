@@ -43,7 +43,10 @@ class PeminjamanController extends Controller
         }
         $cart = session()->get('cart', []);
         $formData['cart'] = $cart;
-        // Simpan data peminjaman tanpa kode peminjaman
+        // Generate kode peminjaman otomatis
+        $kodePeminjaman = 'PJM-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        
+        // Simpan data peminjaman dengan kode peminjaman
         $peminjaman = \App\Models\Peminjaman::create([
             'nama' => $formData['nama'],
             'unit' => $formData['unit'],
@@ -54,6 +57,7 @@ class PeminjamanController extends Controller
             'tanggal_selesai' => $formData['tanggal_selesai'],
             'bukti' => $formData['bukti'],
             'status' => 'menunggu',
+            'kode_peminjaman' => $kodePeminjaman,
         ]);
         // Simpan detail barang yang dipinjam
         foreach ($formData['cart'] as $item) {

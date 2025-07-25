@@ -43,7 +43,50 @@
 <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white fw-bold">Quick Approve Peminjaman</div>
     <div class="card-body">
+        @if($quickApprove->count() > 0)
+        <div class="table-responsive mb-0">
+            <table class="table align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Nama</th>
+                        <th>No HP</th>
+                        <th>Unit/Jurusan</th>
+                        <th>Nama Kegiatan</th>
+                        <th>Tujuan</th>
+                        <th>Tgl Pinjam</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($quickApprove as $p)
+                    <tr>
+                        <td>{{ $p->nama }}</td>
+                        <td>{{ $p->no_telp }}</td>
+                        <td>{{ $p->unit }}</td>
+                        <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
+                        <td>{{ Str::limit($p->tujuan, 20) }}</td>
+                        <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ ucfirst($p->status) }}</span></td>
+                        <td>
+                            <a href="{{ route('admin.peminjaman.show', $p->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
+                            <form action="{{ route('admin.peminjaman.approve', $p->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button class="btn btn-success btn-sm" onclick="return confirm('Approve peminjaman?')">Approve</button>
+                            </form>
+                            <form action="{{ route('admin.peminjaman.reject', $p->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button class="btn btn-danger btn-sm" onclick="return confirm('Tolak peminjaman?')">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @else
         <div class="alert alert-info mb-0">Belum ada peminjaman yang menunggu approve.</div>
+        @endif
     </div>
 </div>
 @endsection 

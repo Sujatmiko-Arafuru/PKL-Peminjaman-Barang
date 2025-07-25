@@ -49,8 +49,3 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
 });
-
-// Export PDF arsip (berdasarkan filter)
-Route::get('admin/arsip/export', [ArsipController::class, 'exportPdf'])->name('admin.arsip.export');
-// Export PDF per peminjaman
-Route::get('admin/arsip/{id}/export', [ArsipController::class, 'exportSinglePdf'])->name('admin.arsip.exportSingle');

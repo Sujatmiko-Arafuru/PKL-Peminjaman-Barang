@@ -15,6 +15,7 @@ class DashboardController extends Controller
         $totalPengguna = Peminjaman::distinct('nama')->count('nama');
         $menungguPengembalian = Peminjaman::where('status', 'disetujui')->count();
         $totalBarang = Barang::count();
-        return view('admin.dashboard', compact('menungguApprove', 'totalPengguna', 'menungguPengembalian', 'totalBarang'));
+        $quickApprove = Peminjaman::where('status', 'menunggu')->orderBy('created_at', 'asc')->get();
+        return view('admin.dashboard', compact('menungguApprove', 'totalPengguna', 'menungguPengembalian', 'totalBarang', 'quickApprove'));
     }
 } 

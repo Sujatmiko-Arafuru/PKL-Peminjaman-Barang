@@ -3,7 +3,6 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Arsip Peminjaman & Pengembalian</h2>
-    <a href="{{ route('admin.arsip.export', request()->all()) }}" class="btn btn-danger"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
 </div>
 <form method="GET" class="row g-2 mb-3">
     <div class="col-md-3">
@@ -94,7 +93,68 @@
                     @endforeach
                 </td>
                 <td>
-                    <a href="{{ route('admin.arsip.exportSingle', $p->id) }}" class="btn btn-sm btn-danger" title="Download PDF"><i class="bi bi-file-earmark-pdf"></i></a>
+                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
+                        <i class="bi bi-eye"></i> Detail
+                    </button>
+
+                    <!-- Modal Detail -->
+                    <div class="modal fade" id="detailModal{{ $p->id }}" tabindex="-1" aria-labelledby="detailModalLabel{{ $p->id }}" aria-hidden="true">
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="detailModalLabel{{ $p->id }}">Detail Peminjaman</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row">
+                              <div class="col-md-6 mb-3">
+                                <div class="card">
+                                  <div class="card-body">
+                                    <h5 class="card-title text-primary">Data Peminjam</h5>
+                                    <p class="mb-1">Nama: <b>{{ $p->nama }}</b></p>
+                                    <p class="mb-1">No HP: <b>{{ $p->no_telp }}</b></p>
+                                    <p class="mb-1">Unit/Jurusan: <b>{{ $p->unit }}</b></p>
+                                    <p class="mb-1">Nama Kegiatan: <b>{{ $p->nama_kegiatan }}</b></p>
+                                    <p class="mb-1">Tujuan: <b>{{ $p->tujuan }}</b></p>
+                                    <p class="mb-1">Tanggal Pinjam: <b>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</b></p>
+                                    <p class="mb-1">Kode Peminjaman: <b>{{ $p->kode_peminjaman }}</b></p>
+                                    <p class="mb-1">Lampiran: 
+                                        @if($p->bukti)
+                                            <a href="{{ asset('storage/' . $p->bukti) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Bukti</a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </p>
+                                    <p class="mb-1">Status: <span class="badge
+                                        @if($p->status == 'dikembalikan') bg-success
+                                        @elseif($p->status == 'disetujui') bg-primary
+                                        @elseif($p->status == 'ditolak') bg-danger
+                                        @else bg-warning text-dark
+                                        @endif
+                                    ">{{ ucfirst($p->status) }}</span></p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                <div class="card">
+                                  <div class="card-body">
+                                    <h5 class="card-title text-primary">Barang yang Dipinjam</h5>
+                                    <ul class="list-group">
+                                      @foreach($p->details as $detail)
+                                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ $detail->barang->nama ?? '-' }}
+                                        <span class="badge bg-primary">{{ $detail->jumlah }}</span>
+                                      </li>
+                                      @endforeach
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                 </td>
             </tr>
             @empty
