@@ -3,6 +3,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Arsip Peminjaman & Pengembalian</h2>
+    <div>
+        <a href="{{ route('admin.arsip.export.pdf') }}{{ count(request()->all()) ? '?' . http_build_query(request()->all()) : '' }}" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Download PDF
+        </a>
+    </div>
 </div>
 <form method="GET" class="row g-2 mb-3">
     <div class="col-md-3">
@@ -39,7 +44,7 @@
     <span class="badge bg-primary">Barang Terlaris: {{ $terlaris ? $terlaris->nama . ' (' . ($terlaris->details_count ?? 0) . 'x)' : '-' }}</span>
     <span class="badge bg-secondary ms-2">Barang Tidak Pernah Dipinjam: 
         @if($tidakPernah && count($tidakPernah) > 0)
-            {{ implode(', ', array_map(fn($b) => $b->nama, $tidakPernah)) }}
+            {{ implode(', ', array_map(fn($b) => $b['nama'], $tidakPernah->toArray())) }}
         @else
             -
         @endif

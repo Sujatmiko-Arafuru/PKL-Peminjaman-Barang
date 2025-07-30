@@ -12,18 +12,34 @@ class PeminjamanController extends Controller
     public function index(Request $request): \Illuminate\View\View
     {
         $query = Peminjaman::query();
+        
+        // Filter berdasarkan search
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('no_telp', 'like', '%' . $request->search . '%');
+                  ->orWhere('no_telp', 'like', '%' . $request->search . '%')
+                  ->orWhere('nama_kegiatan', 'like', '%' . $request->search . '%');
         }
+        
+        // Filter berdasarkan status
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $query->where('status', $request->status);
+        }
+        
+        // Sorting
         if ($request->filled('urut')) {
             $query->orderBy('created_at', $request->urut == 'terbaru' ? 'desc' : 'asc');
         } else {
-            $query->orderBy('created_at', 'asc');
+            $query->orderBy('created_at', 'desc');
         }
-        $menunggu = (clone $query)->where('status', 'menunggu')->get();
-        $sedang_berlangsung = (clone $query)->where('status', 'disetujui')->get();
-        return view('admin.peminjaman.index', compact('menunggu', 'sedang_berlangsung'));
+        
+        // Tanpa pagination - tampilkan semua data
+        $peminjamans = $query->get();
+        
+        // Data untuk tabel terpisah (tanpa pagination)
+        $menunggu = Peminjaman::where('status', 'menunggu')->orderBy('created_at', 'desc')->get();
+        $sedang_berlangsung = Peminjaman::where('status', 'disetujui')->orderBy('created_at', 'desc')->get();
+        
+        return view('admin.peminjaman.index', compact('peminjamans', 'menunggu', 'sedang_berlangsung'));
     }
 
     public function show($id): \Illuminate\View\View

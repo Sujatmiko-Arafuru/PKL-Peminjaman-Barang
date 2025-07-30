@@ -135,8 +135,8 @@ class PeminjamanController extends Controller
             $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
         }
         
-        // Urutkan berdasarkan tanggal terbaru
-        $peminjamans = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Urutkan berdasarkan tanggal terbaru - tanpa pagination
+        $peminjamans = $query->orderBy('created_at', 'desc')->get();
         
         return view('list_peminjam', compact('peminjamans'));
     }

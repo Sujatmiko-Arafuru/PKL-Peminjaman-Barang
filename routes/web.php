@@ -48,4 +48,5 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     // Arsip
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
+    Route::get('arsip/export/pdf', [ArsipController::class, 'exportPdf'])->name('arsip.export.pdf');
 });

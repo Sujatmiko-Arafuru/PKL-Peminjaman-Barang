@@ -6,45 +6,124 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\Barang;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ArsipController extends Controller
 {
-    public function index(Request $request): \Illuminate\View\View
+    public function index(Request $request)
     {
-        $query = Peminjaman::query();
+        $query = Peminjaman::with(['details.barang']);
+
+        // Filter berdasarkan search
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
+
+        // Filter berdasarkan status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+
+        // Filter berdasarkan tanggal
         if ($request->filled('tanggal_mulai')) {
-            $query->whereDate('tanggal_mulai', '>=', $request->tanggal_mulai);
+            $query->where('tanggal_mulai', '>=', $request->tanggal_mulai);
         }
+
         if ($request->filled('tanggal_selesai')) {
-            $query->whereDate('tanggal_selesai', '<=', $request->tanggal_selesai);
+            $query->where('tanggal_selesai', '<=', $request->tanggal_selesai);
         }
+
+        // Urutan
         if ($request->filled('urut')) {
-            $query->orderBy('created_at', $request->urut == 'terbaru' ? 'desc' : 'asc');
+            if ($request->urut == 'terlama') {
+                $query->orderBy('created_at', 'asc');
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
         } else {
             $query->orderBy('created_at', 'desc');
         }
-        $peminjamans = $query->with('details.barang')->paginate(15);
 
-        // Statistik barang terlaris/tidak pernah dipinjam
-        $barangStats = Barang::withCount('details')->get();
-        $terlaris = $barangStats->sortByDesc('details_count')->first();
-        $tidakPernah = $barangStats->where('details_count', 0)->all();
+        $peminjamans = $query->paginate(10);
+
+        // Data untuk summary
+        $terlaris = Barang::withCount(['details' => function($query) {
+            $query->whereHas('peminjaman', function($q) {
+                $q->where('status', 'dikembalikan');
+            });
+        }])->orderBy('details_count', 'desc')->first();
+
+        $tidakPernah = Barang::whereDoesntHave('details.peminjaman', function($query) {
+            $query->where('status', 'dikembalikan');
+        })->get();
 
         return view('admin.arsip.index', compact('peminjamans', 'terlaris', 'tidakPernah'));
     }
 
-    public function show($id): \Illuminate\View\View
+    public function show($id)
     {
-        $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+        $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
         return view('admin.arsip.show', compact('peminjaman'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = Peminjaman::with(['details.barang']);
+
+        // Filter berdasarkan search
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter berdasarkan status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->filled('tanggal_mulai')) {
+            $query->where('tanggal_mulai', '>=', $request->tanggal_mulai);
+        }
+
+        if ($request->filled('tanggal_selesai')) {
+            $query->where('tanggal_selesai', '<=', $request->tanggal_selesai);
+        }
+
+        // Urutan
+        if ($request->filled('urut')) {
+            if ($request->urut == 'terlama') {
+                $query->orderBy('created_at', 'asc');
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $peminjamans = $query->get();
+
+        // Data untuk summary
+        $terlaris = Barang::withCount(['details' => function($query) {
+            $query->whereHas('peminjaman', function($q) {
+                $q->where('status', 'dikembalikan');
+            });
+        }])->orderBy('details_count', 'desc')->first();
+
+        $tidakPernah = Barang::whereDoesntHave('details.peminjaman', function($query) {
+            $query->where('status', 'dikembalikan');
+        })->get();
+
+        // Filter info untuk ditampilkan di PDF
+        $filterInfo = [];
+        if ($request->filled('search')) $filterInfo['search'] = $request->search;
+        if ($request->filled('status')) $filterInfo['status'] = $request->status;
+        if ($request->filled('tanggal_mulai')) $filterInfo['tanggal_mulai'] = $request->tanggal_mulai;
+        if ($request->filled('tanggal_selesai')) $filterInfo['tanggal_selesai'] = $request->tanggal_selesai;
+
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('admin.arsip.pdf', compact('peminjamans', 'terlaris', 'tidakPernah', 'filterInfo'));
+        
+        $filename = 'arsip_peminjaman_' . date('Y-m-d_H-i-s') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 } 

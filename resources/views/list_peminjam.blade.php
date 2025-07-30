@@ -108,11 +108,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <!-- Pagination -->
-                        <div class="mt-3">
-                            {{ $peminjamans->withQueryString()->links() }}
-                        </div>
                     @else
                         <div class="alert alert-info text-center">
                             <i class="bi bi-info-circle me-2"></i>
