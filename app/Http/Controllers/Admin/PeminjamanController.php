@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
+use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
@@ -50,10 +51,40 @@ class PeminjamanController extends Controller
 
     public function approve($id): \Illuminate\Http\RedirectResponse
     {
-        $peminjaman = Peminjaman::findOrFail($id);
-        $peminjaman->status = 'disetujui';
-        $peminjaman->save();
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui.');
+        $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+        
+        // Validasi stok sebelum approve
+        foreach ($peminjaman->details as $detail) {
+            $barang = $detail->barang;
+            $availableStock = $barang->stok_tersedia;
+            
+            if ($availableStock < $detail->jumlah) {
+                return redirect()->route('admin.peminjaman.index')->with('error', 'Stok barang "' . $barang->nama . '" tidak mencukupi untuk approve peminjaman ini.');
+            }
+        }
+        
+        // Mulai transaction
+        DB::beginTransaction();
+        
+        try {
+            // Update status peminjaman
+            $peminjaman->status = 'disetujui';
+            $peminjaman->save();
+            
+            // Kurangi stok barang
+            foreach ($peminjaman->details as $detail) {
+                $barang = $detail->barang;
+                $barang->stok = max(0, $barang->stok - $detail->jumlah);
+                $barang->save();
+            }
+            
+            DB::commit();
+            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui.');
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->route('admin.peminjaman.index')->with('error', 'Terjadi kesalahan saat approve peminjaman: ' . $e->getMessage());
+        }
     }
 
     public function reject($id): \Illuminate\Http\RedirectResponse

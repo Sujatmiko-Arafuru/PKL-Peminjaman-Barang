@@ -58,7 +58,7 @@
                 <thead class="table-light">
                     <tr>
                         <th class="px-3">Nama</th>
-                        <th>Nama Kegiatan</th>
+                        <th>Kegiatan & Unit</th>
                         <th>Tanggal Kegiatan</th>
                         <th>Status</th>
                         <th>No. HP</th>
@@ -73,8 +73,8 @@
                             <small class="text-muted">{{ $p->unit }}</small>
                         </td>
                         <td>
-                            <div class="fw-medium">{{ Str::limit($p->nama_kegiatan, 30) }}</div>
-                            <small class="text-muted">{{ Str::limit($p->tujuan, 40) }}</small>
+                            <div class="fw-medium">{{ Str::limit($p->nama_kegiatan, 50) }}</div>
+                            <small class="text-muted">{{ $p->unit }}</small>
                         </td>
                         <td>
                             <div class="fw-medium">{{ $p->tanggal_mulai }}</div>

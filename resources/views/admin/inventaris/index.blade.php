@@ -13,7 +13,7 @@
     <div>
         <span class="badge bg-primary">Total Barang: {{ $barangs->count() }}</span>
         <span class="badge bg-info text-dark ms-2">Total Stok: {{ $barangs->sum('stok') }}</span>
-        <span class="badge bg-warning text-dark ms-2">Stok Dipinjam: {{ $barangs->sum(function($b){return $b->getOriginal('stok') - $b->stok;}) }}</span>
+        <span class="badge bg-warning text-dark ms-2">Stok Dipinjam: {{ $barangs->sum('stok_dipinjam') }}</span>
     </div>
 </div>
 <div class="table-responsive">
@@ -45,7 +45,7 @@
                     @endif
                 </td>
                 <td>{{ $barang->stok }}</td>
-                <td>{{ $barang->getOriginal('stok') - $barang->stok }}</td>
+                <td>{{ $barang->stok_dipinjam }}</td>
                 <td><span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($barang->status) }}</span></td>
                 <td>{{ Str::limit($barang->deskripsi, 40) }}</td>
                 <td>

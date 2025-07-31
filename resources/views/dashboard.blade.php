@@ -67,7 +67,7 @@
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-primary mb-1">{{ $barang->nama }}</h5>
                             <p class="card-text mb-1">{{ Str::limit($barang->deskripsi, 60) }}</p>
-                            <p class="mb-1">Stok: <span class="fw-bold">{{ $barang->stok }}</span></p>
+                            <p class="mb-1">Stok Tersedia: <span class="fw-bold">{{ $barang->stok_tersedia }}</span></p>
                             <p>Status: <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($barang->status) }}</span></p>
                             <div class="mt-auto d-flex gap-2">
                                 <a href="{{ route('barang.detail', $barang->id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-info-circle"></i> Detail</a>

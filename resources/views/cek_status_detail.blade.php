@@ -43,6 +43,17 @@
                             <h5 class="mb-0"><i class="bi bi-person me-2"></i>Data Peminjam</h5>
                         </div>
                         <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4 text-center">
+                                    @if($peminjaman->foto_peminjam)
+                                        <img src="{{ asset('storage/' . $peminjaman->foto_peminjam) }}" alt="Foto Peminjam" class="img-fluid rounded" style="max-width: 120px; max-height: 120px; object-fit: cover;">
+                                    @else
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                            <i class="bi bi-person text-muted" style="font-size: 2.5rem;"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="col-md-8">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>Nama:</strong></span>
@@ -59,10 +70,6 @@
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>Nama Kegiatan:</strong></span>
                                     <span>{{ $peminjaman->nama_kegiatan }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <span><strong>Tujuan:</strong></span>
-                                    <span>{{ $peminjaman->tujuan }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>Tanggal Pinjam:</strong></span>
@@ -99,6 +106,8 @@
                                     </span>
                                 </li>
                             </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

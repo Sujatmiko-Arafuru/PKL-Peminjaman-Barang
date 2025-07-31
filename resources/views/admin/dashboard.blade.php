@@ -65,7 +65,7 @@
                         <td>{{ $p->no_telp }}</td>
                         <td>{{ $p->unit }}</td>
                         <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
-                        <td>{{ Str::limit($p->tujuan, 20) }}</td>
+                        <td>-</td>
                         <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
                         <td><span class="badge bg-warning text-dark">{{ ucfirst($p->status) }}</span></td>
                         <td>

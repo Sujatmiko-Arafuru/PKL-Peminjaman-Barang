@@ -24,6 +24,7 @@ class KeranjangController extends Controller
                 'nama' => $barang->nama,
                 'foto' => $fotoUtama,
                 'stok' => $barang->stok,
+                'stok_tersedia' => $barang->stok_tersedia,
                 'status' => $barang->status,
                 'qty' => $jumlah
             ];
@@ -45,9 +46,65 @@ class KeranjangController extends Controller
         return redirect()->route('keranjang.index');
     }
 
+    public function updateQty(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $action = $request->input('action'); // 'increase' or 'decrease'
+        $cart = session()->get('cart', []);
+        
+        if (!isset($cart[$id])) {
+            return response()->json(['success' => false, 'message' => 'Item tidak ditemukan di keranjang']);
+        }
+        
+        $barang = Barang::find($id);
+        if (!$barang) {
+            return response()->json(['success' => false, 'message' => 'Barang tidak ditemukan']);
+        }
+        
+        $currentQty = $cart[$id]['qty'];
+        
+        if ($action === 'increase') {
+            // Check if we can increase quantity (not exceed available stock)
+            $availableStock = $barang->stok_tersedia;
+            if ($currentQty < $availableStock) {
+                $cart[$id]['qty'] = $currentQty + 1;
+            } else {
+                return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi']);
+            }
+        } elseif ($action === 'decrease') {
+            // Check if we can decrease quantity (not below 1)
+            if ($currentQty > 1) {
+                $cart[$id]['qty'] = $currentQty - 1;
+            } else {
+                return response()->json(['success' => false, 'message' => 'Jumlah minimal adalah 1']);
+            }
+        }
+        
+        session(['cart' => $cart]);
+        
+        return response()->json([
+            'success' => true,
+            'newQty' => $cart[$id]['qty'],
+            'stock' => $barang->stok_tersedia,
+            'message' => 'Jumlah berhasil diperbarui'
+        ]);
+    }
+
     public function index(): \Illuminate\View\View
     {
         $cart = session()->get('cart', []);
-        return view('keranjang', compact('cart'));
+        
+        // Bersihkan cart dari barang yang sudah tidak ada
+        $cleanedCart = [];
+        foreach ($cart as $itemId => $item) {
+            $barang = Barang::find($item['id']);
+            if ($barang && $barang->stok >= $item['qty']) {
+                $cleanedCart[$itemId] = $item;
+            }
+        }
+        
+        // Update session cart dengan data yang sudah dibersihkan
+        session(['cart' => $cleanedCart]);
+        
+        return view('keranjang', compact('cleanedCart'));
     }
 } 

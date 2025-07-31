@@ -39,7 +39,7 @@
             </div>
             @endif
             
-            @if(count($cart) > 0)
+            @if(count($cleanedCart) > 0)
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Daftar Barang di Keranjang</h5>
@@ -58,7 +58,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($cart as $item)
+                                @foreach($cleanedCart as $item)
                                 <tr>
                                     <td style="width:80px">
                                         @php
@@ -78,9 +78,19 @@
                                         @endif
                                     </td>
                                     <td class="fw-semibold">{{ $item['nama'] }}</td>
-                                    <td>{{ $item['stok'] }}</td>
+                                    <td>{{ $item['stok_tersedia'] ?? $item['stok'] }}</td>
                                     <td><span class="badge {{ $item['status'] == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($item['status']) }}</span></td>
-                                    <td>{{ $item['qty'] }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="updateQty({{ $item['id'] }}, 'decrease')" {{ $item['qty'] <= 1 ? 'disabled' : '' }}>
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <span class="fw-bold" id="qty-{{ $item['id'] }}">{{ $item['qty'] }}</span>
+                                                                                         <button class="btn btn-outline-secondary btn-sm ms-2" onclick="updateQty({{ $item['id'] }}, 'increase')" {{ $item['qty'] >= ($item['stok_tersedia'] ?? $item['stok']) ? 'disabled' : '' }}>
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
                                     <td>
                                         <form action="{{ route('keranjang.hapus', $item['id']) }}" method="POST" onsubmit="return confirm('Hapus barang dari keranjang?')">
                                             @csrf
@@ -105,4 +115,75 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+function updateQty(itemId, action) {
+    fetch(`/keranjang/update-qty/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the quantity display
+            document.getElementById(`qty-${itemId}`).textContent = data.newQty;
+            
+            // Update button states
+            const decreaseBtn = document.querySelector(`button[onclick="updateQty(${itemId}, 'decrease')"]`);
+            const increaseBtn = document.querySelector(`button[onclick="updateQty(${itemId}, 'increase')"]`);
+            
+            // Disable/enable decrease button
+            if (data.newQty <= 1) {
+                decreaseBtn.disabled = true;
+            } else {
+                decreaseBtn.disabled = false;
+            }
+            
+            // Disable/enable increase button based on stock
+            if (data.newQty >= data.stock) {
+                increaseBtn.disabled = true;
+            } else {
+                increaseBtn.disabled = false;
+            }
+            
+            // Show success message
+            showAlert('success', data.message);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Terjadi kesalahan saat memperbarui jumlah');
+    });
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // Insert at the top of the main content area
+    const mainContent = document.querySelector('.col-md-9.col-lg-10');
+    mainContent.insertBefore(alertDiv, mainContent.firstChild);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 3000);
+}
+</script>
+@endpush 

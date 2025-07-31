@@ -63,11 +63,15 @@
                                 <h2 class="text-primary mb-3">{{ $barang->nama }}</h2>
                                 <p class="mb-3">{{ $barang->deskripsi }}</p>
                                 <div class="row mb-3">
-                                    <div class="col-6">
-                                        <p class="mb-1"><strong>Stok:</strong></p>
+                                    <div class="col-4">
+                                        <p class="mb-1"><strong>Total Stok:</strong></p>
                                         <span class="badge bg-primary fs-6">{{ $barang->stok }}</span>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
+                                        <p class="mb-1"><strong>Stok Tersedia:</strong></p>
+                                        <span class="badge bg-success fs-6">{{ $barang->stok_tersedia }}</span>
+                                    </div>
+                                    <div class="col-4">
                                         <p class="mb-1"><strong>Status:</strong></p>
                                         <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }} fs-6">{{ ucfirst($barang->status) }}</span>
                                     </div>
@@ -78,7 +82,7 @@
                                     @csrf
                                     <div class="input-group mb-2" style="max-width:200px;">
                                         <span class="input-group-text">Jumlah</span>
-                                        <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok }}" value="1" required>
+                                        <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok_tersedia }}" value="1" required>
                                     </div>
                                     <input type="hidden" name="barang_id" value="{{ $barang->id }}">
                                     <button type="submit" class="btn btn-primary btn-lg">

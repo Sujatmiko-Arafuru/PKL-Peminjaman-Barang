@@ -13,7 +13,7 @@ class Peminjaman extends Model
     protected $table = 'peminjamans';
     
     protected $fillable = [
-        'nama', 'unit', 'no_telp', 'nama_kegiatan', 'tujuan', 'tanggal_mulai', 'tanggal_selesai', 'bukti', 'status', 'kode_peminjaman'
+        'nama', 'foto_peminjam', 'unit', 'no_telp', 'nama_kegiatan', 'tanggal_mulai', 'tanggal_selesai', 'bukti', 'status', 'kode_peminjaman'
     ];
     public function details()
     {

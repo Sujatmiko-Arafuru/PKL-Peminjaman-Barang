@@ -15,6 +15,7 @@ Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.deta
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
 Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
 Route::post('/keranjang/hapus/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
+Route::post('/keranjang/update-qty/{id}', [KeranjangController::class, 'updateQty'])->name('keranjang.update-qty');
 Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');
 Route::post('/peminjaman/ajukan', [PeminjamanController::class, 'ajukan'])->name('peminjaman.ajukan');
 Route::post('/pengembalian/ajukan/{id}', [PeminjamanController::class, 'ajukanPengembalian'])->name('pengembalian.ajukan');

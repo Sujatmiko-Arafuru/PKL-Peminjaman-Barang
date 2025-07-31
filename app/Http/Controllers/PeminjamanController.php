@@ -28,31 +28,58 @@ class PeminjamanController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:100',
+            'foto_peminjam' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'unit' => 'required|string|max:100',
             'no_telp' => 'required|string|max:20',
             'nama_kegiatan' => 'required|string|max:255',
-            'tujuan' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'bukti' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
         // Simpan data form
-        $formData = $request->except('bukti');
+        $formData = $request->except(['bukti', 'foto_peminjam']);
+        
+        // Handle foto peminjam upload
+        if ($request->hasFile('foto_peminjam')) {
+            $formData['foto_peminjam'] = $request->file('foto_peminjam')->store('foto_peminjam', 'public');
+        }
+        
+        // Handle bukti upload
         if ($request->hasFile('bukti')) {
             $formData['bukti'] = $request->file('bukti')->store('bukti_peminjaman', 'public');
         }
         $cart = session()->get('cart', []);
-        $formData['cart'] = $cart;
+        
+        // Filter cart untuk memastikan semua barang masih ada
+        $validCart = [];
+        foreach ($cart as $item) {
+            $barang = \App\Models\Barang::find($item['id']);
+            if ($barang && $barang->stok >= $item['qty']) {
+                $validCart[] = $item;
+            }
+        }
+        
+        // Jika tidak ada barang valid di cart
+        if (empty($validCart)) {
+            session()->forget('cart');
+            return redirect()->route('keranjang.index')->with('error', 'Keranjang kosong atau semua barang tidak tersedia.');
+        }
+        
+        $formData['cart'] = $validCart;
         // Generate kode peminjaman otomatis
         $kodePeminjaman = 'PJM-' . date('Ymd') . '-' . strtoupper(Str::random(6));
         
-        // Simpan data peminjaman dengan kode peminjaman
-        $peminjaman = \App\Models\Peminjaman::create([
+        // Mulai database transaction
+        DB::beginTransaction();
+        
+        try {
+            // Simpan data peminjaman dengan kode peminjaman
+            $peminjaman = \App\Models\Peminjaman::create([
             'nama' => $formData['nama'],
+            'foto_peminjam' => $formData['foto_peminjam'],
             'unit' => $formData['unit'],
             'no_telp' => $formData['no_telp'],
             'nama_kegiatan' => $formData['nama_kegiatan'],
-            'tujuan' => $formData['tujuan'],
             'tanggal_mulai' => $formData['tanggal_mulai'],
             'tanggal_selesai' => $formData['tanggal_selesai'],
             'bukti' => $formData['bukti'],
@@ -61,21 +88,47 @@ class PeminjamanController extends Controller
         ]);
         // Simpan detail barang yang dipinjam
         foreach ($formData['cart'] as $item) {
-            \App\Models\DetailPeminjaman::create([
-                'peminjaman_id' => $peminjaman->id,
-                'barang_id' => $item['id'],
-                'jumlah' => $item['qty'],
-            ]);
-            // Kurangi stok barang
+            // Validasi barang masih ada di database
             $barang = \App\Models\Barang::find($item['id']);
-            if ($barang) {
-                $barang->stok = max(0, $barang->stok - $item['qty']);
-                $barang->save();
+            if (!$barang) {
+                // Jika barang tidak ditemukan, hapus dari cart dan lanjutkan
+                continue;
+            }
+            
+            // Validasi stok masih mencukupi (gunakan stok tersedia)
+            $availableStock = $barang->stok_tersedia;
+            if ($availableStock < $item['qty']) {
+                return redirect()->back()->withErrors(['stok' => 'Stok barang "' . $barang->nama . '" tidak mencukupi. Stok tersedia: ' . $availableStock]);
+            }
+            
+            try {
+                \App\Models\DetailPeminjaman::create([
+                    'peminjaman_id' => $peminjaman->id,
+                    'barang_id' => $item['id'],
+                    'jumlah' => $item['qty'],
+                ]);
+                
+                // JANGAN kurangi stok barang saat submit request
+                // Stock hanya dikurangi saat admin approve
+                        } catch (\Exception $e) {
+                // Jika terjadi error, rollback dan kembalikan error
+                DB::rollback();
+                return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan detail peminjaman: ' . $e->getMessage()]);
             }
         }
+        
+        // Commit transaction jika semua berhasil
+        DB::commit();
+        
         // Hapus session cart
         session()->forget('cart');
         return redirect()->route('dashboard')->with('success', 'Peminjaman berhasil diajukan!');
+        
+    } catch (\Exception $e) {
+        // Rollback transaction jika terjadi error
+        DB::rollback();
+        return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat mengajukan peminjaman: ' . $e->getMessage()]);
+    }
     }
 
     public function ajukanPengembalian(Request $request, $id): \Illuminate\Http\RedirectResponse
