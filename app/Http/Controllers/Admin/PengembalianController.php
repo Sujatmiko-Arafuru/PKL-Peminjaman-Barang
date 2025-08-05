@@ -37,15 +37,16 @@ class PengembalianController extends Controller
         $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
         $peminjaman->status = 'dikembalikan';
         $peminjaman->save();
-        // Update stok barang
+        
+        // Update stok barang dan status otomatis
         foreach ($peminjaman->details as $detail) {
             $barang = $detail->barang;
             if ($barang) {
                 $barang->stok += $detail->jumlah;
-                $barang->save();
+                $barang->save(); // Status akan diupdate otomatis melalui boot method
             }
         }
-        return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian disetujui & stok barang diupdate.');
+        return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian disetujui & stok barang diupdate otomatis.');
     }
 
     public function reject($id): \Illuminate\Http\RedirectResponse

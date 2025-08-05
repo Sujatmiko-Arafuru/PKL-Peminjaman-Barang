@@ -51,7 +51,9 @@ class InventarisController extends Controller
             'status' => $request->status,
             'foto' => json_encode($fotoPaths),
         ]);
-        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil ditambahkan.');
+        
+        // Status akan diupdate otomatis melalui boot method di model Barang
+        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil ditambahkan dengan status otomatis.');
     }
 
     public function edit($id): \Illuminate\View\View
@@ -89,7 +91,9 @@ class InventarisController extends Controller
             'status' => $request->status,
             'foto' => json_encode($fotoPaths),
         ]);
-        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil diupdate.');
+        
+        // Status akan diupdate otomatis melalui boot method di model Barang
+        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil diupdate dengan status otomatis.');
     }
 
     public function show($id): \Illuminate\View\View

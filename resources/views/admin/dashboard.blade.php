@@ -17,7 +17,7 @@
             <div class="card-body text-center">
                 <div class="fs-2 text-primary"><i class="bi bi-people"></i></div>
                 <div class="fw-bold fs-4">{{ $totalPengguna }}</div>
-                <div class="text-muted">Total Pengguna</div>
+                <div class="text-muted">Total Peminjam</div>
             </div>
         </div>
     </div>

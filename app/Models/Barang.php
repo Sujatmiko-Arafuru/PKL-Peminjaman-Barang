@@ -38,4 +38,35 @@ class Barang extends Model
         $this->stok = $newStok;
         $this->save();
     }
+    
+    // Method untuk mengupdate status otomatis berdasarkan stok tersedia
+    public function updateStatusOtomatis()
+    {
+        $stokTersedia = $this->stok_tersedia;
+        
+        if ($stokTersedia <= 0) {
+            $this->status = 'tidak tersedia';
+        } else {
+            $this->status = 'tersedia';
+        }
+        
+        $this->save();
+    }
+    
+    // Method untuk mengecek apakah barang bisa dipinjam
+    public function bisaDipinjam($jumlah = 1)
+    {
+        return $this->status === 'tersedia' && $this->stok_tersedia >= $jumlah;
+    }
+    
+    // Override save method untuk mengupdate status otomatis
+    protected static function boot()
+    {
+        parent::boot();
+        
+        // Setelah model disimpan, update status otomatis
+        static::saved(function ($barang) {
+            $barang->updateStatusOtomatis();
+        });
+    }
 } 

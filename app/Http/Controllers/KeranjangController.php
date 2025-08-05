@@ -11,10 +11,28 @@ class KeranjangController extends Controller
     {
         $id = $request->input('barang_id');
         $barang = Barang::findOrFail($id);
-        $cart = session()->get('cart', []);
         $jumlah = (int) $request->input('jumlah', 1);
+        
+        // Cek apakah barang tersedia dan stok mencukupi
+        if (!$barang->bisaDipinjam($jumlah)) {
+            if (!$request->expectsJson()) {
+                return redirect()->back()->with('error', 'Barang "' . $barang->nama . '" tidak tersedia atau stok tidak mencukupi.');
+            }
+            return response()->json(['success' => false, 'message' => 'Barang tidak tersedia atau stok tidak mencukupi']);
+        }
+        
+        $cart = session()->get('cart', []);
+        
         if(isset($cart[$id])) {
-            $cart[$id]['qty'] += $jumlah;
+            // Cek apakah penambahan jumlah tidak melebihi stok tersedia
+            $totalQty = $cart[$id]['qty'] + $jumlah;
+            if ($totalQty > $barang->stok_tersedia) {
+                if (!$request->expectsJson()) {
+                    return redirect()->back()->with('error', 'Jumlah melebihi stok tersedia untuk barang "' . $barang->nama . '".');
+                }
+                return response()->json(['success' => false, 'message' => 'Jumlah melebihi stok tersedia']);
+            }
+            $cart[$id]['qty'] = $totalQty;
         } else {
             // Ambil foto utama (pertama) dari array JSON
             $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
@@ -60,6 +78,11 @@ class KeranjangController extends Controller
             return response()->json(['success' => false, 'message' => 'Barang tidak ditemukan']);
         }
         
+        // Cek apakah barang masih tersedia
+        if (!$barang->bisaDipinjam(1)) {
+            return response()->json(['success' => false, 'message' => 'Barang tidak tersedia']);
+        }
+        
         $currentQty = $cart[$id]['qty'];
         
         if ($action === 'increase') {
@@ -93,12 +116,24 @@ class KeranjangController extends Controller
     {
         $cart = session()->get('cart', []);
         
-        // Bersihkan cart dari barang yang sudah tidak ada
+        // Bersihkan cart dari barang yang sudah tidak ada atau tidak tersedia
         $cleanedCart = [];
         foreach ($cart as $itemId => $item) {
             $barang = Barang::find($item['id']);
-            if ($barang && $barang->stok >= $item['qty']) {
-                $cleanedCart[$itemId] = $item;
+            if ($barang && $barang->bisaDipinjam($item['qty'])) {
+                // Update data barang dengan informasi terbaru
+                $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
+                $fotoUtama = $fotoArray && count($fotoArray) > 0 ? $fotoArray[0] : null;
+                
+                $cleanedCart[$itemId] = [
+                    'id' => $barang->id,
+                    'nama' => $barang->nama,
+                    'foto' => $fotoUtama,
+                    'stok' => $barang->stok,
+                    'stok_tersedia' => $barang->stok_tersedia,
+                    'status' => $barang->status,
+                    'qty' => $item['qty']
+                ];
             }
         }
         

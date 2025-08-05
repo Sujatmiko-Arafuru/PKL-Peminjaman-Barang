@@ -36,13 +36,7 @@
     </div>
     <div class="col-md-2">
         <button type="submit" class="btn btn-primary btn-filter" id="filterBtn">
-            <span class="btn-text">
-                <i class="bi bi-funnel"></i> Filter
-            </span>
-            <span class="btn-loading d-none">
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                Loading...
-            </span>
+            <i class="bi bi-funnel me-1"></i> Filter
         </button>
     </div>
 </form>
@@ -148,14 +142,7 @@
     </div>
 </div>
 
-<!-- Loading Overlay -->
-<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background: rgba(0,0,0,0.5); z-index: 9999;">
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="spinner-border text-light" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-</div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -163,59 +150,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const statusSelect = document.getElementById('statusSelect');
     const sortSelect = document.getElementById('sortSelect');
-    const filterBtn = document.getElementById('filterBtn');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const tableBody = document.getElementById('tableBody');
 
     let searchTimeout;
-    let isLoading = false;
 
-    // Initial hide
-    hideLoading();
-
+    // Auto-submit on search input change
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            if (!isLoading) { showLoading(); filterForm.submit(); }
+            filterForm.submit();
         }, 500);
     });
 
+    // Auto-submit on select change
     statusSelect.addEventListener('change', function() {
-        if (!isLoading) { showLoading(); filterForm.submit(); }
+        filterForm.submit();
     });
 
     sortSelect.addEventListener('change', function() {
-        if (!isLoading) { showLoading(); filterForm.submit(); }
+        filterForm.submit();
     });
-
-    filterForm.addEventListener('submit', function(e) {
-        if (!isLoading) { showLoading(); }
-    });
-
-    function showLoading() {
-        isLoading = true;
-        const btnText = filterBtn.querySelector('.btn-text');
-        const btnLoading = filterBtn.querySelector('.btn-loading');
-        if (btnText && btnLoading) { btnText.classList.add('d-none'); btnLoading.classList.remove('d-none'); }
-        filterBtn.disabled = true;
-        if (loadingOverlay) { loadingOverlay.classList.remove('d-none'); }
-        if (tableBody) { tableBody.style.opacity = '0.5'; tableBody.style.transition = 'opacity 0.3s'; }
-    }
-
-    function hideLoading() {
-        isLoading = false;
-        const btnText = filterBtn.querySelector('.btn-text');
-        const btnLoading = filterBtn.querySelector('.btn-loading');
-        if (btnText && btnLoading) { btnText.classList.remove('d-none'); btnLoading.classList.add('d-none'); }
-        filterBtn.disabled = false;
-        if (loadingOverlay) { loadingOverlay.classList.add('d-none'); }
-        if (tableBody) { tableBody.style.opacity = '1'; }
-    }
-
-    window.addEventListener('load', function() { 
-        setTimeout(hideLoading, 100); 
-    });
-    setTimeout(hideLoading, 100);
 });
 </script>
 
@@ -302,21 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
     color: white !important;
 }
 
-.btn-filter .btn-text,
-.btn-filter .btn-loading {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
-    font-size: 14px !important;
-    line-height: 1.2 !important;
-}
-
-.btn-filter .spinner-border-sm {
-    width: 14px !important;
-    height: 14px !important;
-}
-
 /* Form control styling */
 .form-control,
 .form-select {
@@ -368,6 +306,31 @@ document.addEventListener('DOMContentLoaded', function() {
 .btn:focus {
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     outline: none;
+}
+
+/* Remove any loading animations */
+.spinner-border,
+.spinner-border-sm,
+.spinner-grow,
+.spinner-grow-sm {
+    display: none !important;
+}
+
+/* Remove loading text */
+.btn-loading,
+.loading-text {
+    display: none !important;
+}
+
+/* Ensure smooth transitions without loading */
+.table-hover tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+/* Remove any overlay loading */
+#loadingOverlay,
+.loading-overlay {
+    display: none !important;
 }
 </style>
 @endsection 

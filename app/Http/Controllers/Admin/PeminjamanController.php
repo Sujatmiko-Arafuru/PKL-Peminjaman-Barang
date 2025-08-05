@@ -71,15 +71,15 @@ class PeminjamanController extends Controller
             $peminjaman->status = 'disetujui';
             $peminjaman->save();
             
-            // Kurangi stok barang
+            // Kurangi stok barang dan update status otomatis
             foreach ($peminjaman->details as $detail) {
                 $barang = $detail->barang;
                 $barang->stok = max(0, $barang->stok - $detail->jumlah);
-                $barang->save();
+                $barang->save(); // Status akan diupdate otomatis melalui boot method
             }
             
             DB::commit();
-            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui.');
+            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui dan status barang diupdate otomatis.');
             
         } catch (\Exception $e) {
             DB::rollback();
