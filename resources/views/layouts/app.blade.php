@@ -48,6 +48,19 @@
         .card-body .btn.active {
             font-weight: 600;
         }
+        
+        /* Navbar styling */
+        .navbar .btn-outline-light {
+            border-color: rgba(255,255,255,0.5);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .btn-outline-light:hover {
+            background-color: white;
+            color: #0d6efd;
+            border-color: white;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -56,17 +69,10 @@
             <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <i class="bi bi-box-seam me-2"></i>Peminjaman Barang
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">
-                            <i class="bi bi-house-door me-1"></i>Dashboard
-                        </a>
-                    </li>
-                </ul>
+            <div class="navbar-nav ms-auto">
+                <a class="btn btn-outline-light btn-sm" href="{{ route('admin.login') }}">
+                    <i class="bi bi-person-circle me-1"></i>Login Admin
+                </a>
             </div>
         </div>
     </nav>
