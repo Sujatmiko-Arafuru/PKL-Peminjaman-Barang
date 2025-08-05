@@ -132,6 +132,15 @@ function updateQty(itemId, action) {
     })
     .then(data => {
         if (data.success) {
+            if (data.removed) {
+                // Item dihapus dari keranjang, reload halaman
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+                return;
+            }
+            
             // Update the quantity display
             document.getElementById(`qty-${itemId}`).textContent = data.newQty;
             

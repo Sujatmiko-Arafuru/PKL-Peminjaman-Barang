@@ -116,14 +116,19 @@ class KeranjangController extends Controller
                     ], 400);
                 }
             } elseif ($action === 'decrease') {
-                // Check if we can decrease quantity (not below 1)
+                // Check if we can decrease quantity
                 if ($currentQty > 1) {
                     $cart[$id]['qty'] = $currentQty - 1;
                 } else {
+                    // Jika jumlah akan menjadi 0, hapus item dari keranjang
+                    unset($cart[$id]);
+                    session(['cart' => $cart]);
+                    
                     return response()->json([
-                        'success' => false, 
-                        'message' => 'Jumlah minimal adalah 1'
-                    ], 400);
+                        'success' => true,
+                        'removed' => true,
+                        'message' => 'Item dihapus dari keranjang'
+                    ]);
                 }
             } else {
                 return response()->json([
