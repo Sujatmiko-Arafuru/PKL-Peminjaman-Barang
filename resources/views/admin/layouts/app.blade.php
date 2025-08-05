@@ -21,6 +21,38 @@
         .sidebar .nav-link .bi { margin-right: 8px; }
         .main-content { margin-left: 220px; padding: 2rem 2rem 2rem 2rem; }
         .topbar { background: #fff; border-bottom: 1px solid #e3f0ff; padding: 1rem 2rem; margin-left: 220px; }
+        
+        /* Button styling for admin */
+        .btn {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-group .btn {
+            margin: 0 2px;
+        }
+        
+        .table {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table thead {
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            color: white;
+        }
+        
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
         @media (max-width: 991px) {
             .sidebar, .main-content, .topbar { margin-left: 0 !important; }
             .sidebar { position: static; width: 100%; min-height: auto; }

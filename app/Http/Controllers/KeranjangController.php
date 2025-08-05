@@ -43,6 +43,7 @@ class KeranjangController extends Controller
                 'foto' => $fotoUtama,
                 'stok' => $barang->stok,
                 'stok_tersedia' => $barang->stok_tersedia,
+                'stok_dipinjam' => $barang->stok_dipinjam,
                 'status' => $barang->status,
                 'qty' => $jumlah
             ];
@@ -131,6 +132,7 @@ class KeranjangController extends Controller
                     'foto' => $fotoUtama,
                     'stok' => $barang->stok,
                     'stok_tersedia' => $barang->stok_tersedia,
+                    'stok_dipinjam' => $barang->stok_dipinjam,
                     'status' => $barang->status,
                     'qty' => $item['qty']
                 ];

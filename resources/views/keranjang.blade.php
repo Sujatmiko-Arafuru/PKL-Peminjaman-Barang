@@ -28,7 +28,8 @@
                                 <tr>
                                     <th>Foto</th>
                                     <th>Nama Barang</th>
-                                    <th>Stok</th>
+                                    <th>Stok Tersedia</th>
+                                    <th>Stok Dipinjam</th>
                                     <th>Status</th>
                                     <th>Jumlah</th>
                                     <th>Aksi</th>
@@ -55,7 +56,8 @@
                                         @endif
                                     </td>
                                     <td class="fw-semibold">{{ $item['nama'] }}</td>
-                                    <td>{{ $item['stok_tersedia'] ?? $item['stok'] }}</td>
+                                    <td><span class="badge bg-success">{{ $item['stok_tersedia'] ?? 0 }}</span></td>
+                                    <td><span class="badge bg-warning text-dark">{{ $item['stok_dipinjam'] ?? 0 }}</span></td>
                                     <td><span class="badge {{ $item['status'] == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($item['status']) }}</span></td>
                                     <td>
                                         <div class="d-flex align-items-center">

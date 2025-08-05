@@ -29,7 +29,10 @@ class Barang extends Model
     
     public function getStokTersediaAttribute()
     {
-        return max(0, $this->stok - $this->stok_dipinjam);
+        // Stok tersedia = total stok - stok yang sedang dipinjam
+        $stokDipinjam = $this->stok_dipinjam;
+        $stokTersedia = max(0, $this->stok - $stokDipinjam);
+        return $stokTersedia;
     }
     
     // Method untuk reset stok jika diperlukan

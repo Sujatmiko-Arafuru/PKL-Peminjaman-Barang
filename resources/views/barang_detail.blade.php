@@ -64,15 +64,17 @@
                                 <h2 class="text-primary mb-3">{{ $barang->nama }}</h2>
                                 <p class="mb-3">{{ $barang->deskripsi }}</p>
                                 <div class="row mb-3">
-                                    <div class="col-4">
-                                        <p class="mb-1"><strong>Total Stok:</strong></p>
-                                        <span class="badge bg-primary fs-6">{{ $barang->stok }}</span>
-                                    </div>
-                                    <div class="col-4">
+                                    <div class="col-6">
                                         <p class="mb-1"><strong>Stok Tersedia:</strong></p>
                                         <span class="badge bg-success fs-6">{{ $barang->stok_tersedia }}</span>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-6">
+                                        <p class="mb-1"><strong>Stok Dipinjam:</strong></p>
+                                        <span class="badge bg-warning text-dark fs-6">{{ $barang->stok_dipinjam }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
                                         <p class="mb-1"><strong>Status:</strong></p>
                                         <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }} fs-6">{{ ucfirst($barang->status) }}</span>
                                     </div>
