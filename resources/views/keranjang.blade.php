@@ -99,17 +99,37 @@
 @push('scripts')
 <script>
 function updateQty(itemId, action) {
+    // Disable button selama proses
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+    
     fetch(`/keranjang/update-qty/${itemId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
             action: action
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        // Cek content type untuk memastikan response adalah JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server mengembalikan response non-JSON. Kemungkinan ada masalah dengan CSRF token atau session.');
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Update the quantity display
@@ -136,12 +156,26 @@ function updateQty(itemId, action) {
             // Show success message
             showAlert('success', data.message);
         } else {
-            showAlert('danger', data.message);
+            throw new Error(data.message || 'Gagal memperbarui jumlah');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showAlert('danger', 'Terjadi kesalahan saat memperbarui jumlah');
+        
+        // Jika error terkait CSRF, refresh halaman
+        if (error.message.includes('CSRF') || error.message.includes('non-JSON')) {
+            showAlert('danger', 'Session telah berakhir. Halaman akan di-refresh...');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showAlert('danger', 'Terjadi kesalahan saat memperbarui jumlah: ' + error.message);
+        }
+    })
+    .finally(() => {
+        // Re-enable button
+        button.disabled = false;
+        button.innerHTML = originalContent;
     });
 }
 

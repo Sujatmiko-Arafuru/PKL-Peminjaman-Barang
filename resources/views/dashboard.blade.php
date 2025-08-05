@@ -18,6 +18,69 @@
         background-color: #6c757d !important;
         border-color: #6c757d !important;
     }
+    
+    /* Tombol tambah yang aktif */
+    .btn-success {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Modal styling */
+    .modal-content {
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+        border-bottom: 2px solid #e9ecef;
+        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        color: white;
+        border-radius: 1rem 1rem 0 0;
+    }
+    
+    .modal-footer {
+        border-top: 2px solid #e9ecef;
+        background: #f8f9fa;
+        border-radius: 0 0 1rem 1rem;
+    }
+    
+    /* Notification styling */
+    .alert.position-fixed {
+        animation: slideInRight 0.5s ease-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: none;
+        border-radius: 0.5rem;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #dc3545, #fd7e14);
+        color: white;
+    }
+    
+    .alert .btn-close {
+        filter: invert(1);
+    }
 </style>
 
 <div class="container-fluid">
@@ -83,7 +146,6 @@
                                         data-deskripsi="{{ $barang->deskripsi }}"
                                         data-stok="{{ $barang->stok_tersedia }}"
                                         data-status="{{ $barang->status }}"
-                                        {{ $barang->status === 'tersedia' ? 'onclick="showModal(this)"' : '' }}
                                         title="{{ $barang->status !== 'tersedia' ? 'Barang tidak tersedia untuk dipinjam (Stok: ' . $barang->stok_tersedia . ')' : 'Klik untuk menambah ke keranjang' }}">
                                     <i class="bi bi-cart-plus"></i> 
                                     {{ $barang->status === 'tersedia' ? 'Tambah' : 'Tidak Tersedia' }}
@@ -142,59 +204,147 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
         
-        // Fungsi untuk menampilkan modal
-        window.showModal = function(btn) {
-            // Hanya tampilkan modal jika barang tersedia
-            if (btn.getAttribute('data-status') === 'tersedia') {
-                selectedBarang = {
-                    id: btn.getAttribute('data-id'),
-                    nama: btn.getAttribute('data-nama'),
-                    foto: btn.getAttribute('data-foto'),
-                    deskripsi: btn.getAttribute('data-deskripsi'),
-                    stok: btn.getAttribute('data-stok'),
-                    status: btn.getAttribute('data-status')
-                };
-                document.getElementById('modalFotoBarang').src = selectedBarang.foto;
-                document.getElementById('modalNamaBarang').innerText = selectedBarang.nama;
-                document.getElementById('modalDeskripsiBarang').innerText = selectedBarang.deskripsi;
-                document.getElementById('modalStokBarang').innerText = selectedBarang.stok;
-                let statusSpan = document.getElementById('modalStatusBarang');
-                statusSpan.innerText = selectedBarang.status.charAt(0).toUpperCase() + selectedBarang.status.slice(1);
-                statusSpan.className = 'badge ' + (selectedBarang.status === 'tersedia' ? 'bg-success' : 'bg-secondary');
-                let jumlahInput = document.getElementById('modalJumlahBarang');
-                jumlahInput.value = 1;
-                jumlahInput.max = selectedBarang.stok;
-                modalTambah.show();
+        // Event listener untuk tombol tambah
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('button[data-status="tersedia"]')) {
+                const btn = e.target.closest('button[data-status="tersedia"]');
+                if (btn.getAttribute('data-status') === 'tersedia') {
+                    selectedBarang = {
+                        id: btn.getAttribute('data-id'),
+                        nama: btn.getAttribute('data-nama'),
+                        foto: btn.getAttribute('data-foto'),
+                        deskripsi: btn.getAttribute('data-deskripsi'),
+                        stok: btn.getAttribute('data-stok'),
+                        status: btn.getAttribute('data-status')
+                    };
+                    document.getElementById('modalFotoBarang').src = selectedBarang.foto;
+                    document.getElementById('modalNamaBarang').innerText = selectedBarang.nama;
+                    document.getElementById('modalDeskripsiBarang').innerText = selectedBarang.deskripsi;
+                    document.getElementById('modalStokBarang').innerText = selectedBarang.stok;
+                    let statusSpan = document.getElementById('modalStatusBarang');
+                    statusSpan.innerText = selectedBarang.status.charAt(0).toUpperCase() + selectedBarang.status.slice(1);
+                    statusSpan.className = 'badge ' + (selectedBarang.status === 'tersedia' ? 'bg-success' : 'bg-secondary');
+                    let jumlahInput = document.getElementById('modalJumlahBarang');
+                    jumlahInput.value = 1;
+                    jumlahInput.max = selectedBarang.stok;
+                    modalTambah.show();
+                }
             }
-        };
+        });
         
         document.getElementById('btnKonfirmasiTambah').addEventListener('click', function() {
             let jumlah = parseInt(document.getElementById('modalJumlahBarang').value);
             if(isNaN(jumlah) || jumlah < 1) jumlah = 1;
             if(jumlah > parseInt(selectedBarang.stok)) jumlah = parseInt(selectedBarang.stok);
+            
+            // Disable button selama proses
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Memproses...';
+            
+            // Ambil CSRF token dari meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
             fetch("{{ route('keranjang.tambah') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ barang_id: selectedBarang.id, jumlah: jumlah })
+                body: JSON.stringify({ 
+                    barang_id: selectedBarang.id, 
+                    jumlah: jumlah 
+                })
             })
-            .then(res => res.json())
+            .then(response => {
+                // Cek content type untuk memastikan response adalah JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Server mengembalikan response non-JSON. Kemungkinan ada masalah dengan CSRF token atau session.');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.json();
+            })
             .then(data => {
                 if(data.success) {
-                    document.getElementById('cart-count').innerText = data.cart_count;
+                    // Update cart count
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.innerText = data.cart_count;
+                    }
                     modalTambah.hide();
-                    alert('Barang "' + selectedBarang.nama + '" ('+jumlah+') ditambahkan ke keranjang!');
+                    
+                    // Tampilkan notifikasi sukses yang lebih baik
+                    showSuccessNotification('Barang "' + selectedBarang.nama + '" ('+jumlah+') berhasil ditambahkan ke keranjang!');
                 } else {
-                    alert(data.message || 'Gagal menambahkan ke keranjang');
+                    throw new Error(data.message || 'Gagal menambahkan ke keranjang');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan saat menambahkan ke keranjang');
+                
+                // Jika error terkait CSRF, refresh halaman
+                if (error.message.includes('CSRF') || error.message.includes('non-JSON')) {
+                    showErrorNotification('Session telah berakhir. Halaman akan di-refresh...');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showErrorNotification('Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message);
+                }
+            })
+            .finally(() => {
+                // Re-enable button
+                btn.disabled = false;
+                btn.innerHTML = 'Tambah ke Keranjang';
             });
         });
+        
+        // Fungsi untuk menampilkan notifikasi sukses
+        function showSuccessNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-success position-fixed';
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close ms-2" onclick="this.parentElement.remove()"></button>
+            `;
+            document.body.appendChild(notification);
+            
+            // Auto remove setelah 5 detik
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Fungsi untuk menampilkan notifikasi error
+        function showErrorNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-danger position-fixed';
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close ms-2" onclick="this.parentElement.remove()"></button>
+            `;
+            document.body.appendChild(notification);
+            
+            // Auto remove setelah 8 detik
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 8000);
+        }
     });
 </script>
 @endsection 
