@@ -1,67 +1,183 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<h2 class="mb-4">Kelola Pengembalian</h2>
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-<form method="GET" class="row g-2 mb-3">
-    <div class="col-md-4">
-        <input type="text" name="search" class="form-control" placeholder="Cari nama/no hp..." value="{{ request('search') }}">
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1 text-primary fw-bold">
+                <i class="bi bi-arrow-clockwise me-2"></i>Kelola Pengembalian
+            </h2>
+            <p class="text-muted mb-0">Kelola dan monitor pengembalian barang</p>
+        </div>
     </div>
-    <div class="col-md-3">
-        <select name="urut" class="form-select">
-            <option value="terlama" {{ request('urut')=='terlama'?'selected':'' }}>Urut Terlama</option>
-            <option value="terbaru" {{ request('urut')=='terbaru'?'selected':'' }}>Urut Terbaru</option>
-        </select>
+
+    <!-- Alert Messages -->
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <div class="col-md-2">
-        <button class="btn btn-biru w-100">Filter</button>
+    @endif
+
+    <!-- Filter Section -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 text-primary">
+                <i class="bi bi-funnel me-2"></i>Filter Data
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label text-muted small">Cari Nama/No HP</label>
+                    <input type="text" name="search" class="form-control form-control-sm" 
+                           placeholder="Cari nama/no hp..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted small">Urutan</label>
+                    <select name="urut" class="form-select form-select-sm">
+                        <option value="terlama" {{ request('urut')=='terlama'?'selected':'' }}>Terlama</option>
+                        <option value="terbaru" {{ request('urut')=='terbaru'?'selected':'' }}>Terbaru</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small">&nbsp;</label>
+                    <button class="btn btn-primary btn-sm w-100 shadow-sm">
+                        <i class="bi bi-search me-1"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</form>
-<div class="table-responsive">
-    <table class="table align-middle">
-        <thead class="table-primary">
-            <tr>
-                <th>Nama</th>
-                <th>No HP</th>
-                <th>Unit/Jurusan</th>
-                <th>Nama Kegiatan</th>
-                <th>Tujuan</th>
-                <th>Tgl Pinjam</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($peminjamans as $p)
-            <tr>
-                <td>{{ $p->nama }}</td>
-                <td>{{ $p->no_telp }}</td>
-                <td>{{ $p->unit }}</td>
-                <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
-                <td>{{ Str::limit($p->tujuan, 20) }}</td>
-                <td>{{ $p->tanggal_mulai }} s/d {{ $p->tanggal_selesai }}</td>
-                <td><span class="badge bg-success">{{ ucfirst($p->status) }}</span></td>
-                <td>
-                    <a href="{{ route('admin.pengembalian.show', $p->id) }}" class="btn btn-info btn-sm text-white">Detail</a>
-                    <form action="{{ route('admin.pengembalian.approve', $p->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button class="btn btn-success btn-sm" onclick="return confirm('Approve pengembalian?')">Approve</button>
-                    </form>
-                    <form action="{{ route('admin.pengembalian.reject', $p->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Tolak pengembalian?')">Reject</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="8" class="text-center">Tidak ada pengembalian menunggu approve.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+
+    <!-- Table Section -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0">
+            <h6 class="mb-0 text-primary fw-semibold">
+                <i class="bi bi-table me-2"></i>Daftar Pengembalian
+            </h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">No HP</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Unit/Jurusan</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kegiatan</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Tujuan</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Periode</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($peminjamans as $p)
+                        <tr class="border-bottom">
+                            <td class="px-3 py-3">
+                                <div class="fw-semibold text-dark">{{ $p->nama }}</div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <span class="text-muted">{{ $p->no_telp }}</span>
+                            </td>
+                            <td class="px-3 py-3">
+                                <span class="badge bg-light text-dark">{{ $p->unit }}</span>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="fw-medium" title="{{ $p->nama_kegiatan }}">
+                                    {{ Str::limit($p->nama_kegiatan, 25) }}
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="text-muted" title="{{ $p->tujuan }}">
+                                    {{ Str::limit($p->tujuan, 25) }}
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="small text-muted">
+                                    <div>{{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d/m/Y') }}</div>
+                                    <div class="text-muted">s/d</div>
+                                    <div>{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d/m/Y') }}</div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <span class="badge bg-success rounded-pill">
+                                    <i class="bi bi-check-circle me-1"></i>{{ ucfirst($p->status) }}
+                                </span>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="d-flex gap-1">
+                                    <a href="{{ route('admin.pengembalian.show', $p->id) }}" 
+                                       class="btn btn-sm btn-outline-info shadow-sm">
+                                        <i class="bi bi-eye me-1"></i>Detail
+                                    </a>
+                                    <form action="{{ route('admin.pengembalian.approve', $p->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-success shadow-sm" 
+                                                onclick="return confirm('Approve pengembalian ini?')">
+                                            <i class="bi bi-check-lg me-1"></i>Approve
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.pengembalian.reject', $p->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-danger shadow-sm" 
+                                                onclick="return confirm('Tolak pengembalian ini?')">
+                                            <i class="bi bi-x-lg me-1"></i>Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-check-circle fs-1 text-success"></i>
+                                    <p class="mb-0 mt-2">Tidak ada pengembalian menunggu approve</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if($peminjamans->hasPages())
+    <div class="d-flex justify-content-center mt-4">
+        {{ $peminjamans->withQueryString()->links() }}
+    </div>
+    @endif
 </div>
-<div class="mt-3">
-    {{ $peminjamans->withQueryString()->links() }}
-</div>
+
+<style>
+.card {
+    border-radius: 0.75rem;
+}
+
+.table th {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.btn-sm {
+    font-size: 0.875rem;
+}
+
+.pagination {
+    --bs-pagination-border-radius: 0.5rem;
+}
+</style>
 @endsection 
