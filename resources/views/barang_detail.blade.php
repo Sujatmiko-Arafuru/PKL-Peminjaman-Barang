@@ -1,33 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
+<style>
+    .btn:disabled {
+        opacity: 0.6 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
+    
+    .btn-secondary:disabled {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: #fff !important;
+    }
+    
+    .btn-secondary:disabled:hover {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+    }
+    
+    .form-control:disabled {
+        background-color: #e9ecef !important;
+        opacity: 0.6 !important;
+    }
+</style>
+
+<div class="container-fluid py-4">
     <div class="row">
         <!-- Sidebar Menu -->
-        <div class="col-md-3 col-lg-2">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-primary mb-3"><i class="bi bi-list"></i> Menu</h5>
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('dashboard') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-box-seam me-2"></i>List Barang
-                        </a>
-                        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary position-relative">
-                            <i class="bi bi-cart3 me-2"></i>Keranjang
-                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ session('cart') ? count(session('cart')) : 0 }}
-                            </span>
-                        </a>
-                        <a href="{{ route('list.peminjam') }}" class="btn btn-outline-info">
-                            <i class="bi bi-people me-2"></i>List Peminjam
-                        </a>
-                        <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-success">
-                            <i class="bi bi-arrow-repeat me-2"></i>Pengembalian
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('components.sidebar-menu')
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
@@ -82,13 +83,29 @@
                                     @csrf
                                     <div class="input-group mb-2" style="max-width:200px;">
                                         <span class="input-group-text">Jumlah</span>
-                                        <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok_tersedia }}" value="1" required>
+                                        <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok_tersedia }}" value="1" required {{ $barang->status !== 'tersedia' ? 'disabled' : '' }}>
                                     </div>
                                     <input type="hidden" name="barang_id" value="{{ $barang->id }}">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
+                                    <button type="submit" class="btn btn-lg {{ $barang->status === 'tersedia' ? 'btn-primary' : 'btn-secondary' }}" {{ $barang->status !== 'tersedia' ? 'disabled' : '' }} style="{{ $barang->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}" title="{{ $barang->status !== 'tersedia' ? 'Barang tidak tersedia untuk dipinjam (Stok: ' . $barang->stok_tersedia . ')' : 'Klik untuk menambah ke keranjang' }}">
+                                        <i class="bi bi-cart-plus me-2"></i>
+                                        @if($barang->status === 'tersedia')
+                                            Tambah ke Keranjang
+                                        @else
+                                            Tidak Tersedia
+                                        @endif
                                     </button>
                                 </form>
+                                @if($barang->status !== 'tersedia')
+                                    <small class="text-muted mt-1">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Barang tidak tersedia untuk dipinjam saat ini
+                                    </small>
+                                    <div class="alert alert-warning mt-2" role="alert">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <strong>Informasi:</strong> Barang ini sedang tidak tersedia untuk dipinjam. 
+                                        Stok tersedia: <strong>{{ $barang->stok_tersedia }}</strong> dari total <strong>{{ $barang->stok }}</strong>.
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -112,6 +129,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Inisialisasi tooltip Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
     // Interaksi thumbnail
     document.querySelectorAll('.selector-foto').forEach(function(thumb) {
         thumb.addEventListener('click', function() {

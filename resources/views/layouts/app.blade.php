@@ -1,40 +1,80 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Peminjaman Barang</title>
+    <title>PKL - Sistem Peminjaman Barang</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { background: #e3f0ff; }
-        .navbar { background: #1565c0; }
-        .text-primary { color: #1565c0 !important; }
-        .bg-primary { background: #1565c0 !important; }
-        .btn-primary { background: #1976d2; border-color: #1976d2; }
-        .btn-outline-primary { color: #1976d2; border-color: #1976d2; }
-        .btn-outline-primary:hover { background: #1976d2; color: #fff; }
+        .dashboard-title {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+        
+        .btn-secondary:disabled {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            color: #fff !important;
+        }
+        
+        .btn-secondary:disabled:hover {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+        }
+        
+        .form-control:disabled {
+            background-color: #e9ecef !important;
+            opacity: 0.6 !important;
+        }
+        
+        /* Sidebar menu styling */
+        .card-body .btn {
+            text-align: left;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card-body .btn:hover {
+            transform: translateX(5px);
+        }
+        
+        .card-body .btn.active {
+            font-weight: 600;
+        }
     </style>
 </head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">Peminjaman Barang</a>
-        <div class="d-flex align-items-center ms-auto">
-            <a href="{{ route('keranjang.index') }}" class="btn btn-outline-light position-relative me-2">
-                <i class="bi bi-cart3" style="font-size:1.3rem;"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="keranjang-badge">
-                    {{ session('cart') ? count(session('cart')) : 0 }}
-                </span>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ route('dashboard') }}">
+                <i class="bi bi-box-seam me-2"></i>Peminjaman Barang
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard') }}">
+                            <i class="bi bi-house-door me-1"></i>Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
-<main>
-    @yield('content')
-</main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-@stack('scripts')
+    </nav>
+
+    <main class="py-4">
+        @yield('content')
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

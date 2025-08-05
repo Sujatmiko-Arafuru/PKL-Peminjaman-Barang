@@ -1,33 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4">
+<style>
+    .btn:disabled {
+        opacity: 0.6 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
+    
+    .btn-secondary:disabled {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: #fff !important;
+    }
+    
+    .btn-secondary:disabled:hover {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+    }
+</style>
+
+<div class="container-fluid">
     <div class="row">
         <!-- Sidebar Menu -->
-        <div class="col-md-3 col-lg-2">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-primary mb-3"><i class="bi bi-list"></i> Menu</h5>
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('dashboard') }}" class="btn btn-primary {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                            <i class="bi bi-box-seam me-2"></i>List Barang
-                        </a>
-                        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary position-relative">
-                            <i class="bi bi-cart3 me-2"></i>Keranjang
-                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ session('cart') ? count(session('cart')) : 0 }}
-                            </span>
-                        </a>
-                        <a href="{{ route('list.peminjam') }}" class="btn btn-outline-info">
-                            <i class="bi bi-people me-2"></i>List Peminjam
-                        </a>
-                        <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-success">
-                            <i class="bi bi-arrow-repeat me-2"></i>Pengembalian
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('components.sidebar-menu')
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
@@ -69,9 +65,28 @@
                             <p class="card-text mb-1">{{ Str::limit($barang->deskripsi, 60) }}</p>
                             <p class="mb-1">Stok Tersedia: <span class="fw-bold">{{ $barang->stok_tersedia }}</span></p>
                             <p>Status: <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($barang->status) }}</span></p>
+                            @if($barang->status !== 'tersedia')
+                                <small class="text-muted">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    Tidak tersedia untuk dipinjam
+                                </small>
+                            @endif
                             <div class="mt-auto d-flex gap-2">
                                 <a href="{{ route('barang.detail', $barang->id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-info-circle"></i> Detail</a>
-                                <a href="{{ route('barang.detail', $barang->id) }}" class="btn btn-success btn-sm"><i class="bi bi-cart-plus"></i> Tambah</a>
+                                <button class="btn btn-sm {{ $barang->status === 'tersedia' ? 'btn-success' : 'btn-secondary' }}" 
+                                        {{ $barang->status !== 'tersedia' ? 'disabled' : '' }}
+                                        style="{{ $barang->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}"
+                                        data-id="{{ $barang->id }}"
+                                        data-nama="{{ $barang->nama }}"
+                                        data-foto="{{ $foto ? asset('storage/' . $foto) : '' }}"
+                                        data-deskripsi="{{ $barang->deskripsi }}"
+                                        data-stok="{{ $barang->stok_tersedia }}"
+                                        data-status="{{ $barang->status }}"
+                                        {{ $barang->status === 'tersedia' ? 'onclick="showModal(this)"' : '' }}
+                                        title="{{ $barang->status !== 'tersedia' ? 'Barang tidak tersedia untuk dipinjam (Stok: ' . $barang->stok_tersedia . ')' : 'Klik untuk menambah ke keranjang' }}">
+                                    <i class="bi bi-cart-plus"></i> 
+                                    {{ $barang->status === 'tersedia' ? 'Tambah' : 'Tidak Tersedia' }}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -119,15 +134,24 @@
     document.addEventListener('DOMContentLoaded', function() {
         let selectedBarang = {};
         var modalTambah = new bootstrap.Modal(document.getElementById('modalTambahKeranjang'));
-        document.querySelectorAll('.btn-keranjang').forEach(function(btn) {
-            btn.addEventListener('click', function() {
+        
+        // Inisialisasi tooltip Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Fungsi untuk menampilkan modal
+        window.showModal = function(btn) {
+            // Hanya tampilkan modal jika barang tersedia
+            if (btn.getAttribute('data-status') === 'tersedia') {
                 selectedBarang = {
-                    id: this.getAttribute('data-id'),
-                    nama: this.getAttribute('data-nama'),
-                    foto: this.getAttribute('data-foto'),
-                    deskripsi: this.getAttribute('data-deskripsi'),
-                    stok: this.getAttribute('data-stok'),
-                    status: this.getAttribute('data-status')
+                    id: btn.getAttribute('data-id'),
+                    nama: btn.getAttribute('data-nama'),
+                    foto: btn.getAttribute('data-foto'),
+                    deskripsi: btn.getAttribute('data-deskripsi'),
+                    stok: btn.getAttribute('data-stok'),
+                    status: btn.getAttribute('data-status')
                 };
                 document.getElementById('modalFotoBarang').src = selectedBarang.foto;
                 document.getElementById('modalNamaBarang').innerText = selectedBarang.nama;
@@ -140,8 +164,9 @@
                 jumlahInput.value = 1;
                 jumlahInput.max = selectedBarang.stok;
                 modalTambah.show();
-            });
-        });
+            }
+        };
+        
         document.getElementById('btnKonfirmasiTambah').addEventListener('click', function() {
             let jumlah = parseInt(document.getElementById('modalJumlahBarang').value);
             if(isNaN(jumlah) || jumlah < 1) jumlah = 1;
@@ -160,7 +185,13 @@
                     document.getElementById('cart-count').innerText = data.cart_count;
                     modalTambah.hide();
                     alert('Barang "' + selectedBarang.nama + '" ('+jumlah+') ditambahkan ke keranjang!');
+                } else {
+                    alert(data.message || 'Gagal menambahkan ke keranjang');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menambahkan ke keranjang');
             });
         });
     });

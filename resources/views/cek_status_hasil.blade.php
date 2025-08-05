@@ -4,37 +4,11 @@
 <div class="container py-4">
     <div class="row">
         <!-- Sidebar Menu -->
-        <div class="col-md-3 col-lg-2">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-primary mb-3"><i class="bi bi-list"></i> Menu</h5>
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('dashboard') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-box-seam me-2"></i>List Barang
-                        </a>
-                        <a href="{{ route('keranjang.index') }}" class="btn btn-outline-primary position-relative">
-                            <i class="bi bi-cart3 me-2"></i>Keranjang
-                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ session('cart') ? count(session('cart')) : 0 }}
-                            </span>
-                        </a>
-                        <a href="{{ route('list.peminjam') }}" class="btn btn-outline-info">
-                            <i class="bi bi-people me-2"></i>List Peminjam
-                        </a>
-                        <a href="{{ route('cekStatus.form') }}" class="btn btn-success {{ request()->routeIs('cekStatus.*') ? 'active' : '' }}">
-                            <i class="bi bi-arrow-repeat me-2"></i>Pengembalian
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('components.sidebar-menu')
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="dashboard-title mb-0"><i class="bi bi-clipboard-data me-2"></i>Hasil Cek Status Peminjaman</h1>
-                <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali</a>
-            </div>
+            <h1 class="dashboard-title mb-3"><i class="bi bi-search me-2"></i>Hasil Pencarian Status</h1>
             
             @if($peminjaman)
                 <div class="alert alert-success">

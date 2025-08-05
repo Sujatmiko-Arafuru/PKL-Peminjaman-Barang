@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\InventarisController;
 use App\Http\Controllers\Admin\PeminjamanController as AdminPeminjamanController;
 use App\Http\Controllers\Admin\PengembalianController;
 use App\Http\Controllers\Admin\ArsipController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('/', [BarangController::class, 'index'])->name('dashboard');
 Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.detail');
@@ -33,7 +34,7 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 
 // Route group admin dengan middleware
 Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // CRUD Inventaris
     Route::resource('inventaris', InventarisController::class);
     // Kelola Peminjaman
