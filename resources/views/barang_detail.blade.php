@@ -32,6 +32,15 @@
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             <div class="mb-4">
                 <a href="{{ route('dashboard') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>
             </div>

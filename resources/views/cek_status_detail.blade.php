@@ -10,6 +10,15 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-info-circle me-2"></i>Detail Peminjaman</h1>
             
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             <div class="row">
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0">
@@ -29,6 +38,10 @@
                                 </div>
                                 <div class="col-md-8">
                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span><strong>Kode Peminjaman:</strong></span>
+                                    <span><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></span>
+                                </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>Nama:</strong></span>
                                     <span>{{ $peminjaman->nama }}</span>
@@ -120,6 +133,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali ke Pencarian
+                </a>
             </div>
         </div>
     </div>

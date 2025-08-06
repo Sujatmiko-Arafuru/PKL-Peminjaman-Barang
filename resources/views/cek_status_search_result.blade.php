@@ -10,9 +10,30 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-search me-2"></i>Hasil Pencarian</h1>
             
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             <div class="alert alert-info">
                 <i class="bi bi-info-circle me-2"></i>
-                Hasil pencarian untuk: <strong>"{{ $request->nama_kegiatan }}"</strong>
+                <strong>Hasil pencarian untuk:</strong>
+                @if($request->filled('kode_peminjaman'))
+                    <span class="badge bg-primary me-2">Kode: {{ $request->kode_peminjaman }}</span>
+                @endif
+                @if($request->filled('nama_kegiatan'))
+                    <span class="badge bg-success me-2">Kegiatan: {{ $request->nama_kegiatan }}</span>
+                @endif
+                @if($request->filled('nama_peminjam'))
+                    <span class="badge bg-info me-2">Peminjam: {{ $request->nama_peminjam }}</span>
+                @endif
+                @if($request->filled('no_telp'))
+                    <span class="badge bg-warning me-2">Telepon: {{ $request->no_telp }}</span>
+                @endif
             </div>
             
             @if($peminjamans->count() > 0)
@@ -59,9 +80,15 @@
             @else
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    Tidak ditemukan peminjaman dengan nama kegiatan "{{ $request->nama_kegiatan }}".
+                    Tidak ditemukan peminjaman dengan kriteria pencarian yang diberikan.
                 </div>
             @endif
+            
+            <div class="text-center mt-4">
+                <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali ke Pencarian
+                </a>
+            </div>
         </div>
     </div>
 </div>

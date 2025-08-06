@@ -10,15 +10,28 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-people me-2"></i>List Peminjam</h1>
             
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             <!-- Filter Form -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
                     <form method="GET" class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Kode Peminjaman</label>
+                            <input type="text" name="kode_peminjaman" class="form-control" placeholder="Cari kode..." value="{{ request('kode_peminjaman') }}">
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label fw-bold">Nama Kegiatan</label>
                             <input type="text" name="nama_kegiatan" class="form-control" placeholder="Cari nama kegiatan..." value="{{ request('nama_kegiatan') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label fw-bold">Status</label>
                             <select name="status" class="form-select">
                                 <option value="">Semua Status</option>
@@ -55,6 +68,7 @@
                             <table class="table table-hover">
                                 <thead class="table-light">
                                     <tr>
+                                        <th>Kode Peminjaman</th>
                                         <th>Nama</th>
                                         <th>Nama Kegiatan</th>
                                         <th>Tanggal Kegiatan</th>
@@ -66,6 +80,7 @@
                                 <tbody>
                                     @foreach($peminjamans as $peminjaman)
                                     <tr>
+                                        <td><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></td>
                                         <td><strong>{{ $peminjaman->nama }}</strong></td>
                                         <td>{{ Str::limit($peminjaman->nama_kegiatan, 30) }}</td>
                                         <td>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</td>

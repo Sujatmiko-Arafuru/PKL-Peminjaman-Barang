@@ -21,6 +21,8 @@ class PeminjamanController extends Controller
         if (empty($cart)) {
             return redirect()->route('keranjang.index')->with('error', 'Keranjang masih kosong.');
         }
+        // Hapus session kode peminjaman jika user mulai peminjaman baru
+        session()->forget('kode_peminjaman');
         return view('peminjaman_form', compact('cart'));
     }
 
@@ -122,7 +124,9 @@ class PeminjamanController extends Controller
         
         // Hapus session cart
         session()->forget('cart');
-        return redirect()->route('dashboard')->with('success', 'Peminjaman berhasil diajukan!');
+        // Simpan kode peminjaman di session untuk ditampilkan di sidebar
+        session(['kode_peminjaman' => $kodePeminjaman]);
+        return redirect()->route('dashboard')->with('success', 'Peminjaman berhasil diajukan! Kode Peminjaman: ' . $kodePeminjaman);
         
     } catch (\Exception $e) {
         // Rollback transaction jika terjadi error
@@ -133,6 +137,9 @@ class PeminjamanController extends Controller
 
     public function ajukanPengembalian(Request $request, $id): \Illuminate\Http\RedirectResponse
     {
+        // Hapus session kode peminjaman jika user mengajukan pengembalian
+        session()->forget('kode_peminjaman');
+        
         $peminjaman = \App\Models\Peminjaman::findOrFail($id);
         if ($peminjaman->status !== 'disetujui') {
             return back()->with('error', 'Pengembalian hanya bisa diajukan jika status peminjaman disetujui.');
@@ -144,11 +151,17 @@ class PeminjamanController extends Controller
 
     public function cekStatusForm(): \Illuminate\Contracts\View\View
     {
+        // Hapus session kode peminjaman jika user melakukan cek status
+        session()->forget('kode_peminjaman');
+        
         return view('cek_status_form');
     }
 
     public function cekStatus(Request $request): \Illuminate\Contracts\View\View
     {
+        // Hapus session kode peminjaman jika user melakukan cek status
+        session()->forget('kode_peminjaman');
+        
         $request->validate([
             'kode_peminjaman' => 'required|string',
         ]);
@@ -157,30 +170,76 @@ class PeminjamanController extends Controller
         return view('cek_status_hasil', compact('peminjaman'));
     }
 
-    public function searchByKegiatan(Request $request): \Illuminate\Contracts\View\View
+    public function searchByKegiatan(Request $request): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
     {
+        // Hapus session kode peminjaman jika user melakukan pencarian
+        session()->forget('kode_peminjaman');
+        
         $request->validate([
-            'nama_kegiatan' => 'required|string',
+            'kode_peminjaman' => 'nullable|string',
+            'nama_kegiatan' => 'nullable|string',
+            'nama_peminjam' => 'nullable|string',
+            'no_telp' => 'nullable|string',
         ]);
-        $peminjamans = \App\Models\Peminjaman::where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%')
-            ->with('details.barang')
-            ->get();
+        
+        // Validasi minimal satu field terisi
+        if (!$request->filled('kode_peminjaman') && 
+            !$request->filled('nama_kegiatan') && 
+            !$request->filled('nama_peminjam') && 
+            !$request->filled('no_telp')) {
+            return back()->withErrors(['search' => 'Minimal isi salah satu field untuk melakukan pencarian.']);
+        }
+        
+        $query = \App\Models\Peminjaman::with('details.barang');
+        
+        // Filter berdasarkan kode peminjaman
+        if ($request->filled('kode_peminjaman')) {
+            $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
+        }
+        
+        // Filter berdasarkan nama kegiatan
+        if ($request->filled('nama_kegiatan')) {
+            $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
+        }
+        
+        // Filter berdasarkan nama peminjam
+        if ($request->filled('nama_peminjam')) {
+            $query->where('nama', 'like', '%' . $request->nama_peminjam . '%');
+        }
+        
+        // Filter berdasarkan no telepon
+        if ($request->filled('no_telp')) {
+            $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
+        }
+        
+        $peminjamans = $query->orderBy('created_at', 'desc')->get();
         return view('cek_status_search_result', compact('peminjamans', 'request'));
     }
 
     public function detailPeminjaman($id): \Illuminate\Contracts\View\View
     {
+        // Hapus session kode peminjaman jika user melihat detail peminjam
+        session()->forget('kode_peminjaman');
+        
         $peminjaman = \App\Models\Peminjaman::with('details.barang')->findOrFail($id);
         return view('cek_status_detail', compact('peminjaman'));
     }
 
     public function listPeminjam(Request $request): \Illuminate\Contracts\View\View
     {
+        // Hapus session kode peminjaman jika user melihat list peminjam
+        session()->forget('kode_peminjaman');
+        
         $query = \App\Models\Peminjaman::with('details.barang');
         
         // Filter berdasarkan status jika ada
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+        
+        // Filter berdasarkan kode peminjaman jika ada
+        if ($request->filled('kode_peminjaman')) {
+            $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
         }
         
         // Filter berdasarkan nama kegiatan jika ada
@@ -196,6 +255,9 @@ class PeminjamanController extends Controller
 
     public function detailPeminjamPublic($id): \Illuminate\Contracts\View\View
     {
+        // Hapus session kode peminjaman jika user melihat detail peminjam public
+        session()->forget('kode_peminjaman');
+        
         $peminjaman = \App\Models\Peminjaman::with('details.barang')->findOrFail($id);
         return view('list_peminjam_detail', compact('peminjaman'));
     }

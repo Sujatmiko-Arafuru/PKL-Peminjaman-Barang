@@ -1,8 +1,25 @@
+<style>
+    .alert-sm {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+
 <div class="col-md-3 col-lg-2">
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
             <h5 class="card-title text-primary mb-3"><i class="bi bi-list"></i> Menu</h5>
             <div class="d-grid gap-2">
+                @if(session('kode_peminjaman'))
+                    <div class="alert alert-success alert-sm mb-3">
+                        <small>
+                            <i class="bi bi-receipt me-1"></i>
+                            <strong>Kode Anda:</strong><br>
+                            <span class="badge bg-dark">{{ session('kode_peminjaman') }}</span>
+                        </small>
+                    </div>
+                @endif
+                
                 <a href="{{ route('dashboard') }}" class="btn {{ request()->routeIs('dashboard') ? 'btn-primary' : 'btn-outline-primary' }}">
                     <i class="bi bi-box-seam me-2"></i>List Barang
                 </a>

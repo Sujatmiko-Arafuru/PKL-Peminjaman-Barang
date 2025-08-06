@@ -90,6 +90,98 @@
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
+            @if(session('success'))
+                @php
+                    $successMessage = session('success');
+                    $kodePeminjaman = null;
+                    if (strpos($successMessage, 'Kode Peminjaman:') !== false) {
+                        $kodePeminjaman = trim(substr($successMessage, strpos($successMessage, 'Kode Peminjaman:') + strlen('Kode Peminjaman:')));
+                        $successMessage = trim(substr($successMessage, 0, strpos($successMessage, 'Kode Peminjaman:')));
+                    }
+                @endphp
+                
+                @if($kodePeminjaman)
+                    <!-- Modal Kode Peminjaman -->
+                    <div class="modal fade" id="modalKodePeminjaman" tabindex="-1" aria-labelledby="modalKodePeminjamanLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title" id="modalKodePeminjamanLabel">
+                                        <i class="bi bi-check-circle me-2"></i>Peminjaman Berhasil!
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <div class="mb-4">
+                                        <i class="bi bi-receipt text-success" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h6 class="text-muted mb-3">Kode Peminjaman Anda:</h6>
+                                    <div class="bg-light p-3 rounded mb-3">
+                                        <h4 class="text-primary fw-bold mb-0" id="kodePeminjamanText">{{ $kodePeminjaman }}</h4>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyKodePeminjaman()">
+                                        <i class="bi bi-clipboard me-2"></i>Salin Kode
+                                    </button>
+                                    <p class="text-muted small">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Simpan kode ini untuk mengecek status peminjaman Anda
+                                    </p>
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-lightbulb me-2"></i>
+                                        <strong>Tips:</strong> Anda dapat menggunakan kode ini untuk mencari peminjaman di menu "Pengembalian Barang"
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                                        <i class="bi bi-check me-2"></i>Mengerti
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var modal = new bootstrap.Modal(document.getElementById('modalKodePeminjaman'));
+                            modal.show();
+                        });
+                        
+                        function copyKodePeminjaman() {
+                            const kodeText = document.getElementById('kodePeminjamanText').textContent;
+                            navigator.clipboard.writeText(kodeText).then(function() {
+                                // Tampilkan notifikasi sukses
+                                const button = event.target.closest('button');
+                                const originalText = button.innerHTML;
+                                button.innerHTML = '<i class="bi bi-check me-2"></i>Tersalin!';
+                                button.classList.remove('btn-outline-primary');
+                                button.classList.add('btn-success');
+                                
+                                setTimeout(() => {
+                                    button.innerHTML = originalText;
+                                    button.classList.remove('btn-success');
+                                    button.classList.add('btn-outline-primary');
+                                }, 2000);
+                            }).catch(function(err) {
+                                console.error('Gagal menyalin: ', err);
+                                alert('Gagal menyalin kode ke clipboard');
+                            });
+                        }
+                    </script>
+                @else
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>{{ $successMessage }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+            @endif
+            
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="dashboard-title mb-0">Daftar Barang Tersedia</h1>
             </div>

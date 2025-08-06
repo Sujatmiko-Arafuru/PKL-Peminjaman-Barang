@@ -10,6 +10,15 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-file-earmark-text me-2"></i>Form Peminjaman</h1>
             
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">

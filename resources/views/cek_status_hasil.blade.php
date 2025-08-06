@@ -10,6 +10,15 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-search me-2"></i>Hasil Pencarian Status</h1>
             
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             @if($peminjaman)
                 <div class="alert alert-success">
                     <i class="bi bi-check-circle me-2"></i> Data peminjaman ditemukan.
@@ -23,6 +32,10 @@
                             </div>
                             <div class="card-body">
                                 <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span><strong>Kode Peminjaman:</strong></span>
+                                        <span><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></span>
+                                    </li>
                                     <li class="list-group-item d-flex justify-content-between">
                                         <span><strong>Nama:</strong></span>
                                         <span>{{ $peminjaman->nama }}</span>
@@ -39,10 +52,7 @@
                                         <span><strong>Nama Kegiatan:</strong></span>
                                         <span>{{ $peminjaman->nama_kegiatan }}</span>
                                     </li>
-                                    <li class="list-group-item d-flex justify-content-between">
-                                        <span><strong>Tujuan:</strong></span>
-                                        <span>{{ $peminjaman->tujuan }}</span>
-                                    </li>
+
                                     <li class="list-group-item d-flex justify-content-between">
                                         <span><strong>Tanggal Pinjam:</strong></span>
                                         <span>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</span>
@@ -53,6 +63,18 @@
                                             {{ ucfirst($peminjaman->status) }}
                                         </span>
                                     </li>
+                                    @if($peminjaman->status == 'disetujui')
+                                    <li class="list-group-item text-center">
+                                        <form action="{{ route('pengembalian.ajukan', $peminjaman->id) }}" method="POST" onsubmit="return confirm('Ajukan pengembalian untuk peminjaman ini?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success"><i class="bi bi-arrow-repeat me-2"></i>Ajukan Pengembalian</button>
+                                        </form>
+                                    </li>
+                                    @elseif($peminjaman->status == 'pengembalian_diajukan')
+                                    <li class="list-group-item text-center">
+                                        <span class="badge bg-warning text-dark">Pengembalian sedang menunggu persetujuan admin.</span>
+                                    </li>
+                                    @endif
                                     <li class="list-group-item d-flex justify-content-between">
                                         <span><strong>Bukti:</strong></span>
                                         <span>
@@ -105,9 +127,23 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ route('cekStatus.detail', $peminjaman->id) }}" class="btn btn-primary">
+                        <i class="bi bi-eye me-2"></i>Lihat Detail Lengkap
+                    </a>
+                    <a href="{{ route('cekStatus.form') }}" class="btn btn-outline-secondary ms-2">
+                        <i class="bi bi-arrow-left me-2"></i>Kembali ke Pencarian
+                    </a>
+                </div>
             @else
                 <div class="alert alert-danger">
                     <i class="bi bi-x-circle me-2"></i> Data peminjaman tidak ditemukan. Pastikan kode peminjaman benar.
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ route('cekStatus.form') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Kembali ke Pencarian
+                    </a>
                 </div>
             @endif
         </div>

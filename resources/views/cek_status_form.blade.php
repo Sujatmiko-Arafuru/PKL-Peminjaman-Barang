@@ -10,17 +10,44 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-arrow-repeat me-2"></i>Pengembalian Barang</h1>
             
+            @if(session('kode_peminjaman'))
+                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-receipt me-2"></i>
+                    <strong>Kode Peminjaman Anda:</strong> 
+                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             <div class="row">
                 <div class="col-md-8 mx-auto">
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="bi bi-list"></i> Cari Berdasarkan Nama Kegiatan</h5>
+                            <h5 class="mb-0"><i class="bi bi-search me-2"></i> Cari Peminjaman</h5>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('cekStatus.search') }}" method="GET" class="mb-3">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Nama Kegiatan</label>
-                                    <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan..." required>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Kode Peminjaman</label>
+                                        <input type="text" name="kode_peminjaman" class="form-control" placeholder="Contoh: PJM-20241201-ABC123">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Nama Kegiatan</label>
+                                        <input type="text" name="nama_kegiatan" class="form-control" placeholder="Masukkan nama kegiatan...">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Nama Peminjam</label>
+                                        <input type="text" name="nama_peminjam" class="form-control" placeholder="Masukkan nama peminjam...">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">No. Telepon</label>
+                                        <input type="text" name="no_telp" class="form-control" placeholder="Contoh: 08123456789">
+                                    </div>
+                                </div>
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Petunjuk:</strong> Anda dapat mencari berdasarkan salah satu atau kombinasi dari kode peminjaman, nama kegiatan, nama peminjam, atau no telepon. Minimal isi salah satu field untuk melakukan pencarian.
                                 </div>
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn btn-success"><i class="bi bi-search"></i> Cek Status</button>

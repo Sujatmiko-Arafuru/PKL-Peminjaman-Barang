@@ -156,6 +156,9 @@ class KeranjangController extends Controller
 
     public function index(): \Illuminate\View\View
     {
+        // Hapus session kode peminjaman jika user melihat keranjang
+        session()->forget('kode_peminjaman');
+        
         $cart = session()->get('cart', []);
         
         // Bersihkan cart dari barang yang sudah tidak ada atau tidak tersedia
