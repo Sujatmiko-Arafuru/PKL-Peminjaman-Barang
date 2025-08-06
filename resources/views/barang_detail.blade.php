@@ -37,12 +37,19 @@
                     <i class="bi bi-receipt me-2"></i>
                     <strong>Kode Peminjaman Anda:</strong> 
                     <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <br><small class="text-muted">Format: NAMA-TANGGAL-URUTAN</small>
+                    <br><small class="text-muted">Contoh: JOH-20241201-0001, SAR-20241201-0002, MIK-20241201-0003</small>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
             
             <div class="mb-4">
                 <a href="{{ route('dashboard') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>
+            </div>
+            
+            <div class="alert alert-info mb-3">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
             </div>
             
             <div class="card shadow-sm border-0">

@@ -126,9 +126,14 @@
                                         <i class="bi bi-info-circle me-1"></i>
                                         Simpan kode ini untuk mengecek status peminjaman Anda
                                     </p>
+                                    <p class="text-muted small">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Format: NAMA-TANGGAL-URUTAN
+                                    </p>
                                     <div class="alert alert-info">
                                         <i class="bi bi-lightbulb me-2"></i>
                                         <strong>Tips:</strong> Anda dapat menggunakan kode ini untuk mencari peminjaman di menu "Pengembalian Barang"
+                                        <br><small class="text-muted">Contoh: JOH-20241201-0001, SAR-20241201-0002, MIK-20241201-0003, ANA-20241201-0004, DAV-20241201-0005, EMM-20241201-0006, JAM-20241201-0007</small>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -184,6 +189,11 @@
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="dashboard-title mb-0">Daftar Barang Tersedia</h1>
+            </div>
+            
+            <div class="alert alert-info mb-3">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
             </div>
             
             <!-- Search Form -->

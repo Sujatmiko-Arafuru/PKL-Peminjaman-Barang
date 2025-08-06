@@ -53,6 +53,10 @@
                                 <p class="mb-0 fw-semibold text-primary">{{ $peminjaman->kode_peminjaman }}</p>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-muted">Tanggal Pengajuan</label>
+                                <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($peminjaman->created_at)->format('d/m/Y H:i') }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Status</label>
                                 <div>
                                     @if($peminjaman->status == 'menunggu')

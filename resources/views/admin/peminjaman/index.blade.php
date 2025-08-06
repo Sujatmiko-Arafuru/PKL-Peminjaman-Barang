@@ -75,9 +75,11 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode Unik</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama & Unit</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kegiatan</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Periode</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Tanggal Pengajuan</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">No. HP</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold text-center">Aksi</th>
@@ -86,6 +88,9 @@
                     <tbody id="tableBody">
                         @forelse($peminjamans as $p)
                         <tr class="border-bottom">
+                            <td class="px-3 py-3">
+                                <span class="badge bg-dark">{{ $p->kode_peminjaman }}</span>
+                            </td>
                             <td class="px-3 py-3">
                                 <div class="fw-semibold text-dark">{{ $p->nama }}</div>
                                 <small class="text-muted">{{ $p->unit }}</small>
@@ -100,6 +105,12 @@
                                     <div>{{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d/m/Y') }}</div>
                                     <div class="text-muted">s/d</div>
                                     <div>{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d/m/Y') }}</div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="small text-muted">
+                                    <div>{{ \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') }}</div>
+                                    <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
                                 </div>
                             </td>
                             <td class="px-3 py-3">
@@ -161,7 +172,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p class="mb-0 mt-2">Tidak ada data peminjaman</p>

@@ -29,7 +29,7 @@ class PeminjamanController extends Controller
     public function ajukan(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
-            'nama' => 'required|string|max:100',
+            'nama' => 'required|string|max:100|min:3',
             'foto_peminjam' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'unit' => 'required|string|max:100',
             'no_telp' => 'required|string|max:20',
@@ -37,6 +37,10 @@ class PeminjamanController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'bukti' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+        ], [
+            'nama.min' => 'Nama harus minimal 3 karakter untuk generate kode unik.',
+            'nama.required' => 'Nama wajib diisi.',
+            'nama.max' => 'Nama maksimal 100 karakter.',
         ]);
         // Simpan data form
         $formData = $request->except(['bukti', 'foto_peminjam']);
@@ -68,8 +72,28 @@ class PeminjamanController extends Controller
         }
         
         $formData['cart'] = $validCart;
-        // Generate kode peminjaman otomatis
-        $kodePeminjaman = 'PJM-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        // Generate kode peminjaman otomatis dengan format NAMAAWAL-TANGGALMULAIDIPINJAM-000X
+        $namaAwal = strtoupper(substr($formData['nama'], 0, 3)); // Ambil 3 huruf pertama nama
+        $tanggalMulai = date('Ymd', strtotime($formData['tanggal_mulai']));
+        
+        // Cari urutan peminjaman terakhir berdasarkan tanggal pengajuan (created_at) secara global
+        $lastPeminjaman = \App\Models\Peminjaman::orderBy('created_at', 'desc')->first();
+        
+        if ($lastPeminjaman) {
+            // Extract nomor urut dari kode terakhir (ambil 4 digit terakhir)
+            $lastNumber = intval(substr($lastPeminjaman->kode_peminjaman, -4));
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        $kodePeminjaman = $namaAwal . '-' . $tanggalMulai . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        
+        // Pastikan kode peminjaman unik
+        while (\App\Models\Peminjaman::where('kode_peminjaman', $kodePeminjaman)->exists()) {
+            $nextNumber++;
+            $kodePeminjaman = $namaAwal . '-' . $tanggalMulai . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        }
         
         // Mulai database transaction
         DB::beginTransaction();

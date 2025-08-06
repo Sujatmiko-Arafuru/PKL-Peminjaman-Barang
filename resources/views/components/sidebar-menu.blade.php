@@ -16,6 +16,8 @@
                             <i class="bi bi-receipt me-1"></i>
                             <strong>Kode Anda:</strong><br>
                             <span class="badge bg-dark">{{ session('kode_peminjaman') }}</span>
+                            <br><small class="text-muted">Format: NAMA-TANGGAL-URUTAN</small>
+                            <br><small class="text-muted">Contoh: JOH-20241201-0001, SAR-20241201-0002, MIK-20241201-0003, ANA-20241201-0004, DAV-20241201-0005, EMM-20241201-0006, JAM-20241201-0007</small>
                         </small>
                     </div>
                 @endif

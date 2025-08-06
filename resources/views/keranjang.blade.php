@@ -10,11 +10,18 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-cart3 me-2"></i>Keranjang Peminjaman</h1>
             
+            <div class="alert alert-info mb-3">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
+            </div>
+            
             @if(session('kode_peminjaman'))
                 <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
                     <i class="bi bi-receipt me-2"></i>
                     <strong>Kode Peminjaman Anda:</strong> 
                     <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
+                    <br><small class="text-muted">Format: NAMA-TANGGAL-URUTAN</small>
+                    <br><small class="text-muted">Contoh: JOH-20241201-0001, SAR-20241201-0002, MIK-20241201-0003, ANA-20241201-0004, DAV-20241201-0005, EMM-20241201-0006, JAM-20241201-0007</small>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
