@@ -285,4 +285,43 @@ class PeminjamanController extends Controller
         $peminjaman = \App\Models\Peminjaman::with('details.barang')->findOrFail($id);
         return view('list_peminjam_detail', compact('peminjaman'));
     }
+
+    public function getDetailPeminjamApi($id): \Illuminate\Http\JsonResponse
+    {
+        $peminjaman = \App\Models\Peminjaman::with('details.barang')->findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $peminjaman->id,
+                'kode_peminjaman' => $peminjaman->kode_peminjaman,
+                'nama' => $peminjaman->nama,
+                'unit' => $peminjaman->unit,
+                'no_telp' => $peminjaman->no_telp,
+                'nama_kegiatan' => $peminjaman->nama_kegiatan,
+                'tanggal_mulai' => $peminjaman->tanggal_mulai,
+                'tanggal_selesai' => $peminjaman->tanggal_selesai,
+                'status' => $peminjaman->status,
+                'foto_peminjam' => $peminjaman->foto_peminjam ? asset('storage/' . $peminjaman->foto_peminjam) : null,
+                'bukti' => $peminjaman->bukti ? asset('storage/' . $peminjaman->bukti) : null,
+                'created_at' => $peminjaman->created_at->format('d/m/Y H:i'),
+                'updated_at' => $peminjaman->updated_at->format('d/m/Y H:i'),
+                'details' => $peminjaman->details->map(function($detail) {
+                    return [
+                        'id' => $detail->id,
+                        'barang_id' => $detail->barang_id,
+                        'qty' => $detail->jumlah,
+                        'barang' => [
+                            'id' => $detail->barang->id,
+                            'nama' => $detail->barang->nama,
+                            'kode' => 'BRG-' . str_pad($detail->barang->id, 4, '0', STR_PAD_LEFT),
+                            'kategori' => 'Barang',
+                            'stok' => $detail->barang->stok,
+                            'satuan' => 'Unit',
+                        ]
+                    ];
+                })
+            ]
+        ]);
+    }
 } 

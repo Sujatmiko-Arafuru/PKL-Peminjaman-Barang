@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PeminjamanController extends Controller
 {
@@ -51,47 +52,80 @@ class PeminjamanController extends Controller
 
     public function approve($id): \Illuminate\Http\RedirectResponse
     {
+        try {
         $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
         
         // Validasi stok sebelum approve
         foreach ($peminjaman->details as $detail) {
             $barang = $detail->barang;
+                if (!$barang) {
+                    return redirect()->route('admin.peminjaman.index')->with('error', 'Data barang tidak ditemukan.');
+                }
+                
             $availableStock = $barang->stok_tersedia;
             
             if ($availableStock < $detail->jumlah) {
-                return redirect()->route('admin.peminjaman.index')->with('error', 'Stok barang "' . $barang->nama . '" tidak mencukupi untuk approve peminjaman ini.');
-            }
+                    return redirect()->route('admin.peminjaman.index')->with('error', 'Stok barang "' . $barang->nama . '" tidak mencukupi untuk approve peminjaman ini. Stok tersedia: ' . $availableStock . ', diminta: ' . $detail->jumlah);
+                }
         }
         
         // Mulai transaction
         DB::beginTransaction();
         
-        try {
             // Update status peminjaman
             $peminjaman->status = 'disetujui';
-            $peminjaman->save();
+            $peminjaman->saveQuietly(); // Gunakan saveQuietly untuk performa
             
-            // Kurangi stok barang dan update status otomatis
+            // Batch update stok barang untuk optimasi
+            $barangUpdates = [];
             foreach ($peminjaman->details as $detail) {
                 $barang = $detail->barang;
-                $barang->stok = max(0, $barang->stok - $detail->jumlah);
-                $barang->save(); // Status akan diupdate otomatis melalui boot method
+                $newStok = max(0, $barang->stok - $detail->jumlah);
+                $barangUpdates[] = [
+                    'id' => $barang->id,
+                    'stok' => $newStok
+                ];
+            }
+            
+            // Update stok dalam batch untuk efisiensi
+            foreach ($barangUpdates as $update) {
+                DB::table('barangs')
+                    ->where('id', $update['id'])
+                    ->update(['stok' => $update['stok']]);
+                    
+                // Update status secara manual untuk barang yang diupdate
+                $barang = \App\Models\Barang::find($update['id']);
+                if ($barang) {
+                    $barang->updateStatusOtomatis();
+                }
             }
             
             DB::commit();
-            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui dan status barang diupdate otomatis.');
+            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui dan stok barang berhasil diupdate.');
             
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('admin.peminjaman.index')->with('error', 'Terjadi kesalahan saat approve peminjaman: ' . $e->getMessage());
+            Log::error('Error saat approve peminjaman: ' . $e->getMessage(), [
+                'peminjaman_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('admin.peminjaman.index')->with('error', 'Terjadi kesalahan saat approve peminjaman. Silakan coba lagi.');
         }
     }
 
     public function reject($id): \Illuminate\Http\RedirectResponse
     {
+        try {
         $peminjaman = Peminjaman::findOrFail($id);
         $peminjaman->status = 'ditolak';
-        $peminjaman->save();
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman ditolak.');
+            $peminjaman->saveQuietly();
+            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil ditolak.');
+        } catch (\Exception $e) {
+            Log::error('Error saat reject peminjaman: ' . $e->getMessage(), [
+                'peminjaman_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('admin.peminjaman.index')->with('error', 'Terjadi kesalahan saat menolak peminjaman. Silakan coba lagi.');
+        }
     }
 } 

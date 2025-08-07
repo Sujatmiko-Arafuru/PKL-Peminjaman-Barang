@@ -47,13 +47,14 @@ class Barang extends Model
     {
         $stokTersedia = $this->stok_tersedia;
         
-        if ($stokTersedia <= 0) {
-            $this->status = 'tidak tersedia';
-        } else {
-            $this->status = 'tersedia';
-        }
+        $newStatus = ($stokTersedia <= 0) ? 'tidak tersedia' : 'tersedia';
         
-        $this->save();
+        // Hanya update jika status berbeda untuk menghindari infinite loop
+        if ($this->status !== $newStatus) {
+            $this->status = $newStatus;
+            // Gunakan saveQuietly untuk menghindari trigger boot method
+            $this->saveQuietly();
+        }
     }
     
     // Method untuk mengecek apakah barang bisa dipinjam
@@ -69,7 +70,10 @@ class Barang extends Model
         
         // Setelah model disimpan, update status otomatis
         static::saved(function ($barang) {
-            $barang->updateStatusOtomatis();
+            // Hanya jalankan jika stok berubah untuk menghindari infinite loop
+            if ($barang->isDirty('stok') || $barang->wasRecentlyCreated) {
+                $barang->updateStatusOtomatis();
+            }
         });
     }
 } 

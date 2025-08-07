@@ -26,6 +26,7 @@ Route::get('/cek-status/search', [PeminjamanController::class, 'searchByKegiatan
 Route::get('/cek-status/detail/{id}', [PeminjamanController::class, 'detailPeminjaman'])->name('cekStatus.detail');
 Route::get('/list-peminjam', [PeminjamanController::class, 'listPeminjam'])->name('list.peminjam');
 Route::get('/list-peminjam/detail/{id}', [PeminjamanController::class, 'detailPeminjamPublic'])->name('list.peminjam.detail');
+Route::get('/api/list-peminjam/detail/{id}', [PeminjamanController::class, 'getDetailPeminjamApi'])->name('api.list.peminjam.detail');
 
 // Route login admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');

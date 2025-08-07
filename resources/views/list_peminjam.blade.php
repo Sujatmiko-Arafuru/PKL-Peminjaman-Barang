@@ -102,9 +102,9 @@
                                         </td>
                                         <td>{{ $peminjaman->no_telp }}</td>
                                         <td>
-                                            <a href="{{ route('list.peminjam.detail', $peminjaman->id) }}" class="btn btn-sm btn-info text-white">
+                                            <button type="button" class="btn btn-sm btn-info text-white" onclick="showDetailModal({{ $peminjaman->id }})">
                                                 <i class="bi bi-eye"></i> Detail
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -122,4 +122,196 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Detail Peminjam -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="detailModalLabel">
+                    <i class="bi bi-person-circle me-2"></i>Detail Peminjam
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Memuat data...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDetailModal(id) {
+    // Reset modal content
+    document.getElementById('modalBody').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Memuat data...</p>
+        </div>
+    `;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+    modal.show();
+    
+    // Fetch data
+    fetch(`/api/list-peminjam/detail/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const peminjaman = data.data;
+                document.getElementById('modalBody').innerHTML = generateDetailContent(peminjaman);
+            } else {
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Gagal memuat data peminjam.
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('modalBody').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Terjadi kesalahan saat memuat data.
+                </div>
+            `;
+        });
+}
+
+function generateDetailContent(peminjaman) {
+    const statusBadgeClass = peminjaman.status == 'dikembalikan' ? 'bg-success' : 
+                            (peminjaman.status == 'disetujui' ? 'bg-primary' : 
+                            (peminjaman.status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark'));
+    
+    return `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-person me-2"></i>Informasi Peminjam
+                </h6>
+                <table class="table table-sm">
+                    <tr>
+                        <td class="fw-bold" style="width: 40%">Kode Peminjaman:</td>
+                        <td><span class="badge bg-dark">${peminjaman.kode_peminjaman}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Nama:</td>
+                        <td><strong>${peminjaman.nama}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Unit:</td>
+                        <td>${peminjaman.unit}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">No. HP:</td>
+                        <td>${peminjaman.no_telp}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Status:</td>
+                        <td><span class="badge ${statusBadgeClass}">${peminjaman.status.charAt(0).toUpperCase() + peminjaman.status.slice(1)}</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-calendar-event me-2"></i>Informasi Kegiatan
+                </h6>
+                <table class="table table-sm">
+                    <tr>
+                        <td class="fw-bold" style="width: 40%">Nama Kegiatan:</td>
+                        <td>${peminjaman.nama_kegiatan}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Tanggal Mulai:</td>
+                        <td>${peminjaman.tanggal_mulai}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Tanggal Selesai:</td>
+                        <td>${peminjaman.tanggal_selesai}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Tanggal Pengajuan:</td>
+                        <td>${peminjaman.created_at}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Terakhir Update:</td>
+                        <td>${peminjaman.updated_at}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-image me-2"></i>Foto Peminjam
+                </h6>
+                ${peminjaman.foto_peminjam ? 
+                    `<img src="${peminjaman.foto_peminjam}" class="img-fluid rounded" style="max-height: 200px;" alt="Foto Peminjam" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="alert alert-warning" style="display: none;"><i class="bi bi-exclamation-triangle me-2"></i>Foto tidak dapat dimuat</div>` : 
+                    '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>Tidak ada foto peminjam</div>'
+                }
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary mb-3">
+                    <i class="bi bi-file-earmark-text me-2"></i>Bukti Kegiatan
+                </h6>
+                ${peminjaman.bukti ? 
+                    `<a href="${peminjaman.bukti}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-download me-2"></i>Lihat Bukti
+                    </a>` : 
+                    '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>Tidak ada bukti kegiatan</div>'
+                }
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <h6 class="fw-bold text-primary mb-3">
+            <i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam (${peminjaman.details.length} item)
+        </h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Kategori</th>
+                        <th>Qty</th>
+                        <th>Satuan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${peminjaman.details.map((detail, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><span class="badge bg-secondary">${detail.barang.kode}</span></td>
+                            <td><strong>${detail.barang.nama}</strong></td>
+                            <td>${detail.barang.kategori}</td>
+                            <td><span class="badge bg-info">${detail.qty}</span></td>
+                            <td>${detail.barang.satuan}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+</script>
 @endsection 
