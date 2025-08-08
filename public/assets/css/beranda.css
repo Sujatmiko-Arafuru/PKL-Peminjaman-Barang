@@ -35,10 +35,7 @@
     }
 }
 
-/* Animasi untuk logo */
-.logo-container {
-    animation: fadeInDown 1s ease-out;
-}
+
 
 /* Animasi untuk hero content */
 .hero-content {

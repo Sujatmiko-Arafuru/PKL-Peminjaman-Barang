@@ -37,21 +37,7 @@
         z-index: -1;
     }
     
-    .logo-container {
-        position: absolute;
-        top: 30px;
-        left: 30px;
-        z-index: 10;
-    }
-    
-    .logo-img {
-        width: 215px;
-        height: 58px;
-        object-fit: contain;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 10px;
-        border-radius: 8px;
-    }
+
     
     .hero-content {
         max-width: 800px;
@@ -137,15 +123,7 @@
             font-size: 1.1rem;
         }
         
-        .logo-container {
-            top: 15px;
-            left: 15px;
-        }
-        
-        .logo-img {
-            width: 160px;
-            height: 44px;
-        }
+
         
         .cta-button {
             padding: 12px 25px;
@@ -162,10 +140,7 @@
             font-size: 1rem;
         }
         
-        .logo-img {
-            width: 130px;
-            height: 36px;
-        }
+
     }
 </style>
 
@@ -179,11 +154,7 @@
     <!-- Video Overlay -->
     <div class="video-overlay"></div>
     
-    <!-- Logo di pojok kiri atas -->
-    <div class="logo-container">
-        <img src="{{ asset('assets/images/logo.png') }}" alt="Logo Poltekkes Kemenkes Denpasar" class="logo-img">
-    </div>
-    
+
     <!-- Hero Content -->
     <div class="hero-content">
         <h1 class="hero-title">Selamat Datang di SIMBARA</h1>
