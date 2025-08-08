@@ -1,0 +1,14 @@
+Upload video background Anda di sini dengan nama "background.mp4"
+
+Spesifikasi Video:
+- Format: MP4 (H.264)
+- Resolusi: 1920x1080 (Full HD) atau 1280x720 (HD)
+- Durasi: 30-60 detik (akan diloop)
+- Ukuran: Maksimal 50MB
+- Nama file: background.mp4
+
+Tips untuk video background:
+- Gunakan video dengan gerakan yang slow dan smooth
+- Hindari video dengan teks atau detail kecil
+- Video dengan pemandangan, teknologi, atau suasana kampus sangat cocok
+- Pastikan video tidak terlalu kontras agar teks di atasnya tetap terbaca

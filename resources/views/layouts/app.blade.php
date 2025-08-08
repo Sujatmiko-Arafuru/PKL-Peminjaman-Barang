@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>PKL - Sistem Peminjaman Barang</title>
+    <title>SIMBARA - Poltekkes Denpasar</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}" onerror="this.href='{{ asset('favicon.ico') }}'">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    @yield('head')
     <style>
         .dashboard-title {
             color: #0d6efd;
@@ -62,13 +64,52 @@
             color: #0d6efd;
             border-color: white;
         }
+        
+        /* Logo styling in navbar */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        
+        .navbar-logo {
+            height: 40px;
+            width: auto;
+            margin-right: 12px;
+            object-fit: contain;
+            /* Show original logo colors with white background */
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 4px 8px;
+            border-radius: 6px;
+            /* Debug: make sure image is visible */
+            display: inline-block !important;
+            vertical-align: middle;
+            /* Ensure image loads */
+            max-width: 120px;
+        }
+        
+        /* Responsive navbar logo */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .navbar-logo {
+                height: 32px;
+                margin-right: 8px;
+                padding: 3px 6px;
+            }
+        }
     </style>
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">
-                <i class="bi bi-box-seam me-2"></i>Peminjaman Barang
+            <a class="navbar-brand" href="{{ route('beranda') }}">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="Logo SIMBARA" class="navbar-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <i class="bi bi-hospital me-2" style="display: none; color: white;"></i>
+                SIMBARA Poltekkes Denpasar
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="btn btn-outline-light btn-sm" href="{{ route('admin.login') }}">
@@ -83,6 +124,32 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Debug script untuk memastikan logo loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoImg = document.querySelector('.navbar-logo');
+            if (logoImg) {
+                logoImg.onload = function() {
+                    console.log('Logo loaded successfully:', this.src);
+                };
+                logoImg.onerror = function() {
+                    console.error('Logo failed to load:', this.src);
+                    this.style.display = 'none';
+                    const fallbackIcon = this.nextElementSibling;
+                    if (fallbackIcon) {
+                        fallbackIcon.style.display = 'inline-block';
+                    }
+                };
+                
+                // Force reload if already loaded
+                if (logoImg.complete && logoImg.naturalHeight === 0) {
+                    logoImg.onerror();
+                }
+            }
+        });
+    </script>
+    
     @stack('scripts')
 </body>
 </html> 

@@ -1,0 +1,10 @@
+Upload logo Anda di sini dengan nama "logo.png"
+
+Spesifikasi Logo:
+- Ukuran: 431 x 117 pixels (atau rasio 3.7:1)
+- Format: PNG (recommended) atau JPG
+- Background: Transparan (PNG) atau putih/sesuai tema
+- Nama file: logo.png
+
+Contoh nama institusi:
+"Poltekkes Kemenkes Denpasar"

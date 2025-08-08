@@ -22,6 +22,9 @@
                     </div>
                 @endif
                 
+                <a href="{{ route('beranda') }}" class="btn {{ request()->routeIs('beranda') ? 'btn-primary' : 'btn-outline-primary' }}">
+                    <i class="bi bi-house me-2"></i>Beranda
+                </a>
                 <a href="{{ route('dashboard') }}" class="btn {{ request()->routeIs('dashboard') ? 'btn-primary' : 'btn-outline-primary' }}">
                     <i class="bi bi-box-seam me-2"></i>List Barang
                 </a>

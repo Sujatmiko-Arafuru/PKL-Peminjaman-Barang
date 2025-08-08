@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\PengembalianController;
 use App\Http\Controllers\Admin\ArsipController;
 use App\Http\Controllers\Admin\DashboardController;
 
-Route::get('/', [BarangController::class, 'index'])->name('dashboard');
+Route::get('/', [BarangController::class, 'beranda'])->name('beranda');
+Route::get('/list-barang', [BarangController::class, 'index'])->name('dashboard');
 Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.detail');
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
 Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');

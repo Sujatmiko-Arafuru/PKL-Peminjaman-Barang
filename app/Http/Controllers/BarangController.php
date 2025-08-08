@@ -7,6 +7,11 @@ use App\Models\Barang;
 
 class BarangController extends Controller
 {
+    public function beranda(): \Illuminate\View\View
+    {
+        return view('beranda');
+    }
+
     public function index(Request $request): \Illuminate\View\View
     {
         // Hapus session kode peminjaman jika user melihat dashboard (kecuali jika baru saja melakukan peminjaman)
