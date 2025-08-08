@@ -113,11 +113,6 @@
     .client-section {
         bottom: 30px;
     }
-    
-    .logo-img {
-        width: 120px !important;
-        height: 33px !important;
-    }
 }
 
 /* Loading state untuk video */

@@ -87,10 +87,14 @@
     .client-section {
         position: absolute;
         bottom: 50px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 0;
+        right: 0;
         text-align: center;
         z-index: 5;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     
     .client-text {
@@ -99,6 +103,10 @@
         opacity: 0.9;
         letter-spacing: 2px;
         text-transform: uppercase;
+        margin: 0 auto;
+        text-align: center;
+        display: block;
+        width: fit-content;
     }
     
     /* Fallback background jika video tidak load */
