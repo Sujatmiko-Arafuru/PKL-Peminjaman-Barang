@@ -54,7 +54,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Tanggal Pengajuan</label>
-                                <p class="mb-0 fw-semibold">{{ \Carbon\Carbon::parse($peminjaman->created_at)->format('d/m/Y H:i') }}</p>
+                                <p class="mb-0 fw-semibold">{{ format_tanggal($peminjaman->created_at, true) }}</p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">Status</label>

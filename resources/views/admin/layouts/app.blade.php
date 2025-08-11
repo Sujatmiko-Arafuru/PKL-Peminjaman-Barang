@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin SarPras</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('assets/css/custom-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/components.css') }}" rel="stylesheet">
     <style>
-        body { background: #e3f0ff; }
+        body { background: #E0FFFF; }
         .sidebar {
             min-height: 100vh;
-            background: #1565c0;
+            background: #20B2AA;
             color: #fff;
             width: 220px;
             position: fixed;
@@ -17,10 +19,10 @@
             z-index: 100;
         }
         .sidebar .nav-link { color: #fff; font-weight: 500; }
-        .sidebar .nav-link.active, .sidebar .nav-link:hover { background: #1976d2; color: #fff; }
+        .sidebar .nav-link.active, .sidebar .nav-link:hover { background: #008B8B; color: #fff; }
         .sidebar .nav-link .bi { margin-right: 8px; }
         .main-content { margin-left: 220px; padding: 2rem 2rem 2rem 2rem; }
-        .topbar { background: #fff; border-bottom: 1px solid #e3f0ff; padding: 1rem 2rem; margin-left: 220px; }
+        .topbar { background: #fff; border-bottom: 1px solid #E0FFFF; padding: 1rem 2rem; margin-left: 220px; }
         
         /* Button styling for admin */
         .btn {
@@ -44,7 +46,7 @@
         }
         
         .table thead {
-            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            background: linear-gradient(135deg, #20B2AA, #48D1CC);
             color: white;
         }
         

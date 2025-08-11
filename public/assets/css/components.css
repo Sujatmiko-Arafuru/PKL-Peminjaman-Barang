@@ -1,0 +1,367 @@
+/* Components CSS - Teal Theme untuk SIMBARA Poltekkes Denpasar */
+
+/* Custom Card Styling */
+.card {
+    border: 1px solid rgba(32, 178, 170, 0.1);
+    box-shadow: 0 2px 8px rgba(32, 178, 170, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(32, 178, 170, 0.15);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #20B2AA, #48D1CC);
+    color: white;
+    border-bottom: 1px solid rgba(32, 178, 170, 0.2);
+}
+
+/* Custom Button Styling */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(32, 178, 170, 0.2);
+}
+
+/* Custom Form Styling */
+.form-control:focus {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
+}
+
+.form-select:focus {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
+}
+
+/* Custom Table Styling */
+.table thead th {
+    background: linear-gradient(135deg, #20B2AA, #48D1CC);
+    color: white;
+    border-color: #20B2AA;
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(32, 178, 170, 0.05);
+}
+
+/* Custom Badge Styling */
+.badge {
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+/* Custom Alert Styling */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alert-primary {
+    background: linear-gradient(135deg, #E0FFFF, #F0FFFF);
+    color: #008B8B;
+    border-left: 4px solid #20B2AA;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #F0FFF0, #F5FFFA);
+    color: #2E8B57;
+    border-left: 4px solid #2E8B57;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #FFF8DC, #FFFAF0);
+    color: #DAA520;
+    border-left: 4px solid #DAA520;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #FFF0F0, #FFF5F5);
+    color: #DC143C;
+    border-left: 4px solid #DC143C;
+}
+
+/* Custom Modal Styling */
+.modal-header {
+    background: linear-gradient(135deg, #20B2AA, #48D1CC);
+    color: white;
+    border-bottom: 1px solid rgba(32, 178, 170, 0.2);
+}
+
+.modal-footer {
+    background: #F8F9FA;
+    border-top: 1px solid rgba(32, 178, 170, 0.1);
+}
+
+/* Custom Pagination Styling */
+.pagination .page-link {
+    color: #20B2AA;
+    border-color: rgba(32, 178, 170, 0.2);
+}
+
+.pagination .page-link:hover {
+    background-color: rgba(32, 178, 170, 0.1);
+    border-color: #20B2AA;
+    color: #008B8B;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #20B2AA;
+    border-color: #20B2AA;
+    color: white;
+}
+
+/* Custom Dropdown Styling */
+.dropdown-menu {
+    border: 1px solid rgba(32, 178, 170, 0.1);
+    box-shadow: 0 4px 12px rgba(32, 178, 170, 0.15);
+    border-radius: 0.5rem;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(32, 178, 170, 0.1);
+    color: #008B8B;
+}
+
+.dropdown-item.active {
+    background-color: #20B2AA;
+    color: white;
+}
+
+/* Custom Progress Bar Styling */
+.progress {
+    background-color: rgba(32, 178, 170, 0.1);
+    border-radius: 0.5rem;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #20B2AA, #48D1CC);
+    border-radius: 0.5rem;
+}
+
+/* Custom List Group Styling */
+.list-group-item {
+    border-color: rgba(32, 178, 170, 0.1);
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: rgba(32, 178, 170, 0.05);
+    border-color: rgba(32, 178, 170, 0.2);
+}
+
+.list-group-item.active {
+    background: linear-gradient(135deg, #20B2AA, #48D1CC);
+    border-color: #20B2AA;
+    color: white;
+}
+
+/* Custom Toast Styling */
+.toast {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(32, 178, 170, 0.15);
+}
+
+.toast.bg-primary {
+    background: linear-gradient(135deg, #20B2AA, #48D1CC) !important;
+}
+
+.toast.bg-success {
+    background: linear-gradient(135deg, #2E8B57, #3CB371) !important;
+}
+
+/* Custom Navbar Styling */
+.navbar {
+    box-shadow: 0 2px 8px rgba(32, 178, 170, 0.15);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: white !important;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #E0FFFF !important;
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.375rem;
+    color: white !important;
+}
+
+/* Custom Sidebar Styling */
+.sidebar {
+    box-shadow: 2px 0 8px rgba(32, 178, 170, 0.15);
+}
+
+.sidebar .nav-link {
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Custom Footer Styling */
+.footer {
+    background: linear-gradient(135deg, #20B2AA, #008B8B);
+    color: white;
+    padding: 2rem 0;
+    margin-top: 3rem;
+}
+
+/* Custom Loading Spinner */
+.spinner-border.text-primary {
+    color: #20B2AA !important;
+}
+
+/* Custom Icon Styling */
+.bi {
+    transition: all 0.3s ease;
+}
+
+.card:hover .bi {
+    transform: scale(1.1);
+    color: #20B2AA;
+}
+
+/* Custom Image Styling */
+.img-thumbnail {
+    border-color: rgba(32, 178, 170, 0.2);
+    transition: all 0.3s ease;
+}
+
+.img-thumbnail:hover {
+    border-color: #20B2AA;
+    transform: scale(1.05);
+}
+
+/* Custom Background Utilities */
+.bg-teal-light {
+    background-color: #E0FFFF !important;
+}
+
+.bg-teal-lighter {
+    background-color: #F0FFFF !important;
+}
+
+.bg-teal-opacity-10 {
+    background-color: rgba(32, 178, 170, 0.1) !important;
+}
+
+.bg-teal-opacity-20 {
+    background-color: rgba(32, 178, 170, 0.2) !important;
+}
+
+/* Custom Text Utilities */
+.text-teal {
+    color: #20B2AA !important;
+}
+
+.text-teal-dark {
+    color: #008B8B !important;
+}
+
+.text-teal-light {
+    color: #48D1CC !important;
+}
+
+/* Custom Border Utilities */
+.border-teal {
+    border-color: #20B2AA !important;
+}
+
+.border-teal-light {
+    border-color: #48D1CC !important;
+}
+
+.border-teal-opacity-10 {
+    border-color: rgba(32, 178, 170, 0.1) !important;
+}
+
+/* Custom Shadow Utilities */
+.shadow-teal {
+    box-shadow: 0 0.5rem 1rem rgba(32, 178, 170, 0.15) !important;
+}
+
+.shadow-teal-lg {
+    box-shadow: 0 1rem 3rem rgba(32, 178, 170, 0.175) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card:hover {
+        transform: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .sidebar .nav-link:hover {
+        transform: none;
+    }
+    
+    .navbar-nav .nav-link:hover {
+        transform: none;
+    }
+}
+
+/* Animation Utilities */
+@keyframes fadeInTeal {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-teal {
+    animation: fadeInTeal 0.6s ease-out;
+}
+
+@keyframes pulseTeal {
+    0% {
+        box-shadow: 0 0 0 0 rgba(32, 178, 170, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(32, 178, 170, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(32, 178, 170, 0);
+    }
+}
+
+.pulse-teal {
+    animation: pulseTeal 2s infinite;
+}

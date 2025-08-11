@@ -48,7 +48,7 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>Tanggal Kegiatan:</strong></span>
-                                    <span>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</span>
+                                    <span>{{ format_tanggal($peminjaman->tanggal_mulai) }} s/d {{ format_tanggal($peminjaman->tanggal_selesai) }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>Status:</strong></span>

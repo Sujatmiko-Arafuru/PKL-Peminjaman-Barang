@@ -53,7 +53,7 @@
                                         <span>{{ $peminjaman->no_telp }}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between">
-                                        <span><strong>Unit/Jurusan:</strong></span>
+                                        <span><strong>Jurusan / Ormawa:</strong></span>
                                         <span>{{ $peminjaman->unit }}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between">
@@ -63,7 +63,7 @@
 
                                     <li class="list-group-item d-flex justify-content-between">
                                         <span><strong>Tanggal Pinjam:</strong></span>
-                                        <span>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</span>
+                                        <span>{{ format_tanggal($peminjaman->tanggal_mulai) }} s/d {{ format_tanggal($peminjaman->tanggal_selesai) }}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between">
                                         <span><strong>Status:</strong></span>

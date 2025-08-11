@@ -1,0 +1,388 @@
+/* Custom Theme CSS - Teal/Turquoise Theme untuk SIMBARA Poltekkes Denpasar */
+
+:root {
+    /* Primary Teal Colors */
+    --primary-teal: #20B2AA; /* Light Sea Green */
+    --primary-teal-dark: #008B8B; /* Dark Cyan */
+    --primary-teal-light: #48D1CC; /* Medium Turquoise */
+    --primary-teal-lighter: #E0FFFF; /* Light Cyan */
+    
+    /* Secondary Colors */
+    --secondary-teal: #40E0D0; /* Turquoise */
+    --accent-teal: #00CED1; /* Dark Turquoise */
+    --success-teal: #2E8B57; /* Sea Green */
+    --info-teal: #5F9EA0; /* Cadet Blue */
+    
+    /* Neutral Colors */
+    --white: #FFFFFF;
+    --light-gray: #F8F9FA;
+    --gray: #6C757D;
+    --dark-gray: #343A40;
+    --black: #000000;
+}
+
+/* Override Bootstrap Primary Colors */
+.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.bg-primary-dark {
+    background-color: var(--primary-teal-dark) !important;
+}
+
+.bg-primary-light {
+    background-color: var(--primary-teal-light) !important;
+}
+
+.bg-primary-lighter {
+    background-color: var(--primary-teal-lighter) !important;
+}
+
+.text-primary {
+    color: var(--primary-teal) !important;
+}
+
+.text-primary-dark {
+    color: var(--primary-teal-dark) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-teal) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    color: var(--white) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-teal-dark) !important;
+    border-color: var(--primary-teal-dark) !important;
+    color: var(--white) !important;
+}
+
+.btn-primary:focus {
+    background-color: var(--primary-teal-dark) !important;
+    border-color: var(--primary-teal-dark) !important;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25) !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    color: var(--white) !important;
+}
+
+.btn-outline-light {
+    color: var(--white) !important;
+    border-color: var(--white) !important;
+}
+
+.btn-outline-light:hover {
+    background-color: var(--white) !important;
+    border-color: var(--white) !important;
+    color: var(--primary-teal) !important;
+}
+
+/* Override Bootstrap Success Colors */
+.bg-success {
+    background-color: var(--success-teal) !important;
+}
+
+.text-success {
+    color: var(--success-teal) !important;
+}
+
+.btn-success {
+    background-color: var(--success-teal) !important;
+    border-color: var(--success-teal) !important;
+}
+
+.btn-success:hover {
+    background-color: #1e6b47 !important;
+    border-color: #1e6b47 !important;
+}
+
+/* Override Bootstrap Info Colors */
+.bg-info {
+    background-color: var(--info-teal) !important;
+}
+
+.text-info {
+    color: var(--info-teal) !important;
+}
+
+.btn-info {
+    background-color: var(--info-teal) !important;
+    border-color: var(--info-teal) !important;
+}
+
+.btn-info:hover {
+    background-color: #4a7a7c !important;
+    border-color: #4a7a7c !important;
+}
+
+/* Navbar Styling */
+.navbar-dark.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--white) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--primary-teal-lighter) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+    color: var(--white) !important;
+    background-color: var(--primary-teal-dark) !important;
+    border-radius: 0.375rem;
+}
+
+/* Card Headers */
+.card-header.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.card-header.bg-success {
+    background-color: var(--success-teal) !important;
+}
+
+/* Badge Styling */
+.badge.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--success-teal) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-teal) !important;
+}
+
+/* Modal Headers */
+.modal-header.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.modal-header.bg-success {
+    background-color: var(--success-teal) !important;
+}
+
+/* Background Opacity Classes */
+.bg-primary.bg-opacity-10 {
+    background-color: rgba(32, 178, 170, 0.1) !important;
+}
+
+.bg-success.bg-opacity-10 {
+    background-color: rgba(46, 139, 87, 0.1) !important;
+}
+
+.bg-info.bg-opacity-10 {
+    background-color: rgba(95, 158, 160, 0.1) !important;
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: var(--primary-teal) !important;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25) !important;
+}
+
+.form-select:focus {
+    border-color: var(--primary-teal) !important;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25) !important;
+}
+
+/* Links */
+a {
+    color: var(--primary-teal);
+}
+
+a:hover {
+    color: var(--primary-teal-dark);
+}
+
+/* Sidebar Menu (Admin) */
+.sidebar {
+    background-color: var(--primary-teal) !important;
+}
+
+.sidebar .nav-link {
+    color: var(--white) !important;
+}
+
+.sidebar .nav-link:hover {
+    background-color: var(--primary-teal-dark) !important;
+    color: var(--white) !important;
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--primary-teal-dark) !important;
+    color: var(--white) !important;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--primary-teal) !important;
+    color: var(--white) !important;
+}
+
+/* Custom Button Variants */
+.btn-teal {
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    color: var(--white) !important;
+}
+
+.btn-teal:hover {
+    background-color: var(--primary-teal-dark) !important;
+    border-color: var(--primary-teal-dark) !important;
+    color: var(--white) !important;
+}
+
+.btn-teal-outline {
+    color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    background-color: transparent !important;
+}
+
+.btn-teal-outline:hover {
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    color: var(--white) !important;
+}
+
+/* Alert Styling */
+.alert-primary {
+    background-color: var(--primary-teal-lighter) !important;
+    border-color: var(--primary-teal) !important;
+    color: var(--primary-teal-dark) !important;
+}
+
+.alert-success {
+    background-color: rgba(46, 139, 87, 0.1) !important;
+    border-color: var(--success-teal) !important;
+    color: var(--success-teal) !important;
+}
+
+/* Progress Bars */
+.progress-bar.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.progress-bar.bg-success {
+    background-color: var(--success-teal) !important;
+}
+
+/* List Group */
+.list-group-item.active {
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+}
+
+/* Pagination */
+.page-link {
+    color: var(--primary-teal) !important;
+}
+
+.page-link:hover {
+    color: var(--primary-teal-dark) !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+}
+
+/* Dropdown */
+.dropdown-item:hover {
+    background-color: var(--primary-teal-lighter) !important;
+}
+
+.dropdown-item.active {
+    background-color: var(--primary-teal) !important;
+}
+
+/* Toast Notifications */
+.toast.bg-primary {
+    background-color: var(--primary-teal) !important;
+}
+
+.toast.bg-success {
+    background-color: var(--success-teal) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar-thumb {
+    background: var(--primary-teal) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-teal-dark) !important;
+}
+
+/* Focus States */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-teal) !important;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25) !important;
+}
+
+/* Hover Effects */
+.card:hover {
+    border-color: var(--primary-teal) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--primary-teal-lighter) !important;
+}
+
+/* Custom Background Gradients */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-teal-dark) 100%) !important;
+}
+
+.bg-gradient-teal {
+    background: linear-gradient(135deg, var(--primary-teal) 0%, var(--secondary-teal) 100%) !important;
+}
+
+/* Text Utilities */
+.text-teal {
+    color: var(--primary-teal) !important;
+}
+
+.text-teal-dark {
+    color: var(--primary-teal-dark) !important;
+}
+
+.text-teal-light {
+    color: var(--primary-teal-light) !important;
+}
+
+/* Border Utilities */
+.border-teal {
+    border-color: var(--primary-teal) !important;
+}
+
+.border-teal-dark {
+    border-color: var(--primary-teal-dark) !important;
+}
+
+/* Shadow with Teal */
+.shadow-teal {
+    box-shadow: 0 0.5rem 1rem rgba(32, 178, 170, 0.15) !important;
+}
+
+.shadow-teal-lg {
+    box-shadow: 0 1rem 3rem rgba(32, 178, 170, 0.175) !important;
+}

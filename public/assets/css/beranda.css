@@ -122,7 +122,7 @@
 
 /* Fallback untuk browser yang tidak support video */
 .no-video .hero-section::before {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background: linear-gradient(135deg, #20B2AA 0%, #008B8B 50%, #48D1CC 100%);
 }
 
 /* Smooth scrolling */

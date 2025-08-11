@@ -134,7 +134,7 @@
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Tanggal Pengajuan</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Barang</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Aksi</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Lihat Detail</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -243,14 +243,10 @@
                                                                     <div class="fw-semibold">{{ $p->nama_kegiatan }}</div>
                                                                 </div>
                                                                 <div class="mb-2">
-                                                                    <small class="text-muted">Tujuan</small>
-                                                                    <div class="fw-semibold">{{ $p->tujuan }}</div>
-                                                                </div>
-                                                                <div class="mb-2">
                                                                     <small class="text-muted">Periode Peminjaman</small>
                                                                     <div class="fw-semibold">
-                                                                        {{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d/m/Y') }} - 
-                                                                        {{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d/m/Y') }}
+                                                                        {{ format_tanggal($p->tanggal_mulai) }} - 
+                                                                        {{ format_tanggal($p->tanggal_selesai) }}
                                                                     </div>
                                                                 </div>
                                                                 <div class="mb-2">

@@ -101,17 +101,6 @@ class ArsipController extends Controller
 
         $peminjamans = $query->get();
 
-        // Data untuk summary
-        $terlaris = Barang::withCount(['details' => function($query) {
-            $query->whereHas('peminjaman', function($q) {
-                $q->where('status', 'dikembalikan');
-            });
-        }])->orderBy('details_count', 'desc')->first();
-
-        $tidakPernah = Barang::whereDoesntHave('details.peminjaman', function($query) {
-            $query->where('status', 'dikembalikan');
-        })->get();
-
         // Filter info untuk ditampilkan di PDF
         $filterInfo = [];
         if ($request->filled('search')) $filterInfo['search'] = $request->search;
@@ -120,7 +109,7 @@ class ArsipController extends Controller
         if ($request->filled('tanggal_selesai')) $filterInfo['tanggal_selesai'] = $request->tanggal_selesai;
 
         $pdf = app('dompdf.wrapper');
-        $pdf->loadView('admin.arsip.pdf', compact('peminjamans', 'terlaris', 'tidakPernah', 'filterInfo'));
+        $pdf->loadView('admin.arsip.pdf', compact('peminjamans', 'filterInfo'));
         
         $filename = 'arsip_peminjaman_' . date('Y-m-d_H-i-s') . '.pdf';
         

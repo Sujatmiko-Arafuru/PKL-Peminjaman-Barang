@@ -16,13 +16,13 @@
         
         .header {
             text-align: center;
-            border-bottom: 3px solid #1565c0;
+            border-bottom: 3px solid #20B2AA;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
         
         .header h1 {
-            color: #1565c0;
+            color: #20B2AA;
             font-size: 24px;
             font-weight: bold;
             margin: 0 0 5px 0;
@@ -49,7 +49,7 @@
         }
         
         .filter-info h3 {
-            color: #1565c0;
+            color: #20B2AA;
             font-size: 14px;
             margin: 0 0 10px 0;
             border-bottom: 1px solid #dee2e6;
@@ -61,44 +61,6 @@
             font-size: 11px;
         }
         
-        .summary-section {
-            margin-bottom: 25px;
-        }
-        
-        .summary-section h3 {
-            color: #1565c0;
-            font-size: 14px;
-            margin: 0 0 10px 0;
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 5px;
-        }
-        
-        .summary-grid {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .summary-item {
-            flex: 1;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        
-        .summary-item h4 {
-            color: #1565c0;
-            font-size: 12px;
-            margin: 0 0 5px 0;
-        }
-        
-        .summary-item p {
-            margin: 0;
-            font-size: 11px;
-            color: #666;
-        }
-        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -107,12 +69,12 @@
         }
         
         th {
-            background: #1565c0;
+            background: #20B2AA;
             color: white;
             padding: 8px;
             text-align: left;
             font-weight: bold;
-            border: 1px solid #1565c0;
+            border: 1px solid #20B2AA;
         }
         
         td {
@@ -133,8 +95,8 @@
             color: white;
         }
         
-        .status-dikembalikan { background: #28a745; }
-        .status-disetujui { background: #007bff; }
+        .status-dikembalikan { background: #2E8B57; }
+        .status-disetujui { background: #20B2AA; }
         .status-pengembalian_diajukan { background: #ffc107; color: #333; }
         .status-ditolak { background: #dc3545; }
         .status-pengembalian-ditolak { background: #dc3545; }
@@ -176,25 +138,6 @@
             color: #666;
             font-style: italic;
         }
-        
-        .total-info {
-            background: #e8f5e8;
-            border: 1px solid #c8e6c9;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .total-info h4 {
-            color: #2e7d32;
-            font-size: 12px;
-            margin: 0 0 5px 0;
-        }
-        
-        .total-info p {
-            margin: 3px 0;
-            font-size: 11px;
-        }
     </style>
 </head>
 <body>
@@ -203,7 +146,7 @@
         <h1>ARSIP PEMINJAMAN SARANA DAN PRASARANA</h1>
         <h2>Sistem Peminjaman Sarana dan Prasarana (SarPras)</h2>
         <div class="info">
-            <p>Dicetak pada: {{ date('d/m/Y H:i:s') }}</p>
+            <p>Dicetak pada: {{ format_tanggal(now(), true) }}</p>
             <p>Total Data: {{ $peminjamans->count() }} peminjaman</p>
         </div>
     </div>
@@ -219,54 +162,13 @@
             <p><strong>Status:</strong> {{ ucfirst($filterInfo['status']) }}</p>
         @endif
         @if(isset($filterInfo['tanggal_mulai']))
-            <p><strong>Tanggal Mulai:</strong> {{ date('d/m/Y', strtotime($filterInfo['tanggal_mulai'])) }}</p>
+            <p><strong>Tanggal Mulai:</strong> {{ format_tanggal($filterInfo['tanggal_mulai']) }}</p>
         @endif
         @if(isset($filterInfo['tanggal_selesai']))
-            <p><strong>Tanggal Selesai:</strong> {{ date('d/m/Y', strtotime($filterInfo['tanggal_selesai'])) }}</p>
+            <p><strong>Tanggal Selesai:</strong> {{ format_tanggal($filterInfo['tanggal_selesai']) }}</p>
         @endif
     </div>
     @endif
-
-    <!-- Summary Section -->
-    <div class="summary-section">
-        <h3>📊 Ringkasan Data</h3>
-        <div class="summary-grid">
-            <div class="summary-item">
-                <h4>🏆 Barang Terlaris</h4>
-                <p>
-                    @if($terlaris)
-                        {{ $terlaris->nama }} ({{ $terlaris->details_count ?? 0 }}x dipinjam)
-                    @else
-                        Tidak ada data
-                    @endif
-                </p>
-            </div>
-            <div class="summary-item">
-                <h4>📦 Barang Tidak Pernah Dipinjam</h4>
-                <p>
-                    @if($tidakPernah && count($tidakPernah) > 0)
-                        {{ count($tidakPernah) }} item
-                    @else
-                        Tidak ada
-                    @endif
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Information -->
-    <div class="total-info">
-        <h4>📈 Statistik Status Peminjaman</h4>
-        @php
-            $statusCounts = $peminjamans->groupBy('status')->map->count();
-        @endphp
-        <p><strong>Total Peminjaman:</strong> {{ $peminjamans->count() }}</p>
-        <p><strong>Dikembalikan:</strong> {{ $statusCounts['dikembalikan'] ?? 0 }}</p>
-        <p><strong>Disetujui:</strong> {{ $statusCounts['disetujui'] ?? 0 }}</p>
-        <p><strong>Menunggu:</strong> {{ $statusCounts['menunggu'] ?? 0 }}</p>
-        <p><strong>Ditolak:</strong> {{ $statusCounts['ditolak'] ?? 0 }}</p>
-        <p><strong>Pengembalian Diajukan:</strong> {{ $statusCounts['pengembalian_diajukan'] ?? 0 }}</p>
-    </div>
 
     <!-- Data Table -->
     @if($peminjamans->count() > 0)
@@ -274,14 +176,13 @@
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
-                <th style="width: 15%;">Nama Peminjam</th>
-                <th style="width: 10%;">No HP</th>
-                <th style="width: 12%;">Unit/Jurusan</th>
-                <th style="width: 15%;">Nama Kegiatan</th>
-                <th style="width: 12%;">Tujuan</th>
-                <th style="width: 12%;">Tanggal Pinjam</th>
-                <th style="width: 8%;">Status</th>
-                <th style="width: 11%;">Barang Dipinjam</th>
+                <th style="width: 18%;">Nama Peminjam</th>
+                <th style="width: 12%;">No HP</th>
+                <th style="width: 15%;">Unit/Jurusan</th>
+                <th style="width: 20%;">Nama Kegiatan</th>
+                <th style="width: 15%;">Tanggal Pinjam</th>
+                <th style="width: 10%;">Status</th>
+                <th style="width: 15%;">Barang Dipinjam</th>
             </tr>
         </thead>
         <tbody>
@@ -295,10 +196,9 @@
                 <td>{{ $p->no_telp }}</td>
                 <td>{{ $p->unit }}</td>
                 <td>{{ Str::limit($p->nama_kegiatan, 30) }}</td>
-                <td>{{ Str::limit($p->tujuan, 25) }}</td>
                 <td>
-                    <strong>Mulai:</strong> {{ date('d/m/Y', strtotime($p->tanggal_mulai)) }}<br>
-                    <strong>Selesai:</strong> {{ date('d/m/Y', strtotime($p->tanggal_selesai)) }}
+                    <strong>Mulai:</strong> {{ format_tanggal($p->tanggal_mulai) }}<br>
+                    <strong>Selesai:</strong> {{ format_tanggal($p->tanggal_selesai) }}
                 </td>
                 <td style="text-align: center;">
                     <span class="status-badge status-{{ str_replace(' ', '-', $p->status) }}">

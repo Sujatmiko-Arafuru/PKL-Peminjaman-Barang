@@ -62,7 +62,7 @@
     }
     
     .cta-button {
-        background: linear-gradient(45deg, #007bff, #0056b3);
+        background: linear-gradient(45deg, #20B2AA, #008B8B);
         color: white;
         padding: 15px 35px;
         font-size: 1.1rem;
@@ -72,14 +72,14 @@
         text-decoration: none;
         display: inline-block;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        box-shadow: 0 4px 15px rgba(32, 178, 170, 0.3);
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     
     .cta-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
         color: white;
         text-decoration: none;
     }
@@ -182,7 +182,7 @@
 </div>
 
 <!-- Additional Content Section (Optional) -->
-<div class="container-fluid py-5" style="background: #f8f9fa;">
+        <div class="container-fluid py-5" style="background: #E0FFFF;">
     <div class="container">
         <div class="row">
             <div class="col-md-4 text-center mb-4">

@@ -15,7 +15,7 @@
 
                 <p class="mb-1">Tanggal Pinjam: <b>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</b></p>
                 <p class="mb-1">Kode Peminjaman: <b>{{ $peminjaman->kode_peminjaman }}</b></p>
-                <p class="mb-1">Tanggal Pengajuan: <b>{{ \Carbon\Carbon::parse($peminjaman->created_at)->format('d/m/Y H:i') }}</b></p>
+                <p class="mb-1">Tanggal Pengajuan: <b>{{ format_tanggal($peminjaman->created_at, true) }}</b></p>
                 <p class="mb-1">Lampiran: 
                     @if($peminjaman->bukti)
                         <a href="{{ asset('storage/' . $peminjaman->bukti) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Bukti</a>

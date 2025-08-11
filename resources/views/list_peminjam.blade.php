@@ -85,7 +85,7 @@
                                         <th>Tanggal Kegiatan</th>
                                         <th>Status</th>
                                         <th>No. HP</th>
-                                        <th>Aksi</th>
+                                        <th>Lihat Detail</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -94,7 +94,7 @@
                                         <td><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></td>
                                         <td><strong>{{ $peminjaman->nama }}</strong></td>
                                         <td>{{ Str::limit($peminjaman->nama_kegiatan, 30) }}</td>
-                                        <td>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</td>
+                                        <td>${formatTanggal(peminjaman.tanggal_mulai)} s/d ${formatTanggal(peminjaman.tanggal_selesai)}</td>
                                         <td>
                                             <span class="badge {{ $peminjaman->status == 'dikembalikan' ? 'bg-success' : ($peminjaman->status == 'disetujui' ? 'bg-primary' : ($peminjaman->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">
                                                 {{ ucfirst($peminjaman->status) }}
@@ -149,6 +149,25 @@
 </div>
 
 <script>
+function formatTanggal(dateString, includeTime = false) {
+    if (!dateString) return '-';
+    
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    
+    let formatted = `${day}/${month}/${year}`;
+    
+    if (includeTime) {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        formatted += ` ${hours}:${minutes}`;
+    }
+    
+    return formatted;
+}
+
 function showDetailModal(id) {
     // Reset modal content
     document.getElementById('modalBody').innerHTML = `
@@ -236,19 +255,19 @@ function generateDetailContent(peminjaman) {
                     </tr>
                     <tr>
                         <td class="fw-bold">Tanggal Mulai:</td>
-                        <td>${peminjaman.tanggal_mulai}</td>
+                        <td>${formatTanggal(peminjaman.tanggal_mulai)}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold">Tanggal Selesai:</td>
-                        <td>${peminjaman.tanggal_selesai}</td>
+                        <td>${formatTanggal(peminjaman.tanggal_selesai)}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold">Tanggal Pengajuan:</td>
-                        <td>${peminjaman.created_at}</td>
+                        <td>${formatTanggal(peminjaman.created_at, true)}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold">Terakhir Update:</td>
-                        <td>${peminjaman.updated_at}</td>
+                        <td>${formatTanggal(peminjaman.updated_at, true)}</td>
                     </tr>
                 </table>
             </div>

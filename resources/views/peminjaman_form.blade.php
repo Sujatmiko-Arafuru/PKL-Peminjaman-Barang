@@ -1,6 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.form-control:focus {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
+}
+</style>
+
 <div class="container py-4">
     <div class="row">
         <!-- Sidebar Menu -->
@@ -55,11 +75,10 @@
                                                     <div class="mb-3">
                                                         <img id="preview-foto" src="{{ asset('storage/dummy.jpg') }}" alt="Preview Foto" class="img-fluid rounded" style="max-width: 200px; max-height: 200px; object-fit: cover;">
                                                     </div>
-                                                    <label for="foto_peminjam" class="btn btn-outline-primary btn-sm">
-                                                        <i class="bi bi-upload me-2"></i>Pilih Foto
-                                                    </label>
-                                                    <input type="file" id="foto_peminjam" name="foto_peminjam" class="form-control d-none" accept="image/jpg,image/jpeg,image/png" required onchange="previewFoto(this)">
-                                                    <div class="form-text">Format: JPG, JPEG, PNG (Max: 2MB)</div>
+                                                    <div class="mb-3">
+                                                        <input type="file" id="foto_peminjam" name="foto_peminjam" class="form-control" accept="image/jpg,image/jpeg,image/png" required onchange="previewFoto(this)">
+                                                        <div class="form-text">Format: JPG, JPEG, PNG (Max: 2MB)</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
@@ -73,7 +92,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label fw-bold">Unit / Jurusan</label>
+                                                        <label class="form-label fw-bold">Jurusan / Ormawa</label>
                                                         <input type="text" name="unit" class="form-control" required value="{{ old('unit') }}" placeholder="Contoh: Teknik Informatika">
                                                     </div>
                                                     <div class="col-md-6 mb-3">
@@ -127,8 +146,13 @@
                             </table>
                         </div>
                         
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success"><i class="bi bi-send-check"></i> Ajukan Peminjaman</button>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-info" onclick="testForm()">
+                                <i class="bi bi-bug"></i> Test Form
+                            </button>
+                            <button type="submit" class="btn btn-success" id="submitBtn">
+                                <i class="bi bi-send-check"></i> Ajukan Peminjaman
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -152,6 +176,36 @@ function previewFoto(input) {
     }
 }
 
+function testForm() {
+    console.log('=== FORM TEST START ===');
+    const form = document.querySelector('form[action*="peminjaman/ajukan"]');
+    console.log('Form found:', !!form);
+    console.log('Form action:', form ? form.action : 'N/A');
+    console.log('Form method:', form ? form.method : 'N/A');
+    console.log('Form enctype:', form ? form.enctype : 'N/A');
+    
+    // Check all form fields
+    const fields = form ? form.querySelectorAll('input, select, textarea') : [];
+    console.log('Total form fields:', fields.length);
+    
+    fields.forEach((field, index) => {
+        console.log(`Field ${index + 1}:`, {
+            name: field.name,
+            type: field.type,
+            value: field.value,
+            required: field.required,
+            disabled: field.disabled
+        });
+    });
+    
+    // Check cart
+    const cartTable = document.querySelector('table tbody');
+    console.log('Cart table found:', !!cartTable);
+    console.log('Cart items:', cartTable ? cartTable.children.length : 0);
+    
+    console.log('=== FORM TEST END ===');
+}
+
 // Set default date values
 document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
@@ -168,6 +222,69 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (tanggalSelesaiInput && !tanggalSelesaiInput.value) {
         tanggalSelesaiInput.value = tomorrowStr;
+    }
+    
+    // Form validation and debugging
+    const form = document.querySelector('form[action*="peminjaman/ajukan"]');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (form) {
+        console.log('Form found:', form);
+        
+        form.addEventListener('submit', function(e) {
+            console.log('Form submission started...');
+            
+            // Disable submit button to prevent double submission
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
+            }
+            
+            // Check if all required fields are filled
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            let emptyFields = [];
+            
+            requiredFields.forEach(function(field) {
+                console.log('Checking field:', field.name, 'Value:', field.value);
+                if (!field.value.trim()) {
+                    console.error('Required field empty:', field.name);
+                    emptyFields.push(field.name);
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Check if cart has items
+            const cartTable = document.querySelector('table tbody');
+            if (cartTable && cartTable.children.length === 0) {
+                console.error('Cart is empty');
+                alert('Keranjang kosong! Silakan tambahkan barang terlebih dahulu.');
+                e.preventDefault();
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-send-check"></i> Ajukan Peminjaman';
+                }
+                return false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Mohon lengkapi semua field yang wajib diisi: ' + emptyFields.join(', '));
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-send-check"></i> Ajukan Peminjaman';
+                }
+                return false;
+            }
+            
+            console.log('Form validation passed, submitting...');
+            // Allow form to submit
+        });
+    } else {
+        console.error('Form not found!');
     }
 });
 </script>

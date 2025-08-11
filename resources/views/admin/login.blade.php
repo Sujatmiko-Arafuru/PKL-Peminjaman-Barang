@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin SarPras</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('assets/css/custom-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/components.css') }}" rel="stylesheet">
     <style>
-        body { background: #e3f0ff; }
-        .login-box { max-width: 400px; margin: 80px auto; background: #fff; border-radius: 1rem; box-shadow: 0 2px 16px rgba(21,101,192,0.10); padding: 2.5rem 2rem; }
-        .text-primary { color: #1565c0 !important; }
-        .btn-biru { background: #1976d2; color: #fff; border-radius: 0.5rem; border: none; padding: 0.5rem 1.2rem; font-weight: 500; transition: background 0.2s; }
-        .btn-biru:hover { background: #1565c0; }
+        body { background: #E0FFFF; }
+        .login-box { max-width: 400px; margin: 80px auto; background: #fff; border-radius: 1rem; box-shadow: 0 2px 16px rgba(32,178,170,0.10); padding: 2.5rem 2rem; }
+        .text-primary { color: #20B2AA !important; }
+        .btn-biru { background: #20B2AA; color: #fff; border-radius: 0.5rem; border: none; padding: 0.5rem 1.2rem; font-weight: 500; transition: background 0.2s; }
+        .btn-biru:hover { background: #008B8B; }
     </style>
 </head>
 <body>

@@ -64,7 +64,7 @@
                                 <td><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></td>
                                 <td>{{ $peminjaman->nama }}</td>
                                 <td>{{ $peminjaman->nama_kegiatan }}</td>
-                                <td>{{ $peminjaman->tanggal_mulai }} s/d {{ $peminjaman->tanggal_selesai }}</td>
+                                <td>{{ format_tanggal($peminjaman->tanggal_mulai) }} s/d {{ format_tanggal($peminjaman->tanggal_selesai) }}</td>
                                 <td>
                                     <span class="badge {{ $peminjaman->status == 'dikembalikan' ? 'bg-success' : ($peminjaman->status == 'disetujui' ? 'bg-primary' : ($peminjaman->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">
                                         {{ ucfirst($peminjaman->status) }}

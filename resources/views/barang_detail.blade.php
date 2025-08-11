@@ -65,7 +65,7 @@
                             </div>
                             <div class="d-flex justify-content-center gap-2">
                                 @foreach($fotoArray as $i => $foto)
-                                <img src="{{ asset('storage/' . $foto) }}" class="img-thumbnail selector-foto" data-foto="{{ asset('storage/' . $foto) }}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;{{ $i==0?'border:2px solid #0d6efd;':'' }}" alt="Thumb {{ $i+1 }}">
+                                <img src="{{ asset('storage/' . $foto) }}" class="img-thumbnail selector-foto" data-foto="{{ asset('storage/' . $foto) }}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;{{ $i==0?'border:2px solid #20B2AA;':'' }}" alt="Thumb {{ $i+1 }}">
                                 @endforeach
                             </div>
                             @else
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.selector-foto').forEach(function(thumb) {
         thumb.addEventListener('click', function() {
             document.querySelectorAll('.selector-foto').forEach(t => t.style.border = '');
-            this.style.border = '2px solid #0d6efd';
+            this.style.border = '2px solid #20B2AA';
             var mainFoto = document.querySelector('.main-foto-barang');
             if(mainFoto) mainFoto.setAttribute('src', this.getAttribute('data-foto'));
         });

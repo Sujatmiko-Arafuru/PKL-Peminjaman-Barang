@@ -101,15 +101,17 @@
                                 </div>
                             </td>
                             <td class="px-3 py-3">
-                                <div class="small text-muted">
-                                    <div>{{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d/m/Y') }}</div>
-                                    <div class="text-muted">s/d</div>
-                                    <div>{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d/m/Y') }}</div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Tanggal Mulai</small>
+                                    <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
                                 </div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="small text-muted">
-                                    <div>{{ \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') }}</div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Tanggal Selesai</small>
+                                    <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Tanggal Pengajuan</small>
+                                    <div>{{ format_tanggal($p->created_at) }}</div>
                                     <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
                                 </div>
                             </td>

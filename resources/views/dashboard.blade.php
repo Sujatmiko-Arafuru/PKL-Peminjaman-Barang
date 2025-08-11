@@ -38,14 +38,14 @@
     
     .modal-header {
         border-bottom: 2px solid #e9ecef;
-        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        background: linear-gradient(135deg, #20B2AA, #48D1CC);
         color: white;
         border-radius: 1rem 1rem 0 0;
     }
     
     .modal-footer {
         border-top: 2px solid #e9ecef;
-        background: #f8f9fa;
+        background: #E0FFFF;
         border-radius: 0 0 1rem 1rem;
     }
     
@@ -69,7 +69,7 @@
     }
     
     .alert-success {
-        background: linear-gradient(135deg, #28a745, #20c997);
+        background: linear-gradient(135deg, #2E8B57, #3CB371);
         color: white;
     }
     
