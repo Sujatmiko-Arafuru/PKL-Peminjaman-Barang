@@ -126,15 +126,13 @@
                     <thead class="table-light">
                         <tr>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">KODE UNIK</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">NAMA</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">NO HP</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">UNIT/JURUSAN</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">NAMA & UNIT</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">KEGIATAN</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">PERIODE</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">TANGGAL PENGAJUAN</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">STATUS</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">BARANG</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">LIHAT DETAIL</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">NO. HP</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">AKSI</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,35 +143,29 @@
                             </td>
                             <td class="px-3 py-3">
                                 <div class="fw-semibold text-dark">{{ $p->nama }}</div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="text-muted">{{ $p->no_telp }}</span>
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="badge bg-light text-dark">{{ $p->unit }}</span>
+                                <div class="text-muted small">{{ $p->unit }}</div>
                             </td>
                             <td class="px-3 py-3">
                                 <div class="fw-medium" title="{{ $p->nama_kegiatan }}">
-                                    {{ Str::limit($p->nama_kegiatan, 25) }}
+                                    {{ Str::limit($p->nama_kegiatan, 30) }}
                                 </div>
                             </td>
                             <td class="px-3 py-3">
                                 <div class="small text-muted">
-                                    <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
-                                    <div class="text-muted">s/d</div>
-                                    <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
+                                    <div>Tanggal Mulai {{ format_tanggal($p->tanggal_mulai) }}</div>
+                                    <div>Tanggal Selesai {{ format_tanggal($p->tanggal_selesai) }}</div>
                                 </div>
                             </td>
                             <td class="px-3 py-3">
                                 <div class="small text-muted">
-                                    <div>{{ format_tanggal($p->created_at) }}</div>
-                                    <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
+                                    <div>Tanggal Pengajuan {{ format_tanggal($p->created_at) }}</div>
+                                    <div>{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
                                 </div>
                             </td>
                             <td class="px-3 py-3">
                                 <span class="badge rounded-pill
                                     @if($p->status == 'dikembalikan') bg-success
-                                    @elseif($p->status == 'disetujui') bg-primary
+                                    @elseif($p->status == 'disetujui') bg-success
                                     @elseif($p->status == 'pengembalian_diajukan') bg-warning text-dark
                                     @elseif($p->status == 'ditolak' || $p->status == 'pengembalian ditolak') bg-danger
                                     @else bg-secondary
@@ -183,22 +175,18 @@
                                         Pengembalian Diajukan
                                     @elseif($p->status == 'pengembalian ditolak')
                                         Pengembalian Ditolak
+                                    @elseif($p->status == 'disetujui')
+                                        Disetujui
                                     @else
                                         {{ ucfirst($p->status) }}
                                     @endif
                                 </span>
                             </td>
                             <td class="px-3 py-3">
-                                <div class="d-flex flex-wrap gap-1">
-                                    @foreach($p->details as $detail)
-                                        <span class="badge bg-info bg-opacity-75 text-dark rounded-pill">
-                                            {{ Str::limit($detail->barang->nama ?? '-', 20) }} ({{ $detail->jumlah }})
-                                        </span>
-                                    @endforeach
-                                </div>
+                                <span class="text-muted">{{ $p->no_telp }}</span>
                             </td>
                             <td class="px-3 py-3">
-                                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm detail-btn" 
+                                <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm detail-btn" 
                                         data-peminjaman-id="{{ $p->id }}">
                                     <i class="bi bi-eye me-1"></i>Detail
                                 </button>
@@ -206,7 +194,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p class="mb-0 mt-2">Tidak ada data arsip</p>
@@ -253,10 +241,12 @@
 .table th {
     font-size: 0.875rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .table td {
     vertical-align: middle;
+    white-space: nowrap;
 }
 
 .badge {
@@ -278,6 +268,58 @@
 
 .pagination {
     --bs-pagination-border-radius: 0.5rem;
+}
+
+/* Table responsive improvements */
+.table-responsive {
+    overflow-x: auto;
+    min-width: 100%;
+}
+
+.table {
+    min-width: 1200px; /* Ensure minimum width for all columns */
+    width: 100%;
+}
+
+/* Column widths */
+.table th:nth-child(1), .table td:nth-child(1) { /* KODE UNIK */
+    width: 150px;
+    min-width: 150px;
+}
+
+.table th:nth-child(2), .table td:nth-child(2) { /* NAMA & UNIT */
+    width: 180px;
+    min-width: 180px;
+}
+
+.table th:nth-child(3), .table td:nth-child(3) { /* KEGIATAN */
+    width: 200px;
+    min-width: 200px;
+}
+
+.table th:nth-child(4), .table td:nth-child(4) { /* PERIODE */
+    width: 200px;
+    min-width: 200px;
+}
+
+.table th:nth-child(5), .table td:nth-child(5) { /* TANGGAL PENGAJUAN */
+    width: 180px;
+    min-width: 180px;
+}
+
+.table th:nth-child(6), .table td:nth-child(6) { /* STATUS */
+    width: 150px;
+    min-width: 150px;
+}
+
+.table th:nth-child(7), .table td:nth-child(7) { /* NO. HP */
+    width: 140px;
+    min-width: 140px;
+}
+
+.table th:nth-child(8), .table td:nth-child(8) { /* AKSI */
+    width: 120px;
+    min-width: 120px;
 }
 
 /* Modal improvements */
@@ -366,6 +408,22 @@
         font-size: 0.8rem;
         padding: 0.25rem 0.5rem;
     }
+    
+    .table {
+        min-width: 1000px; /* Smaller minimum width for mobile */
+    }
+}
+
+/* Debug styles to ensure columns are visible */
+.table th, .table td {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+}
+
+.table th {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+    font-weight: 600 !important;
 }
 </style>
 
@@ -388,19 +446,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const kodePeminjaman = cells[0].querySelector('.badge').textContent;
         const nama = cells[1].querySelector('.fw-semibold').textContent;
-        const noTelp = cells[2].textContent;
-        const unit = cells[3].querySelector('.badge').textContent;
-        const kegiatan = cells[4].querySelector('.fw-medium').getAttribute('title') || cells[4].querySelector('.fw-medium').textContent;
-        const periodeMulai = cells[5].querySelector('.small div:first-child').textContent;
-        const periodeSelesai = cells[5].querySelector('.small div:last-child').textContent;
-        const tanggalPengajuan = cells[6].querySelector('.small div:first-child').textContent;
-        const waktuPengajuan = cells[6].querySelector('.small div:last-child').textContent;
-        const status = cells[7].querySelector('.badge').textContent;
-        
-        const barangDetails = [];
-        cells[8].querySelectorAll('.badge').forEach(badge => {
-            barangDetails.push(badge.textContent);
-        });
+        const unit = cells[1].querySelector('.text-muted').textContent;
+        const kegiatan = cells[2].querySelector('.fw-medium').getAttribute('title') || cells[2].querySelector('.fw-medium').textContent;
+        const periodeMulai = cells[3].querySelector('.small div:first-child').textContent.replace('Tanggal Mulai ', '');
+        const periodeSelesai = cells[3].querySelector('.small div:last-child').textContent.replace('Tanggal Selesai ', '');
+        const tanggalPengajuan = cells[4].querySelector('.small div:first-child').textContent.replace('Tanggal Pengajuan ', '');
+        const waktuPengajuan = cells[4].querySelector('.small div:last-child').textContent;
+        const status = cells[5].querySelector('.badge').textContent;
+        const noTelp = cells[6].textContent;
         
         const modalContent = `
             <div class="row">
@@ -421,12 +474,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="fw-semibold">${nama}</div>
                             </div>
                             <div class="mb-2">
-                                <small class="text-muted">No HP</small>
-                                <div class="fw-semibold">${noTelp}</div>
-                            </div>
-                            <div class="mb-2">
                                 <small class="text-muted">Unit/Jurusan</small>
                                 <div class="fw-semibold">${unit}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">No HP</small>
+                                <div class="fw-semibold">${noTelp}</div>
                             </div>
                             <div class="mb-2">
                                 <small class="text-muted">Nama Kegiatan</small>
@@ -442,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <div class="mb-0">
                                 <small class="text-muted">Status</small>
-                                <div>${cells[7].innerHTML}</div>
+                                <div>${cells[5].innerHTML}</div>
                             </div>
                         </div>
                     </div>
@@ -455,23 +508,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             </h6>
                         </div>
                         <div class="card-body">
-                            ${barangDetails.length > 0 ? `
-                                <div class="list-group list-group-flush">
-                                    ${barangDetails.map(barang => `
-                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                            <div>
-                                                <div class="fw-semibold">${barang.split(' (')[0]}</div>
-                                                <small class="text-muted">Jumlah: ${barang.match(/\((\d+)\)/)?.[1] || '-'}</small>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : `
-                                <div class="text-center text-muted py-3">
-                                    <i class="bi bi-box-seam fs-1"></i>
-                                    <p class="mb-0 mt-2">Tidak ada barang</p>
-                                </div>
-                            `}
+                            <div class="text-center text-muted py-3">
+                                <i class="bi bi-info-circle fs-1"></i>
+                                <p class="mb-0 mt-2">Klik tombol Detail untuk melihat barang yang dipinjam</p>
+                                <small>Data lengkap tersedia di halaman detail peminjaman</small>
+                            </div>
                         </div>
                     </div>
                 </div>

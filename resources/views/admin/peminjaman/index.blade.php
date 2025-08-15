@@ -109,6 +109,8 @@
                                     <small class="text-muted">Tanggal Selesai</small>
                                     <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
                                 </div>
+                            </td>
+                            <td class="px-3 py-3">
                                 <div class="mb-2">
                                     <small class="text-muted">Tanggal Pengajuan</small>
                                     <div>{{ format_tanggal($p->created_at) }}</div>
@@ -222,14 +224,28 @@ document.addEventListener('DOMContentLoaded', function() {
     border-radius: 0.75rem;
 }
 
+.table-responsive { overflow-x: auto; }
+.table { min-width: 1100px; }
+
 .table th {
     font-size: 0.875rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .table td {
     vertical-align: middle;
+    white-space: nowrap;
 }
+
+.table th:nth-child(1), .table td:nth-child(1) { min-width: 150px; }
+.table th:nth-child(2), .table td:nth-child(2) { min-width: 200px; }
+.table th:nth-child(3), .table td:nth-child(3) { min-width: 220px; }
+.table th:nth-child(4), .table td:nth-child(4) { min-width: 220px; }
+.table th:nth-child(5), .table td:nth-child(5) { min-width: 200px; }
+.table th:nth-child(6), .table td:nth-child(6) { min-width: 140px; }
+.table th:nth-child(7), .table td:nth-child(7) { min-width: 160px; }
+.table th:nth-child(8), .table td:nth-child(8) { min-width: 140px; text-align:center; }
 
 .badge {
     font-size: 0.75rem;
