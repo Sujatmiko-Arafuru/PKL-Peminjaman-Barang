@@ -125,13 +125,16 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Unit</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kegiatan</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Periode</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Aksi</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">KODE UNIK</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">NAMA</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">NO HP</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">UNIT/JURUSAN</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">KEGIATAN</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">PERIODE</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">TANGGAL PENGAJUAN</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">STATUS</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">BARANG</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">LIHAT DETAIL</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -142,14 +145,16 @@
                             </td>
                             <td class="px-3 py-3">
                                 <div class="fw-semibold text-dark">{{ $p->nama }}</div>
-                                <small class="text-muted">{{ $p->no_telp }}</small>
+                            </td>
+                            <td class="px-3 py-3">
+                                <span class="text-muted">{{ $p->no_telp }}</span>
                             </td>
                             <td class="px-3 py-3">
                                 <span class="badge bg-light text-dark">{{ $p->unit }}</span>
                             </td>
                             <td class="px-3 py-3">
                                 <div class="fw-medium" title="{{ $p->nama_kegiatan }}">
-                                    {{ Str::limit($p->nama_kegiatan, 30) }}
+                                    {{ Str::limit($p->nama_kegiatan, 25) }}
                                 </div>
                             </td>
                             <td class="px-3 py-3">
@@ -157,6 +162,12 @@
                                     <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
                                     <div class="text-muted">s/d</div>
                                     <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="small text-muted">
+                                    <div>{{ format_tanggal($p->created_at) }}</div>
+                                    <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
                                 </div>
                             </td>
                             <td class="px-3 py-3">
@@ -178,6 +189,15 @@
                                 </span>
                             </td>
                             <td class="px-3 py-3">
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach($p->details as $detail)
+                                        <span class="badge bg-info bg-opacity-75 text-dark rounded-pill">
+                                            {{ Str::limit($detail->barang->nama ?? '-', 20) }} ({{ $detail->jumlah }})
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
                                 <button type="button" class="btn btn-sm btn-outline-primary shadow-sm detail-btn" 
                                         data-peminjaman-id="{{ $p->id }}">
                                     <i class="bi bi-eye me-1"></i>Detail
@@ -186,7 +206,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p class="mb-0 mt-2">Tidak ada data arsip</p>
@@ -327,6 +347,11 @@
     color: #212529 !important;
 }
 
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+    color: white !important;
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
     .table-responsive {
@@ -363,12 +388,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const kodePeminjaman = cells[0].querySelector('.badge').textContent;
         const nama = cells[1].querySelector('.fw-semibold').textContent;
-        const noTelp = cells[1].querySelector('small').textContent;
-        const unit = cells[2].querySelector('.badge').textContent;
-        const kegiatan = cells[3].querySelector('.fw-medium').getAttribute('title') || cells[3].querySelector('.fw-medium').textContent;
-        const periodeMulai = cells[4].querySelector('.small div:first-child').textContent;
-        const periodeSelesai = cells[4].querySelector('.small div:last-child').textContent;
-        const status = cells[5].querySelector('.badge').textContent;
+        const noTelp = cells[2].textContent;
+        const unit = cells[3].querySelector('.badge').textContent;
+        const kegiatan = cells[4].querySelector('.fw-medium').getAttribute('title') || cells[4].querySelector('.fw-medium').textContent;
+        const periodeMulai = cells[5].querySelector('.small div:first-child').textContent;
+        const periodeSelesai = cells[5].querySelector('.small div:last-child').textContent;
+        const tanggalPengajuan = cells[6].querySelector('.small div:first-child').textContent;
+        const waktuPengajuan = cells[6].querySelector('.small div:last-child').textContent;
+        const status = cells[7].querySelector('.badge').textContent;
+        
+        const barangDetails = [];
+        cells[8].querySelectorAll('.badge').forEach(badge => {
+            barangDetails.push(badge.textContent);
+        });
         
         const modalContent = `
             <div class="row">
@@ -404,9 +436,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <small class="text-muted">Periode Peminjaman</small>
                                 <div class="fw-semibold">${periodeMulai} - ${periodeSelesai}</div>
                             </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Tanggal Pengajuan</small>
+                                <div class="fw-semibold">${tanggalPengajuan} ${waktuPengajuan}</div>
+                            </div>
                             <div class="mb-0">
                                 <small class="text-muted">Status</small>
-                                <div>${cells[5].innerHTML}</div>
+                                <div>${cells[7].innerHTML}</div>
                             </div>
                         </div>
                     </div>
@@ -419,11 +455,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             </h6>
                         </div>
                         <div class="card-body">
-                            <div class="text-center text-muted py-3">
-                                <i class="bi bi-info-circle fs-1"></i>
-                                <p class="mb-0 mt-2">Klik tombol Detail untuk melihat barang yang dipinjam</p>
-                                <small>Data lengkap tersedia di halaman detail peminjaman</small>
-                            </div>
+                            ${barangDetails.length > 0 ? `
+                                <div class="list-group list-group-flush">
+                                    ${barangDetails.map(barang => `
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <div>
+                                                <div class="fw-semibold">${barang.split(' (')[0]}</div>
+                                                <small class="text-muted">Jumlah: ${barang.match(/\((\d+)\)/)?.[1] || '-'}</small>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-box-seam fs-1"></i>
+                                    <p class="mb-0 mt-2">Tidak ada barang</p>
+                                </div>
+                            `}
                         </div>
                     </div>
                 </div>
