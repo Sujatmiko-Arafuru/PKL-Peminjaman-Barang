@@ -160,14 +160,14 @@
 
                             <td class="px-3 py-3">
                                 <div class="small text-muted">
-                                    <div>{{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d/m/Y') }}</div>
+                                    <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
                                     <div class="text-muted">s/d</div>
-                                    <div>{{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d/m/Y') }}</div>
+                                    <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
                                 </div>
                             </td>
                             <td class="px-3 py-3">
                                 <div class="small text-muted">
-                                    <div>{{ \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') }}</div>
+                                    <div>{{ format_tanggal($p->created_at) }}</div>
                                     <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
                                 </div>
                             </td>
@@ -199,122 +199,10 @@
                                 </div>
                             </td>
                             <td class="px-3 py-3">
-                                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" 
-                                        data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
+                                <button type="button" class="btn btn-sm btn-outline-primary shadow-sm detail-btn" 
+                                        data-peminjaman-id="{{ $p->id }}">
                                     <i class="bi bi-eye me-1"></i>Detail
                                 </button>
-
-                                <!-- Modal Detail -->
-                                <div class="modal fade" id="detailModal{{ $p->id }}" tabindex="-1" 
-                                     aria-labelledby="detailModalLabel{{ $p->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content border-0 shadow">
-                                            <div class="modal-header bg-primary text-white">
-                                                <h5 class="modal-title" id="detailModalLabel{{ $p->id }}">
-                                                    <i class="bi bi-info-circle me-2"></i>Detail Peminjaman
-                                                </h5>
-                                                <button type="button" class="btn-close btn-close-white" 
-                                                        data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <div class="card border-0 shadow-sm">
-                                                            <div class="card-header bg-light">
-                                                                <h6 class="mb-0 text-primary">
-                                                                    <i class="bi bi-person me-2"></i>Data Peminjam
-                                                                </h6>
-                                                            </div>
-                                                            <div class="card-body">
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">Nama</small>
-                                                                    <div class="fw-semibold">{{ $p->nama }}</div>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">No HP</small>
-                                                                    <div class="fw-semibold">{{ $p->no_telp }}</div>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">Unit/Jurusan</small>
-                                                                    <div class="fw-semibold">{{ $p->unit }}</div>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">Nama Kegiatan</small>
-                                                                    <div class="fw-semibold">{{ $p->nama_kegiatan }}</div>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">Periode Peminjaman</small>
-                                                                    <div class="fw-semibold">
-                                                                        {{ format_tanggal($p->tanggal_mulai) }} - 
-                                                                        {{ format_tanggal($p->tanggal_selesai) }}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">Kode Peminjaman</small>
-                                                                    <div class="fw-semibold text-primary">{{ $p->kode_peminjaman }}</div>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <small class="text-muted">Lampiran</small>
-                                                                    <div>
-                                                                        @if($p->bukti)
-                                                                            <a href="{{ asset('storage/' . $p->bukti) }}" 
-                                                                               target="_blank" class="btn btn-sm btn-outline-info">
-                                                                                <i class="bi bi-file-earmark me-1"></i>Lihat Bukti
-                                                                            </a>
-                                                                        @else
-                                                                            <span class="text-muted">-</span>
-                                                                        @endif
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mb-0">
-                                                                    <small class="text-muted">Status</small>
-                                                                    <div>
-                                                                        <span class="badge rounded-pill
-                                                                            @if($p->status == 'dikembalikan') bg-success
-                                                                            @elseif($p->status == 'disetujui') bg-primary
-                                                                            @elseif($p->status == 'ditolak') bg-danger
-                                                                            @else bg-warning text-dark
-                                                                            @endif
-                                                                        ">{{ ucfirst($p->status) }}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 mb-3">
-                                                        <div class="card border-0 shadow-sm">
-                                                            <div class="card-header bg-light">
-                                                                <h6 class="mb-0 text-primary">
-                                                                    <i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam
-                                                                </h6>
-                                                            </div>
-                                                            <div class="card-body">
-                                                                @if($p->details->count() > 0)
-                                                                    <div class="list-group list-group-flush">
-                                                                        @foreach($p->details as $detail)
-                                                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                                                            <div>
-                                                                                <div class="fw-semibold">{{ $detail->barang->nama ?? '-' }}</div>
-                                                                                <small class="text-muted">ID: {{ $detail->barang->id ?? '-' }}</small>
-                                                                            </div>
-                                                                            <span class="badge bg-primary rounded-pill">{{ $detail->jumlah }}</span>
-                                                                        </div>
-                                                                        @endforeach
-                                                                    </div>
-                                                                @else
-                                                                    <div class="text-center text-muted py-3">
-                                                                        <i class="bi bi-box-seam fs-1"></i>
-                                                                        <p class="mb-0 mt-2">Tidak ada barang</p>
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
                         @empty
@@ -339,6 +227,23 @@
         {{ $peminjamans->withQueryString()->links() }}
     </div>
     @endif
+</div>
+
+<!-- Modal Detail Peminjaman -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="detailModalLabel">
+                    <i class="bi bi-info-circle me-2"></i>Detail Peminjaman
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -375,5 +280,161 @@
 .pagination {
     --bs-pagination-border-radius: 0.5rem;
 }
+
+/* Modal improvements */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prevent multiple event listeners
+    const detailButtons = document.querySelectorAll('.detail-btn');
+    
+    detailButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const peminjamanId = this.getAttribute('data-peminjaman-id');
+            showDetailModal(peminjamanId);
+        });
+    });
+    
+    function showDetailModal(peminjamanId) {
+        // Get the row data
+        const row = document.querySelector(`[data-peminjaman-id="${peminjamanId}"]`).closest('tr');
+        const cells = row.querySelectorAll('td');
+        
+        // Extract data from the row
+        const kodePeminjaman = cells[0].querySelector('.badge').textContent;
+        const nama = cells[1].querySelector('.fw-semibold').textContent;
+        const noTelp = cells[2].textContent;
+        const unit = cells[3].querySelector('.badge').textContent;
+        const kegiatan = cells[4].querySelector('.fw-medium').getAttribute('title') || cells[4].querySelector('.fw-medium').textContent;
+        const periodeMulai = cells[5].querySelector('.small div:first-child').textContent;
+        const periodeSelesai = cells[5].querySelector('.small div:last-child').textContent;
+        const tanggalPengajuan = cells[6].querySelector('.small div:first-child').textContent;
+        const waktuPengajuan = cells[6].querySelector('.small div:last-child').textContent;
+        const status = cells[7].querySelector('.badge').textContent;
+        
+        // Get barang details
+        const barangDetails = [];
+        cells[8].querySelectorAll('.badge').forEach(badge => {
+            barangDetails.push(badge.textContent);
+        });
+        
+        // Build modal content
+        const modalContent = `
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-primary">
+                                <i class="bi bi-person me-2"></i>Data Peminjam
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <small class="text-muted">Nama</small>
+                                <div class="fw-semibold">${nama}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">No HP</small>
+                                <div class="fw-semibold">${noTelp}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Unit/Jurusan</small>
+                                <div class="fw-semibold">${unit}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Nama Kegiatan</small>
+                                <div class="fw-semibold">${kegiatan}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Periode Peminjaman</small>
+                                <div class="fw-semibold">${periodeMulai} - ${periodeSelesai}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Kode Peminjaman</small>
+                                <div class="fw-semibold text-primary">${kodePeminjaman}</div>
+                            </div>
+                                                         <div class="mb-2">
+                                 <small class="text-muted">Lampiran</small>
+                                 <div>
+                                     <span class="text-muted">-</span>
+                                 </div>
+                             </div>
+                            <div class="mb-0">
+                                <small class="text-muted">Status</small>
+                                <div>${cells[7].innerHTML}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-primary">
+                                <i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            ${barangDetails.length > 0 ? `
+                                <div class="list-group list-group-flush">
+                                    ${barangDetails.map(barang => `
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <div>
+                                                <div class="fw-semibold">${barang.split(' (')[0]}</div>
+                                                <small class="text-muted">Jumlah: ${barang.match(/\((\d+)\)/)?.[1] || '-'}</small>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-box-seam fs-1"></i>
+                                    <p class="mb-0 mt-2">Tidak ada barang</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Update modal content and show
+        document.getElementById('modalBody').innerHTML = modalContent;
+        
+        // Show modal with smooth animation
+        const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+        modal.show();
+    }
+    
+    // Prevent modal from closing when clicking inside
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            const modal = bootstrap.Modal.getInstance(this);
+            modal.hide();
+        }
+    });
+});
+</script>
 @endsection 
