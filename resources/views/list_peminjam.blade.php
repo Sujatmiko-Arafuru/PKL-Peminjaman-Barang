@@ -96,7 +96,7 @@
                                         <td><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></td>
                                         <td><strong>{{ $peminjaman->nama }}</strong></td>
                                         <td>{{ Str::limit($peminjaman->nama_kegiatan, 30) }}</td>
-                                        <td>${formatTanggal(peminjaman.tanggal_mulai)} s/d ${formatTanggal(peminjaman.tanggal_selesai)}</td>
+                                        <td>{{ format_tanggal($peminjaman->tanggal_mulai) }} s/d {{ format_tanggal($peminjaman->tanggal_selesai) }}</td>
                                         <td>
                                             @if($peminjaman->status == 'dikembalikan')
                                                 <span class="badge bg-success">
