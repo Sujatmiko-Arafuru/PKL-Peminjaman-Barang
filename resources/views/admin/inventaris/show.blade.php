@@ -28,19 +28,19 @@
                     </h6>
                 </div>
                 <div class="card-body p-0">
-                    @php $fotos = $barang->foto ? json_decode($barang->foto, true) : []; @endphp
-                    @if(count($fotos) > 0)
+                    @php $photos = $barang->getAllPhotos(); @endphp
+                    @if(count($photos) > 0)
                         <div id="fotoCarousel" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
-                                @foreach($fotos as $i => $foto)
+                                @foreach($photos as $i => $photo)
                                 <div class="carousel-item{{ $i==0 ? ' active' : '' }}">
-                                    <img src="{{ asset('storage/' . $foto) }}" 
+                                    <img src="{{ Storage::url('public/barang-photos/' . $photo) }}" 
                                          class="d-block w-100" 
                                          style="max-height:400px;object-fit:cover;border-radius:0.75rem;">
                                 </div>
                                 @endforeach
                             </div>
-                            @if(count($fotos) > 1)
+                            @if(count($photos) > 1)
                             <button class="carousel-control-prev" type="button" data-bs-target="#fotoCarousel" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon"></span>
                             </button>
@@ -49,9 +49,9 @@
                             </button>
                             @endif
                         </div>
-                        @if(count($fotos) > 1)
+                        @if(count($photos) > 1)
                         <div class="text-center py-2">
-                            <small class="text-muted">{{ count($fotos) }} foto tersedia</small>
+                            <small class="text-muted">{{ count($photos) }} foto tersedia</small>
                         </div>
                         @endif
                     @else

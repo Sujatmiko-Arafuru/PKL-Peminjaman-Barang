@@ -27,33 +27,38 @@ class InventarisController extends Controller
             'deskripsi' => 'nullable|string',
             'stok' => 'required|integer|min:0',
             'status' => 'required|in:tersedia,tidak tersedia',
-            'foto' => 'required',
-            'foto.*' => 'image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'foto.required' => 'Wajib upload 3 foto barang.',
-            'foto.*.image' => 'File harus berupa gambar.',
-            'foto.*.mimes' => 'Format foto harus jpg/jpeg/png.',
-            'foto.*.max' => 'Ukuran foto maksimal 2MB.',
+            'photo1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        if (count($request->file('foto', [])) !== 3) {
-            return back()->withInput()->withErrors(['foto' => 'Wajib upload 3 foto barang.']);
-        }
-        $fotoPaths = [];
-        if ($request->hasFile('foto')) {
-            foreach ($request->file('foto') as $foto) {
-                $fotoPaths[] = $foto->store('barang_foto', 'public');
-            }
-        }
+        
         $barang = Barang::create([
             'nama' => $request->nama,
             'deskripsi' => $request->deskripsi,
             'stok' => $request->stok,
             'status' => $request->status,
-            'foto' => json_encode($fotoPaths),
         ]);
         
+        // Upload foto jika ada
+        $photoService = app(\App\Services\PhotoUploadService::class);
+        
+        if ($request->hasFile('photo1')) {
+            $fileName = $photoService->uploadPhoto($request->file('photo1'), $barang->id);
+            $barang->update(['foto' => $fileName]);
+        }
+        
+        if ($request->hasFile('photo2')) {
+            $fileName = $photoService->uploadPhoto($request->file('photo2'), $barang->id);
+            $barang->update(['foto2' => $fileName]);
+        }
+        
+        if ($request->hasFile('photo3')) {
+            $fileName = $photoService->uploadPhoto($request->file('photo3'), $barang->id);
+            $barang->update(['foto3' => $fileName]);
+        }
+        
         // Status akan diupdate otomatis melalui boot method di model Barang
-        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil ditambahkan dengan status otomatis.');
+        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil ditambahkan.');
     }
 
     public function edit($id): \Illuminate\View\View
@@ -70,30 +75,75 @@ class InventarisController extends Controller
             'deskripsi' => 'nullable|string',
             'stok' => 'required|integer|min:0',
             'status' => 'required|in:tersedia,tidak tersedia',
-            'foto.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'photo1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        $fotoPaths = $barang->foto ? json_decode($barang->foto, true) : [];
-        // Hapus foto lama yang tidak di-keep
-        $keep = $request->input('keep_foto', []);
-        $fotoPaths = array_values(array_intersect($fotoPaths, $keep));
-        if ($request->hasFile('foto')) {
-            if (count($request->file('foto')) !== 3) {
-                return back()->withInput()->withErrors(['foto' => 'Wajib upload 3 foto barang.']);
-            }
-            foreach ($request->file('foto') as $foto) {
-                $fotoPaths[] = $foto->store('barang_foto', 'public');
-            }
-        }
+        
         $barang->update([
             'nama' => $request->nama,
             'deskripsi' => $request->deskripsi,
             'stok' => $request->stok,
             'status' => $request->status,
-            'foto' => json_encode($fotoPaths),
         ]);
         
+        // Upload foto jika ada
+        $photoService = app(\App\Services\PhotoUploadService::class);
+        
+        // Debug: Log file upload attempts
+        \Log::info('Photo upload debug:', [
+            'has_photo1' => $request->hasFile('photo1'),
+            'has_photo2' => $request->hasFile('photo2'),
+            'has_photo3' => $request->hasFile('photo3'),
+            'current_foto' => $barang->foto,
+            'current_foto2' => $barang->foto2,
+            'current_foto3' => $barang->foto3,
+        ]);
+        
+        if ($request->hasFile('photo1')) {
+            try {
+                // Delete old photo if exists
+                if ($barang->foto) {
+                    $photoService->deletePhoto($barang->foto);
+                }
+                $fileName = $photoService->uploadPhoto($request->file('photo1'), $barang->id);
+                $barang->update(['foto' => $fileName]);
+                \Log::info('Photo1 uploaded successfully: ' . $fileName);
+            } catch (\Exception $e) {
+                \Log::error('Photo1 upload failed: ' . $e->getMessage());
+            }
+        }
+        
+        if ($request->hasFile('photo2')) {
+            try {
+                // Delete old photo if exists
+                if ($barang->foto2) {
+                    $photoService->deletePhoto($barang->foto2);
+                }
+                $fileName = $photoService->uploadPhoto($request->file('photo2'), $barang->id);
+                $barang->update(['foto2' => $fileName]);
+                \Log::info('Photo2 uploaded successfully: ' . $fileName);
+            } catch (\Exception $e) {
+                \Log::error('Photo2 upload failed: ' . $e->getMessage());
+            }
+        }
+        
+        if ($request->hasFile('photo3')) {
+            try {
+                // Delete old photo if exists
+                if ($barang->foto3) {
+                    $photoService->deletePhoto($barang->foto3);
+                }
+                $fileName = $photoService->uploadPhoto($request->file('photo3'), $barang->id);
+                $barang->update(['foto3' => $fileName]);
+                \Log::info('Photo3 uploaded successfully: ' . $fileName);
+            } catch (\Exception $e) {
+                \Log::error('Photo3 upload failed: ' . $e->getMessage());
+            }
+        }
+        
         // Status akan diupdate otomatis melalui boot method di model Barang
-        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil diupdate dengan status otomatis.');
+        return redirect()->route('admin.inventaris.index')->with('success', 'Barang berhasil diupdate.');
     }
 
     public function show($id): \Illuminate\View\View

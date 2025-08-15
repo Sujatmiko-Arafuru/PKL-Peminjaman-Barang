@@ -11,12 +11,40 @@ class Barang extends Model
 
     protected $table = 'barangs'; // Nama tabel, sesuaikan dengan migration nanti
     protected $fillable = [
-        'nama', 'deskripsi', 'stok', 'status', 'foto'
+        'nama', 'deskripsi', 'stok', 'status', 'foto', 'foto2', 'foto3'
     ];
     
     public function details()
     {
         return $this->hasMany(DetailPeminjaman::class);
+    }
+    
+    // Method untuk mendapatkan semua foto yang ada
+    public function getAllPhotos()
+    {
+        $photos = [];
+        if ($this->foto) $photos[] = $this->foto;
+        if ($this->foto2) $photos[] = $this->foto2;
+        if ($this->foto3) $photos[] = $this->foto3;
+        return $photos;
+    }
+    
+    // Method untuk mendapatkan jumlah foto yang sudah diupload
+    public function getPhotoCount()
+    {
+        return count($this->getAllPhotos());
+    }
+    
+    // Method untuk mengecek apakah masih bisa upload foto
+    public function canUploadMorePhotos()
+    {
+        return $this->getPhotoCount() < 3;
+    }
+    
+    // Method untuk mendapatkan foto utama (foto pertama yang ada)
+    public function getMainPhoto()
+    {
+        return $this->foto ?: $this->foto2 ?: $this->foto3 ?: null;
     }
     
     public function getStokDipinjamAttribute()

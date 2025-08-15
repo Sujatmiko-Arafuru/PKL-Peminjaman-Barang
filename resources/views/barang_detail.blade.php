@@ -57,15 +57,15 @@
                     <div class="row">
                         <div class="col-md-5 mb-3 mb-md-0">
                             @php
-                                $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
+                                $photos = $barang->getAllPhotos();
                             @endphp
-                            @if(count($fotoArray) > 0)
+                            @if(count($photos) > 0)
                             <div class="mb-2 text-center">
-                                <img class="main-foto-barang w-100" src="{{ asset('storage/' . $fotoArray[0]) }}" style="border-radius:1rem;max-height:260px;object-fit:cover;max-width:320px;" alt="Foto utama">
+                                <img class="main-foto-barang w-100" src="{{ Storage::url('public/barang-photos/' . $photos[0]) }}" style="border-radius:1rem;max-height:260px;object-fit:cover;max-width:320px;" alt="Foto utama">
                             </div>
                             <div class="d-flex justify-content-center gap-2">
-                                @foreach($fotoArray as $i => $foto)
-                                <img src="{{ asset('storage/' . $foto) }}" class="img-thumbnail selector-foto" data-foto="{{ asset('storage/' . $foto) }}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;{{ $i==0?'border:2px solid #20B2AA;':'' }}" alt="Thumb {{ $i+1 }}">
+                                @foreach($photos as $i => $photo)
+                                <img src="{{ Storage::url('public/barang-photos/' . $photo) }}" class="img-thumbnail selector-foto" data-foto="{{ Storage::url('public/barang-photos/' . $photo) }}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;{{ $i==0?'border:2px solid #20B2AA;':'' }}" alt="Thumb {{ $i+1 }}">
                                 @endforeach
                             </div>
                             @else
