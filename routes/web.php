@@ -48,8 +48,10 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     // Kelola Pengembalian
     Route::get('pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.index');
     Route::get('pengembalian/{id}', [PengembalianController::class, 'show'])->name('pengembalian.show');
+    Route::post('pengembalian/input-kode', [PengembalianController::class, 'inputKodePengembalian'])->name('pengembalian.input-kode');
     Route::post('pengembalian/{id}/approve', [PengembalianController::class, 'approve'])->name('pengembalian.approve');
     Route::post('pengembalian/{id}/reject', [PengembalianController::class, 'reject'])->name('pengembalian.reject');
+    Route::post('pengembalian/{id}/update-detail', [PengembalianController::class, 'updateDetailPengembalian'])->name('pengembalian.update-detail');
     // Arsip
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');

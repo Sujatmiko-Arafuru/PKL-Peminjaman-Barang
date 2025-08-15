@@ -20,6 +20,55 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    <!-- Input Kode Pengembalian Section -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0">
+                <i class="bi bi-keyboard me-2"></i>Input Kode Pengembalian
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('admin.pengembalian.input-kode') }}" class="row g-3">
+                @csrf
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">Kode Peminjaman</label>
+                    <input type="text" name="kode_peminjaman" class="form-control form-control-sm" 
+                           placeholder="Contoh: ANG-20250814-0001" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">Nama Peminjam</label>
+                    <input type="text" name="nama_peminjam" class="form-control form-control-sm" 
+                           placeholder="Nama lengkap peminjam" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">No HP</label>
+                    <input type="text" name="no_telp" class="form-control form-control-sm" 
+                           placeholder="Nomor HP peminjam" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">&nbsp;</label>
+                    <button type="submit" class="btn btn-success btn-sm w-100 shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i>Input Pengembalian
+                    </button>
+                </div>
+            </form>
+            <div class="mt-3">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Cara kerja:</strong> Mahasiswa datang ke admin dengan kode peminjaman, nama, dan no HP. 
+                    Admin memasukkan data tersebut untuk mengajukan pengembalian.
+                </small>
+            </div>
+        </div>
+    </div>
+
     <!-- Filter Section -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-light">
@@ -29,16 +78,24 @@
         </div>
         <div class="card-body">
             <form method="GET" class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label text-muted small">Cari Nama/No HP</label>
-                    <input type="text" name="search" class="form-control form-control-sm" 
-                           placeholder="Cari nama/no hp..." value="{{ request('search') }}">
-                </div>
                 <div class="col-md-4">
+                    <label class="form-label text-muted small">Cari Nama/No HP/Kode</label>
+                    <input type="text" name="search" class="form-control form-control-sm" 
+                           placeholder="Cari nama/no hp/kode..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">Status</label>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">Semua Status</option>
+                        <option value="disetujui" {{ request('status')=='disetujui'?'selected':'' }}>Disetujui</option>
+                        <option value="pengembalian_diajukan" {{ request('status')=='pengembalian_diajukan'?'selected':'' }}>Pengembalian Diajukan</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label text-muted small">Urutan</label>
                     <select name="urut" class="form-select form-select-sm">
-                        <option value="terlama" {{ request('urut')=='terlama'?'selected':'' }}>Terlama</option>
                         <option value="terbaru" {{ request('urut')=='terbaru'?'selected':'' }}>Terbaru</option>
+                        <option value="terlama" {{ request('urut')=='terlama'?'selected':'' }}>Terlama</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -111,9 +168,15 @@
                                 </div>
                             </td>
                             <td class="px-3 py-3">
-                                <span class="badge bg-success rounded-pill">
-                                    <i class="bi bi-check-circle me-1"></i>{{ ucfirst($p->status) }}
-                                </span>
+                                @if($p->status == 'pengembalian_diajukan')
+                                    <span class="badge bg-warning text-dark rounded-pill">
+                                        <i class="bi bi-clock me-1"></i>Pengembalian Diajukan
+                                    </span>
+                                @elseif($p->status == 'disetujui')
+                                    <span class="badge bg-success rounded-pill">
+                                        <i class="bi bi-check-circle me-1"></i>Disetujui
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-3 py-3">
                                 <div class="d-flex gap-1">
@@ -121,20 +184,22 @@
                                        class="btn btn-sm btn-outline-info shadow-sm">
                                         <i class="bi bi-eye me-1"></i>Detail
                                     </a>
-                                    <form action="{{ route('admin.pengembalian.approve', $p->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button class="btn btn-sm btn-success shadow-sm" 
-                                                onclick="return confirm('Approve pengembalian ini?')">
-                                            <i class="bi bi-check-lg me-1"></i>Approve
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('admin.pengembalian.reject', $p->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button class="btn btn-sm btn-danger shadow-sm" 
-                                                onclick="return confirm('Tolak pengembalian ini?')">
-                                            <i class="bi bi-x-lg me-1"></i>Reject
-                                        </button>
-                                    </form>
+                                    @if($p->status == 'pengembalian_diajukan')
+                                        <form action="{{ route('admin.pengembalian.approve', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-success shadow-sm" 
+                                                    onclick="return confirm('Approve pengembalian ini?')">
+                                                <i class="bi bi-check-lg me-1"></i>Approve
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.pengembalian.reject', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-danger shadow-sm" 
+                                                    onclick="return confirm('Tolak pengembalian ini?')">
+                                                <i class="bi bi-x-lg me-1"></i>Reject
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -142,8 +207,8 @@
                         <tr>
                             <td colspan="9" class="text-center py-5">
                                 <div class="text-muted">
-                                    <i class="bi bi-check-circle fs-1 text-success"></i>
-                                    <p class="mb-0 mt-2">Tidak ada pengembalian menunggu approve</p>
+                                    <i class="bi bi-inbox fs-1"></i>
+                                    <p class="mb-0 mt-2">Tidak ada data pengembalian</p>
                                 </div>
                             </td>
                         </tr>
@@ -186,6 +251,28 @@
 
 .pagination {
     --bs-pagination-border-radius: 0.5rem;
+}
+
+/* Form styling */
+.form-control:focus, .form-select:focus {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #2E8B57, #3CB371);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+    color: white;
 }
 </style>
 @endsection 

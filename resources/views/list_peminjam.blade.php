@@ -48,8 +48,10 @@
                                 <option value="">Semua Status</option>
                                 <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
                                 <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                <option value="pengembalian_diajukan" {{ request('status') == 'pengembalian_diajukan' ? 'selected' : '' }}>Pengembalian Diajukan</option>
                                 <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>Dikembalikan</option>
+                                <option value="pengembalian ditolak" {{ request('status') == 'pengembalian ditolak' ? 'selected' : '' }}>Pengembalian Ditolak</option>
+                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -96,9 +98,31 @@
                                         <td>{{ Str::limit($peminjaman->nama_kegiatan, 30) }}</td>
                                         <td>${formatTanggal(peminjaman.tanggal_mulai)} s/d ${formatTanggal(peminjaman.tanggal_selesai)}</td>
                                         <td>
-                                            <span class="badge {{ $peminjaman->status == 'dikembalikan' ? 'bg-success' : ($peminjaman->status == 'disetujui' ? 'bg-primary' : ($peminjaman->status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark')) }}">
-                                                {{ ucfirst($peminjaman->status) }}
-                                            </span>
+                                            @if($peminjaman->status == 'dikembalikan')
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Dikembalikan
+                                                </span>
+                                            @elseif($peminjaman->status == 'disetujui')
+                                                <span class="badge bg-primary">
+                                                    <i class="bi bi-check-lg me-1"></i>Disetujui
+                                                </span>
+                                            @elseif($peminjaman->status == 'pengembalian_diajukan')
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-clock me-1"></i>Pengembalian Diajukan
+                                                </span>
+                                            @elseif($peminjaman->status == 'pengembalian ditolak')
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>Pengembalian Ditolak
+                                                </span>
+                                            @elseif($peminjaman->status == 'ditolak')
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>Ditolak
+                                                </span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-hourglass-split me-1"></i>Menunggu
+                                                </span>
+                                            @endif
                                         </td>
                                         <td>{{ $peminjaman->no_telp }}</td>
                                         <td>
@@ -312,24 +336,57 @@ function generateDetailContent(peminjaman) {
                         <th>Kode Barang</th>
                         <th>Nama Barang</th>
                         <th>Kategori</th>
-                        <th>Qty</th>
+                        <th>Qty Dipinjam</th>
+                        <th>Qty Dikembalikan</th>
+                        <th>Status</th>
                         <th>Satuan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${peminjaman.details.map((detail, index) => `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td><span class="badge bg-secondary">${detail.barang.kode}</span></td>
-                            <td><strong>${detail.barang.nama}</strong></td>
-                            <td>${detail.barang.kategori}</td>
-                            <td><span class="badge bg-info">${detail.qty}</span></td>
-                            <td>${detail.barang.satuan}</td>
-                        </tr>
-                    `).join('')}
+                    ${peminjaman.details.map((detail, index) => {
+                        const qtyDikembalikan = detail.jumlah_dikembalikan || 0;
+                        const statusPengembalian = qtyDikembalikan > 0 ? 
+                            (qtyDikembalikan === detail.qty ? 'Lengkap' : 'Sebagian') : 'Belum Dikembalikan';
+                        const statusBadgeClass = qtyDikembalikan === detail.qty ? 'bg-success' : 
+                                               (qtyDikembalikan > 0 ? 'bg-warning text-dark' : 'bg-secondary');
+                        
+                        return `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td><span class="badge bg-secondary">${detail.barang.kode}</span></td>
+                                <td><strong>${detail.barang.nama}</strong></td>
+                                <td>${detail.barang.kategori}</td>
+                                <td><span class="badge bg-info">${detail.qty}</span></td>
+                                <td><span class="badge bg-primary">${qtyDikembalikan}</span></td>
+                                <td><span class="badge ${statusBadgeClass}">${statusPengembalian}</span></td>
+                                <td>${detail.barang.satuan}</td>
+                            </tr>
+                        `;
+                    }).join('')}
                 </tbody>
             </table>
         </div>
+        
+        ${peminjaman.status === 'pengembalian_diajukan' ? `
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-clock me-2"></i>
+                <strong>Status Pengembalian:</strong> Pengembalian sedang diajukan dan menunggu persetujuan admin.
+            </div>
+        ` : ''}
+        
+        ${peminjaman.status === 'dikembalikan' ? `
+            <div class="alert alert-success mt-3">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Status Pengembalian:</strong> Semua barang telah berhasil dikembalikan dan diverifikasi admin.
+            </div>
+        ` : ''}
+        
+        ${peminjaman.status === 'pengembalian ditolak' ? `
+            <div class="alert alert-danger mt-3">
+                <i class="bi bi-x-circle me-2"></i>
+                <strong>Status Pengembalian:</strong> Pengembalian ditolak oleh admin. Silakan hubungi admin untuk informasi lebih lanjut.
+            </div>
+        ` : ''}
     `;
 }
 </script>

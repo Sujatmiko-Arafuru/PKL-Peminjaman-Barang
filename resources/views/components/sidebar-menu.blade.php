@@ -37,9 +37,7 @@
                 <a href="{{ route('list.peminjam') }}" class="btn {{ request()->routeIs('list.peminjam*') ? 'btn-info' : 'btn-outline-info' }}">
                     <i class="bi bi-people me-2"></i>List Peminjam
                 </a>
-                <a href="{{ route('cekStatus.form') }}" class="btn {{ request()->routeIs('cekStatus.*') ? 'btn-success' : 'btn-outline-success' }}">
-                    <i class="bi bi-arrow-repeat me-2"></i>Pengembalian
-                </a>
+
             </div>
         </div>
     </div>
