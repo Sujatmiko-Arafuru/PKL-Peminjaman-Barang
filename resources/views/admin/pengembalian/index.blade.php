@@ -8,7 +8,7 @@
             <h2 class="mb-1 text-primary fw-bold">
                 <i class="bi bi-arrow-clockwise me-2"></i>Kelola Pengembalian
             </h2>
-            <p class="text-muted mb-0">Kelola dan monitor pengembalian barang</p>
+            <p class="text-muted mb-0">Input data pengembalian dan approve pengembalian barang</p>
         </div>
     </div>
 
@@ -27,11 +27,18 @@
     </div>
     @endif
 
-    <!-- Input Kode Pengembalian Section -->
+    @if(session('info'))
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="bi bi-info-circle me-2"></i>{{ session('info') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    <!-- Form Input Pengembalian Section -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-primary text-white">
             <h6 class="mb-0">
-                <i class="bi bi-keyboard me-2"></i>Input Kode Pengembalian
+                <i class="bi bi-keyboard me-2"></i>Form Input Pengembalian
             </h6>
         </div>
         <div class="card-body">
@@ -40,191 +47,166 @@
                 <div class="col-md-3">
                     <label class="form-label text-muted small">Kode Peminjaman</label>
                     <input type="text" name="kode_peminjaman" class="form-control form-control-sm" 
-                           placeholder="Contoh: ANG-20250814-0001" required>
+                           placeholder="Contoh: ANG-20250814-0001">
+                    <small class="text-muted">Opsional - bisa dikosongkan</small>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label text-muted small">Nama Peminjam</label>
                     <input type="text" name="nama_peminjam" class="form-control form-control-sm" 
-                           placeholder="Nama lengkap peminjam" required>
+                           placeholder="Nama lengkap peminjam">
+                    <small class="text-muted">Opsional - bisa dikosongkan</small>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">Nama Kegiatan</label>
+                    <input type="text" name="nama_kegiatan" class="form-control form-control-sm" 
+                           placeholder="Nama kegiatan yang dilakukan">
+                    <small class="text-muted">Opsional - bisa dikosongkan</small>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label text-muted small">No HP</label>
                     <input type="text" name="no_telp" class="form-control form-control-sm" 
-                           placeholder="Nomor HP peminjam" required>
+                           placeholder="Nomor HP peminjam">
+                    <small class="text-muted">Opsional - bisa dikosongkan</small>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted small">&nbsp;</label>
-                    <button type="submit" class="btn btn-success btn-sm w-100 shadow-sm">
-                        <i class="bi bi-check-lg me-1"></i>Input Pengembalian
+                <div class="col-12">
+                    <hr class="my-3">
+                    <button type="submit" class="btn btn-success shadow-sm">
+                        <i class="bi bi-search me-2"></i>Cari Data Peminjaman
                     </button>
+                    <small class="text-muted ms-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Admin bisa mengisi salah satu atau lebih form untuk memastikan data yang benar
+                    </small>
                 </div>
             </form>
-            <div class="mt-3">
-                <small class="text-muted">
-                    <i class="bi bi-info-circle me-1"></i>
-                    <strong>Cara kerja:</strong> Mahasiswa datang ke admin dengan kode peminjaman, nama, dan no HP. 
-                    Admin memasukkan data tersebut untuk mengajukan pengembalian.
-                </small>
-            </div>
         </div>
     </div>
 
-    <!-- Filter Section -->
+    <!-- Hasil Pencarian Section -->
+    @if(isset($peminjaman) && $peminjaman)
     <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-light">
-            <h6 class="mb-0 text-primary">
-                <i class="bi bi-funnel me-2"></i>Filter Data
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="bi bi-check-circle me-2"></i>Data Peminjaman Ditemukan
             </h6>
         </div>
         <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label text-muted small">Cari Nama/No HP/Kode</label>
-                    <input type="text" name="search" class="form-control form-control-sm" 
-                           placeholder="Cari nama/no hp/kode..." value="{{ request('search') }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted small">Status</label>
-                    <select name="status" class="form-select form-select-sm">
-                        <option value="">Semua Status</option>
-                        <option value="disetujui" {{ request('status')=='disetujui'?'selected':'' }}>Disetujui</option>
-                        <option value="pengembalian_diajukan" {{ request('status')=='pengembalian_diajukan'?'selected':'' }}>Pengembalian Diajukan</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label text-muted small">Urutan</label>
-                    <select name="urut" class="form-select form-select-sm">
-                        <option value="terbaru" {{ request('urut')=='terbaru'?'selected':'' }}>Terbaru</option>
-                        <option value="terlama" {{ request('urut')=='terlama'?'selected':'' }}>Terlama</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label text-muted small">&nbsp;</label>
-                    <button class="btn btn-primary btn-sm w-100 shadow-sm">
-                        <i class="bi bi-search me-1"></i>Filter
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Table Section -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white border-0">
-            <h6 class="mb-0 text-primary fw-semibold">
-                <i class="bi bi-table me-2"></i>Daftar Pengembalian
-            </h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-person me-2"></i>Informasi Peminjam
+                    </h6>
+                    <table class="table table-sm">
                         <tr>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode Unik</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">No HP</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Unit/Jurusan</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kegiatan</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Periode</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Tanggal Pengajuan</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Aksi</th>
+                            <td class="fw-bold" style="width: 40%">Kode Peminjaman:</td>
+                            <td><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($peminjamans as $p)
-                        <tr class="border-bottom">
-                            <td class="px-3 py-3">
-                                <span class="badge bg-dark">{{ $p->kode_peminjaman }}</span>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="fw-semibold text-dark">{{ $p->nama }}</div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="text-muted">{{ $p->no_telp }}</span>
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="badge bg-light text-dark">{{ $p->unit }}</span>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="fw-medium" title="{{ $p->nama_kegiatan }}">
-                                    {{ Str::limit($p->nama_kegiatan, 25) }}
-                                </div>
-                            </td>
-
-                            <td class="px-3 py-3">
-                                <div class="mb-2">
-                                    <small class="text-muted">Tanggal Mulai</small>
-                                    <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Tanggal Selesai</small>
-                                    <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Tanggal Pengajuan</small>
-                                    <div>{{ format_tanggal($p->created_at) }}</div>
-                                    <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
-                                </div>
-                            </td>
-                            <td class="px-3 py-3">
-                                @if($p->status == 'pengembalian_diajukan')
-                                    <span class="badge bg-warning text-dark rounded-pill">
-                                        <i class="bi bi-clock me-1"></i>Pengembalian Diajukan
-                                    </span>
-                                @elseif($p->status == 'disetujui')
+                        <tr>
+                            <td class="fw-bold">Nama:</td>
+                            <td><strong>{{ $peminjaman->nama }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Unit:</td>
+                            <td>{{ $peminjaman->unit }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">No. HP:</td>
+                            <td>{{ $peminjaman->no_telp }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Status:</td>
+                            <td>
+                                @if($peminjaman->status == 'disetujui')
                                     <span class="badge bg-success rounded-pill">
                                         <i class="bi bi-check-circle me-1"></i>Disetujui
                                     </span>
+                                @else
+                                    <span class="badge bg-warning text-dark rounded-pill">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>{{ ucfirst($peminjaman->status) }}
+                                    </span>
                                 @endif
                             </td>
-                            <td class="px-3 py-3">
-                                <div class="d-flex gap-1">
-                                    <a href="{{ route('admin.pengembalian.show', $p->id) }}" 
-                                       class="btn btn-sm btn-outline-info shadow-sm">
-                                        <i class="bi bi-eye me-1"></i>Detail
-                                    </a>
-                                    @if($p->status == 'pengembalian_diajukan')
-                                        <form action="{{ route('admin.pengembalian.approve', $p->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-success shadow-sm" 
-                                                    onclick="return confirm('Approve pengembalian ini?')">
-                                                <i class="bi bi-check-lg me-1"></i>Approve
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.pengembalian.reject', $p->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-danger shadow-sm" 
-                                                    onclick="return confirm('Tolak pengembalian ini?')">
-                                                <i class="bi bi-x-lg me-1"></i>Reject
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
                         </tr>
-                        @empty
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-calendar-event me-2"></i>Informasi Kegiatan
+                    </h6>
+                    <table class="table table-sm">
                         <tr>
-                            <td colspan="9" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="bi bi-inbox fs-1"></i>
-                                    <p class="mb-0 mt-2">Tidak ada data pengembalian</p>
-                                </div>
-                            </td>
+                            <td class="fw-bold" style="width: 40%">Nama Kegiatan:</td>
+                            <td>{{ $peminjaman->nama_kegiatan }}</td>
                         </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        <tr>
+                            <td class="fw-bold">Tanggal Mulai:</td>
+                            <td>{{ format_tanggal($peminjaman->tanggal_mulai) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Tanggal Selesai:</td>
+                            <td>{{ format_tanggal($peminjaman->tanggal_selesai) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Tanggal Pengajuan:</td>
+                            <td>{{ format_tanggal($peminjaman->created_at, true) }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+                <a href="{{ route('admin.pengembalian.show', $peminjaman->id) }}" 
+                   class="btn btn-primary shadow-sm me-2">
+                    <i class="bi bi-eye me-2"></i>Lihat Detail & Centang Barang
+                </a>
+                <form action="{{ route('admin.pengembalian.approve', $peminjaman->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button class="btn btn-success shadow-sm" 
+                            onclick="return confirm('Approve pengembalian ini? Pastikan semua barang sudah dicek!')">
+                        <i class="bi bi-check-lg me-2"></i>Approve Pengembalian
+                    </button>
+                </form>
             </div>
         </div>
     </div>
-
-    <!-- Pagination -->
-    @if($peminjamans->hasPages())
-    <div class="d-flex justify-content-center mt-4">
-        {{ $peminjamans->withQueryString()->links() }}
-    </div>
     @endif
+
+    <!-- Informasi Tambahan -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0">
+                <i class="bi bi-info-circle me-2"></i>Informasi Pengembalian
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-gear me-2"></i>Cara Kerja Sistem
+                    </h6>
+                    <ol class="mb-0">
+                        <li>Admin mengisi form pencarian (bisa salah satu atau lebih)</li>
+                        <li>Sistem mencari data peminjaman yang sesuai</li>
+                        <li>Admin melihat detail dan centang barang yang dikembalikan</li>
+                        <li>Admin approve pengembalian setelah verifikasi</li>
+                        <li>Mahasiswa bisa lihat status di menu "List Peminjam"</li>
+                    </ol>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-eye me-2"></i>Status yang Dapat Dilihat Mahasiswa
+                    </h6>
+                    <ul class="mb-0">
+                        <li><span class="badge bg-warning text-dark">Pengembalian Diajukan</span> - Sedang diproses admin</li>
+                        <li><span class="badge bg-success">Dikembalikan</span> - Sudah selesai dan diverifikasi</li>
+                        <li><span class="badge bg-danger">Pengembalian Ditolak</span> - Ditolak oleh admin</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -245,8 +227,8 @@
     font-size: 0.75rem;
 }
 
-.btn-sm {
-    font-size: 0.875rem;
+.btn {
+    border-radius: 0.5rem;
 }
 
 .pagination {
@@ -273,6 +255,67 @@
 .alert-danger {
     background: linear-gradient(135deg, #dc3545, #fd7e14);
     color: white;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+    color: white;
+}
+
+/* Table improvements */
+.table-sm td, .table-sm th {
+    padding: 0.5rem;
+    border: none;
+}
+
+.table-sm tr {
+    border-bottom: 1px solid #f1f3f4;
+}
+
+/* Badge improvements */
+.badge.bg-dark {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+    color: white !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+/* Card header improvements */
+.card-header {
+    border-bottom: none;
+}
+
+/* Button improvements */
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Info section improvements */
+.card-body ul, .card-body ol {
+    padding-left: 1.5rem;
+}
+
+.card-body li {
+    margin-bottom: 0.5rem;
 }
 </style>
 @endsection 

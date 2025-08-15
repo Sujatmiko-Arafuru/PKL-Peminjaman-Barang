@@ -14,31 +14,42 @@ class PengembalianController extends Controller
 {
     public function index(Request $request): \Illuminate\View\View
     {
-        $query = Peminjaman::query();
+        $peminjaman = null;
         
-        // Filter berdasarkan status pengembalian
-        $query->whereIn('status', ['pengembalian_diajukan', 'disetujui']);
-        
-        if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('no_telp', 'like', '%' . $request->search . '%')
-                  ->orWhere('kode_peminjaman', 'like', '%' . $request->search . '%');
-            });
+        // Jika ada request POST (form submission), lakukan pencarian
+        if ($request->isMethod('post') || $request->hasAny(['kode_peminjaman', 'nama_peminjam', 'nama_kegiatan', 'no_telp'])) {
+            $query = Peminjaman::query();
+            
+            // Filter berdasarkan status yang bisa dikembalikan
+            $query->whereIn('status', ['disetujui', 'pengembalian_diajukan']);
+            
+            // Pencarian fleksibel - admin bisa mengisi salah satu atau lebih
+            if ($request->filled('kode_peminjaman')) {
+                $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
+            }
+            
+            if ($request->filled('nama_peminjam')) {
+                $query->where('nama', 'like', '%' . $request->nama_peminjam . '%');
+            }
+            
+            if ($request->filled('nama_kegiatan')) {
+                $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
+            }
+            
+            if ($request->filled('no_telp')) {
+                $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
+            }
+            
+            // Ambil data pertama yang cocok
+            $peminjaman = $query->first();
+            
+            // Jika tidak ada data yang cocok, set error message
+            if (!$peminjaman) {
+                session()->flash('error', 'Data peminjaman tidak ditemukan. Silakan cek kembali data yang diinput.');
+            }
         }
         
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-        
-        if ($request->filled('urut')) {
-            $query->orderBy('created_at', $request->urut == 'terbaru' ? 'desc' : 'asc');
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
-        
-        $peminjamans = $query->paginate(10);
-        return view('admin.pengembalian.index', compact('peminjamans'));
+        return view('admin.pengembalian.index', compact('peminjaman'));
     }
 
     public function show($id): \Illuminate\View\View
@@ -50,30 +61,63 @@ class PengembalianController extends Controller
     public function inputKodePengembalian(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
-            'kode_peminjaman' => 'required|string|max:50',
-            'nama_peminjam' => 'required|string|max:100',
-            'no_telp' => 'required|string|max:20'
+            'kode_peminjaman' => 'nullable|string|max:50',
+            'nama_peminjam' => 'nullable|string|max:100',
+            'nama_kegiatan' => 'nullable|string|max:200',
+            'no_telp' => 'nullable|string|max:20'
         ]);
 
         try {
-            // Cari peminjaman berdasarkan kode
-            $peminjaman = Peminjaman::where('kode_peminjaman', $request->kode_peminjaman)
-                                   ->where('nama', $request->nama_peminjam)
-                                   ->where('no_telp', $request->no_telp)
-                                   ->where('status', 'disetujui')
-                                   ->first();
+            // Validasi minimal harus ada satu field yang diisi
+            if (!$request->filled('kode_peminjaman') && 
+                !$request->filled('nama_peminjam') && 
+                !$request->filled('nama_kegiatan') && 
+                !$request->filled('no_telp')) {
+                return redirect()->route('admin.pengembalian.index')
+                               ->with('error', 'Minimal harus mengisi salah satu field untuk pencarian.');
+            }
+
+            $query = Peminjaman::query();
+            
+            // Filter berdasarkan status yang bisa dikembalikan
+            $query->whereIn('status', ['disetujui', 'pengembalian_diajukan']);
+            
+            // Pencarian berdasarkan field yang diisi
+            if ($request->filled('kode_peminjaman')) {
+                $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
+            }
+            
+            if ($request->filled('nama_peminjam')) {
+                $query->where('nama', 'like', '%' . $request->nama_peminjam . '%');
+            }
+            
+            if ($request->filled('nama_kegiatan')) {
+                $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
+            }
+            
+            if ($request->filled('no_telp')) {
+                $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
+            }
+
+            // Cari peminjaman yang sesuai
+            $peminjaman = $query->first();
 
             if (!$peminjaman) {
                 return redirect()->route('admin.pengembalian.index')
                                ->with('error', 'Data peminjaman tidak ditemukan atau status tidak sesuai.');
             }
 
-            // Update status menjadi pengembalian_diajukan
-            $peminjaman->status = 'pengembalian_diajukan';
-            $peminjaman->saveQuietly();
-
-            return redirect()->route('admin.pengembalian.index')
-                           ->with('success', 'Kode pengembalian berhasil diinput. Status: Pengembalian Diajukan');
+            // Update status menjadi pengembalian_diajukan jika masih disetujui
+            if ($peminjaman->status == 'disetujui') {
+                $peminjaman->status = 'pengembalian_diajukan';
+                $peminjaman->saveQuietly();
+                
+                return redirect()->route('admin.pengembalian.index')
+                               ->with('success', 'Kode pengembalian berhasil diinput. Status: Pengembalian Diajukan');
+            } else {
+                return redirect()->route('admin.pengembalian.index')
+                               ->with('info', 'Data peminjaman ditemukan dengan status: ' . ucfirst($peminjaman->status));
+            }
 
         } catch (\Exception $e) {
             Log::error('Error saat input kode pengembalian: ' . $e->getMessage());
