@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('assets/css/custom-theme.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/components.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/table-improvements.css') }}" rel="stylesheet">
     @yield('head')
     <style>
         .dashboard-title {

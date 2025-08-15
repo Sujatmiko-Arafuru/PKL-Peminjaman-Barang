@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('assets/css/custom-theme.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/components.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/table-improvements.css') }}" rel="stylesheet">
     <style>
         body { background: #E0FFFF; }
         .sidebar {
