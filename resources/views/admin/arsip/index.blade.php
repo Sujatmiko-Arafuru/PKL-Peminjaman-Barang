@@ -28,9 +28,9 @@
         <div class="card-body">
             <form method="GET" class="row g-3">
                 <div class="col-md-3">
-                    <label class="form-label text-muted small">Cari Nama</label>
+                    <label class="form-label text-muted small">Cari Nama/Kode</label>
                     <input type="text" name="search" class="form-control form-control-sm" 
-                           placeholder="Cari nama user..." value="{{ request('search') }}">
+                           placeholder="Cari nama/kode..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label text-muted small">Status</label>
@@ -125,16 +125,13 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode Unik</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">No HP</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Unit/Jurusan</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Unit</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kegiatan</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Periode</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Tanggal Pengajuan</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Barang</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Lihat Detail</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,30 +142,21 @@
                             </td>
                             <td class="px-3 py-3">
                                 <div class="fw-semibold text-dark">{{ $p->nama }}</div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="text-muted">{{ $p->no_telp }}</span>
+                                <small class="text-muted">{{ $p->no_telp }}</small>
                             </td>
                             <td class="px-3 py-3">
                                 <span class="badge bg-light text-dark">{{ $p->unit }}</span>
                             </td>
                             <td class="px-3 py-3">
                                 <div class="fw-medium" title="{{ $p->nama_kegiatan }}">
-                                    {{ Str::limit($p->nama_kegiatan, 25) }}
+                                    {{ Str::limit($p->nama_kegiatan, 30) }}
                                 </div>
                             </td>
-
                             <td class="px-3 py-3">
                                 <div class="small text-muted">
                                     <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
                                     <div class="text-muted">s/d</div>
                                     <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
-                                </div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="small text-muted">
-                                    <div>{{ format_tanggal($p->created_at) }}</div>
-                                    <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
                                 </div>
                             </td>
                             <td class="px-3 py-3">
@@ -190,15 +178,6 @@
                                 </span>
                             </td>
                             <td class="px-3 py-3">
-                                <div class="d-flex flex-wrap gap-1">
-                                    @foreach($p->details as $detail)
-                                        <span class="badge bg-info bg-opacity-75 text-dark rounded-pill">
-                                            {{ $detail->barang->nama ?? '-' }} ({{ $detail->jumlah }})
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </td>
-                            <td class="px-3 py-3">
                                 <button type="button" class="btn btn-sm btn-outline-primary shadow-sm detail-btn" 
                                         data-peminjaman-id="{{ $p->id }}">
                                     <i class="bi bi-eye me-1"></i>Detail
@@ -207,7 +186,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="7" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p class="mb-0 mt-2">Tidak ada data arsip</p>
@@ -298,50 +277,99 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.modal-header .btn-close {
-    filter: brightness(0) invert(1);
+/* Table improvements */
+.table-hover tbody tr:hover {
+    background-color: rgba(32, 178, 170, 0.05);
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    border-bottom: 1px solid #f1f3f4;
+}
+
+/* Badge improvements */
+.badge.bg-dark {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.badge.bg-primary {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+.badge.bg-light {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Prevent multiple event listeners
     const detailButtons = document.querySelectorAll('.detail-btn');
     
     detailButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
             const peminjamanId = this.getAttribute('data-peminjaman-id');
             showDetailModal(peminjamanId);
         });
     });
     
     function showDetailModal(peminjamanId) {
-        // Get the row data
         const row = document.querySelector(`[data-peminjaman-id="${peminjamanId}"]`).closest('tr');
         const cells = row.querySelectorAll('td');
         
-        // Extract data from the row
         const kodePeminjaman = cells[0].querySelector('.badge').textContent;
         const nama = cells[1].querySelector('.fw-semibold').textContent;
-        const noTelp = cells[2].textContent;
-        const unit = cells[3].querySelector('.badge').textContent;
-        const kegiatan = cells[4].querySelector('.fw-medium').getAttribute('title') || cells[4].querySelector('.fw-medium').textContent;
-        const periodeMulai = cells[5].querySelector('.small div:first-child').textContent;
-        const periodeSelesai = cells[5].querySelector('.small div:last-child').textContent;
-        const tanggalPengajuan = cells[6].querySelector('.small div:first-child').textContent;
-        const waktuPengajuan = cells[6].querySelector('.small div:last-child').textContent;
-        const status = cells[7].querySelector('.badge').textContent;
+        const noTelp = cells[1].querySelector('small').textContent;
+        const unit = cells[2].querySelector('.badge').textContent;
+        const kegiatan = cells[3].querySelector('.fw-medium').getAttribute('title') || cells[3].querySelector('.fw-medium').textContent;
+        const periodeMulai = cells[4].querySelector('.small div:first-child').textContent;
+        const periodeSelesai = cells[4].querySelector('.small div:last-child').textContent;
+        const status = cells[5].querySelector('.badge').textContent;
         
-        // Get barang details
-        const barangDetails = [];
-        cells[8].querySelectorAll('.badge').forEach(badge => {
-            barangDetails.push(badge.textContent);
-        });
-        
-        // Build modal content
         const modalContent = `
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -352,6 +380,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             </h6>
                         </div>
                         <div class="card-body">
+                            <div class="mb-2">
+                                <small class="text-muted">Kode Peminjaman</small>
+                                <div class="fw-semibold text-primary">${kodePeminjaman}</div>
+                            </div>
                             <div class="mb-2">
                                 <small class="text-muted">Nama</small>
                                 <div class="fw-semibold">${nama}</div>
@@ -372,19 +404,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <small class="text-muted">Periode Peminjaman</small>
                                 <div class="fw-semibold">${periodeMulai} - ${periodeSelesai}</div>
                             </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Kode Peminjaman</small>
-                                <div class="fw-semibold text-primary">${kodePeminjaman}</div>
-                            </div>
-                                                         <div class="mb-2">
-                                 <small class="text-muted">Lampiran</small>
-                                 <div>
-                                     <span class="text-muted">-</span>
-                                 </div>
-                             </div>
                             <div class="mb-0">
                                 <small class="text-muted">Status</small>
-                                <div>${cells[7].innerHTML}</div>
+                                <div>${cells[5].innerHTML}</div>
                             </div>
                         </div>
                     </div>
@@ -397,38 +419,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             </h6>
                         </div>
                         <div class="card-body">
-                            ${barangDetails.length > 0 ? `
-                                <div class="list-group list-group-flush">
-                                    ${barangDetails.map(barang => `
-                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                            <div>
-                                                <div class="fw-semibold">${barang.split(' (')[0]}</div>
-                                                <small class="text-muted">Jumlah: ${barang.match(/\((\d+)\)/)?.[1] || '-'}</small>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : `
-                                <div class="text-center text-muted py-3">
-                                    <i class="bi bi-box-seam fs-1"></i>
-                                    <p class="mb-0 mt-2">Tidak ada barang</p>
-                                </div>
-                            `}
+                            <div class="text-center text-muted py-3">
+                                <i class="bi bi-info-circle fs-1"></i>
+                                <p class="mb-0 mt-2">Klik tombol Detail untuk melihat barang yang dipinjam</p>
+                                <small>Data lengkap tersedia di halaman detail peminjaman</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
         
-        // Update modal content and show
         document.getElementById('modalBody').innerHTML = modalContent;
-        
-        // Show modal with smooth animation
         const modal = new bootstrap.Modal(document.getElementById('detailModal'));
         modal.show();
     }
     
-    // Prevent modal from closing when clicking inside
     document.getElementById('detailModal').addEventListener('click', function(e) {
         if (e.target === this) {
             const modal = bootstrap.Modal.getInstance(this);

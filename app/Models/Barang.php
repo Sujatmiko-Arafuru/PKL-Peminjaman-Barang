@@ -11,7 +11,7 @@ class Barang extends Model
 
     protected $table = 'barangs'; // Nama tabel, sesuaikan dengan migration nanti
     protected $fillable = [
-        'nama', 'deskripsi', 'stok', 'status', 'foto', 'foto2', 'foto3'
+        'kode', 'nama', 'kategori', 'deskripsi', 'stok', 'satuan', 'lokasi', 'kondisi', 'status', 'foto', 'foto2', 'foto3'
     ];
     
     public function details()
