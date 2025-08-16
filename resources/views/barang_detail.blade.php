@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('head')
+<link rel="stylesheet" href="{{ asset('assets/css/photo-gallery.css') }}">
+@endsection
+
 @section('content')
 <style>
     .btn:disabled {
@@ -22,6 +26,25 @@
     .form-control:disabled {
         background-color: #e9ecef !important;
         opacity: 0.6 !important;
+    }
+
+    /* Photo carousel styling */
+    .photo-carousel {
+        height: 300px;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .photo-placeholder {
+        height: 300px;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dee2e6;
+        margin-bottom: 2rem;
     }
 </style>
 
@@ -55,48 +78,95 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
                     <div class="row">
-                        <div class="col-md-5 mb-3 mb-md-0">
-                            @php
-                                $photos = $barang->getAllPhotos();
-                            @endphp
-                            @if(count($photos) > 0)
-                            <div class="mb-2 text-center">
-                                <img class="main-foto-barang w-100" src="{{ Storage::url('public/barang-photos/' . $photos[0]) }}" style="border-radius:1rem;max-height:260px;object-fit:cover;max-width:320px;" alt="Foto utama">
-                            </div>
-                            <div class="d-flex justify-content-center gap-2">
-                                @foreach($photos as $i => $photo)
-                                <img src="{{ Storage::url('public/barang-photos/' . $photo) }}" class="img-thumbnail selector-foto" data-foto="{{ Storage::url('public/barang-photos/' . $photo) }}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;{{ $i==0?'border:2px solid #20B2AA;':'' }}" alt="Thumb {{ $i+1 }}">
-                                @endforeach
-                            </div>
+                        <div class="col-md-12">
+                            <!-- Photo Section -->
+                            @if($barang->hasPhotos())
+                                @if($barang->photo_count > 1)
+                                    <div id="barangPhotoCarousel" class="carousel slide photo-carousel photo-gallery" data-bs-ride="carousel">
+                                        <div class="carousel-indicators">
+                                            @foreach($barang->photos as $index => $photo)
+                                            <button type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide-to="{{ $index }}" 
+                                                    class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
+                                                    aria-label="Slide {{ $index + 1 }}"></button>
+                                            @endforeach
+                                        </div>
+                                        <div class="carousel-inner">
+                                            @foreach($barang->photos as $index => $photo)
+                                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                                <img src="{{ Storage::url($photo) }}" class="d-block w-100" alt="Foto {{ $index + 1 }}">
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                    </div>
+                                @else
+                                    <img src="{{ Storage::url($barang->main_photo) }}" alt="{{ $barang->nama }}" class="photo-carousel" style="object-fit: cover;">
+                                @endif
                             @else
-                            <div class="bg-light text-center py-5" style="border-radius:1rem;">
-                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                                <p class="text-muted mt-2">Tidak ada foto</p>
-                            </div>
+                                <div class="photo-placeholder">
+                                    <i class="bi bi-box-seam text-primary" style="font-size: 3rem;"></i>
+                                </div>
                             @endif
-                        </div>
-                        <div class="col-md-7 d-flex flex-column justify-content-between">
-                            <div>
+
+                            <div class="text-center mb-4">
                                 <h2 class="text-primary mb-3">{{ $barang->nama }}</h2>
-                                <p class="mb-3">{{ $barang->deskripsi }}</p>
-                                <div class="row mb-3">
-                                    <div class="col-6">
-                                        <p class="mb-1"><strong>Stok Tersedia:</strong></p>
-                                        <span class="badge bg-success fs-6">{{ $barang->stok_tersedia }}</span>
-                                    </div>
-                                    <div class="col-6">
-                                        <p class="mb-1"><strong>Stok Dipinjam:</strong></p>
-                                        <span class="badge bg-warning text-dark fs-6">{{ $barang->stok_dipinjam }}</span>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-0 bg-primary bg-opacity-10">
+                                        <div class="card-body text-center py-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="bi bi-boxes text-primary"></i>
+                                            </div>
+                                            <h6 class="mb-0 text-primary fw-semibold">Stok Tersedia</h6>
+                                            <p class="mb-0 text-muted small">{{ $barang->stok_tersedia }} unit</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <p class="mb-1"><strong>Status:</strong></p>
-                                        <span class="badge {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }} fs-6">{{ ucfirst($barang->status) }}</span>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-0 bg-warning bg-opacity-10">
+                                        <div class="card-body text-center py-3">
+                                            <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="bi bi-arrow-repeat text-warning"></i>
+                                            </div>
+                                            <h6 class="mb-0 text-warning fw-semibold">Stok Dipinjam</h6>
+                                            <p class="mb-0 text-muted small">{{ $barang->stok_dipinjam }} unit</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-3">
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted small mb-2">Deskripsi</h6>
+                                <div class="bg-light rounded p-3">
+                                    @if($barang->deskripsi)
+                                        <p class="mb-0">{{ $barang->deskripsi }}</p>
+                                    @else
+                                        <p class="mb-0 text-muted">Tidak ada deskripsi</p>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted small mb-2">Status</h6>
+                                <span class="badge rounded-pill fs-6
+                                    {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">
+                                    <i class="bi bi-{{ $barang->status == 'tersedia' ? 'check-circle' : 'right' }} me-1"></i>
+                                    {{ ucfirst($barang->status) }}
+                                </span>
+                            </div>
+                            
+                            <div class="mt-4">
                                 <form action="{{ route('keranjang.tambah') }}" method="POST" class="d-flex flex-column align-items-start gap-2">
                                     @csrf
                                     <div class="input-group mb-2" style="max-width:200px;">
@@ -151,16 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-    
-    // Interaksi thumbnail
-    document.querySelectorAll('.selector-foto').forEach(function(thumb) {
-        thumb.addEventListener('click', function() {
-            document.querySelectorAll('.selector-foto').forEach(t => t.style.border = '');
-            this.style.border = '2px solid #20B2AA';
-            var mainFoto = document.querySelector('.main-foto-barang');
-            if(mainFoto) mainFoto.setAttribute('src', this.getAttribute('data-foto'));
-        });
     });
 });
 </script>

@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('head')
+<link rel="stylesheet" href="{{ asset('assets/css/photo-gallery.css') }}">
+@endsection
+
 @section('content')
 <style>
     .btn:disabled {
@@ -80,6 +84,29 @@
     
     .alert .btn-close {
         filter: invert(1);
+    }
+
+    /* Photo carousel styling */
+    .photo-carousel {
+        height: 180px;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .photo-carousel .carousel-item img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .photo-placeholder {
+        height: 180px;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dee2e6;
     }
 </style>
 
@@ -209,22 +236,42 @@
                 @forelse($barangs as $barang)
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0">
-                        @php
-                            $foto = null;
-                            if ($barang->foto) {
-                                $fotoArr = json_decode($barang->foto, true);
-                                if (is_array($fotoArr) && count($fotoArr) > 0) {
-                                    $foto = $fotoArr[0];
-                                }
-                            }
-                        @endphp
-                        @if($foto)
-                        <img src="{{ asset('storage/' . $foto) }}" alt="{{ $barang->nama }}" class="card-img-top" style="max-height:180px;object-fit:cover;">
+                        <!-- Photo Section -->
+                        @if($barang->hasPhotos())
+                            @if($barang->photo_count > 1)
+                                <div id="photoCarousel{{ $barang->id }}" class="carousel slide photo-carousel photo-gallery" data-bs-ride="carousel">
+                                    <div class="carousel-indicators">
+                                        @foreach($barang->photos as $index => $photo)
+                                        <button type="button" data-bs-target="#photoCarousel{{ $barang->id }}" data-bs-slide-to="{{ $index }}" 
+                                                class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
+                                                aria-label="Slide {{ $index + 1 }}"></button>
+                                        @endforeach
+                                    </div>
+                                    <div class="carousel-inner">
+                                        @foreach($barang->photos as $index => $photo)
+                                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                            <img src="{{ Storage::url($photo) }}" class="d-block w-100" alt="Foto {{ $index + 1 }}">
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#photoCarousel{{ $barang->id }}" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#photoCarousel{{ $barang->id }}" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            @else
+                                <img src="{{ Storage::url($barang->main_photo) }}" alt="{{ $barang->nama }}" class="photo-carousel" style="object-fit: cover;">
+                            @endif
                         @else
-                        <div class="d-flex align-items-center justify-content-center bg-light" style="height:180px;border-radius:.5rem;">
-                            <i class="bi bi-image text-secondary" style="font-size:2.5rem;"></i>
-                        </div>
+                            <div class="photo-placeholder">
+                                <i class="bi bi-box-seam text-secondary" style="font-size:2.5rem;"></i>
+                            </div>
                         @endif
+
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-primary mb-1">{{ $barang->nama }}</h5>
                             <p class="card-text mb-1">{{ Str::limit($barang->deskripsi, 60) }}</p>
@@ -244,7 +291,6 @@
                                         style="{{ $barang->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}"
                                         data-id="{{ $barang->id }}"
                                         data-nama="{{ $barang->nama }}"
-                                        data-foto="{{ $foto ? asset('storage/' . $foto) : '' }}"
                                         data-deskripsi="{{ $barang->deskripsi }}"
                                         data-stok="{{ $barang->stok_tersedia }}"
                                         data-status="{{ $barang->status }}"
@@ -276,7 +322,9 @@
       </div>
       <div class="modal-body">
         <div class="text-center mb-3">
-          <img id="modalFotoBarang" src="" alt="Foto" style="max-width:180px;max-height:180px;border-radius:0.5rem;object-fit:cover;">
+          <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-box-seam text-secondary" style="font-size: 2.5rem;"></i>
+          </div>
         </div>
         <h5 id="modalNamaBarang" class="text-primary mb-2"></h5>
         <div class="mb-2"><span id="modalDeskripsiBarang"></span></div>
@@ -314,12 +362,10 @@
                     selectedBarang = {
                         id: btn.getAttribute('data-id'),
                         nama: btn.getAttribute('data-nama'),
-                        foto: btn.getAttribute('data-foto'),
                         deskripsi: btn.getAttribute('data-deskripsi'),
                         stok: btn.getAttribute('data-stok'),
                         status: btn.getAttribute('data-status')
                     };
-                    document.getElementById('modalFotoBarang').src = selectedBarang.foto;
                     document.getElementById('modalNamaBarang').innerText = selectedBarang.nama;
                     document.getElementById('modalDeskripsiBarang').innerText = selectedBarang.deskripsi;
                     document.getElementById('modalStokBarang').innerText = selectedBarang.stok;

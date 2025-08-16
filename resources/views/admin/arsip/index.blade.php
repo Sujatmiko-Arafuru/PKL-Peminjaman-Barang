@@ -83,7 +83,7 @@
                         <div>
                             <h6 class="mb-0 text-primary fw-semibold">Barang Terlaris</h6>
                             <p class="mb-0 text-muted small">
-                                {{ $terlaris ? $terlaris->nama . ' (' . ($terlaris->details_count ?? 0) . 'x)' : 'Belum ada data' }}
+                                {{ $terlaris ? $terlaris->nama . ' (' . ($terlaris->peminjaman_details_count ?? 0) . 'x)' : 'Belum ada data' }}
                             </p>
                         </div>
                     </div>

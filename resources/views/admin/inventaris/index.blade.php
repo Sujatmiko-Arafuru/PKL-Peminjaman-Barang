@@ -107,8 +107,8 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama Barang</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Foto</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama Barang</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Stok Tersedia</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Stok Dipinjam</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
@@ -120,24 +120,28 @@
                         @foreach($barangs as $barang)
                         <tr class="border-bottom">
                             <td class="px-3 py-3">
-                                <div class="fw-semibold text-dark">{{ $barang->nama }}</div>
-                            </td>
-                            <td class="px-3 py-3">
-                                @php
-                                    $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
-                                    $fotoUtama = $fotoArray && count($fotoArray) > 0 ? $fotoArray[0] : null;
-                                @endphp
-                                @if($fotoUtama)
-                                    <img src="{{ asset('storage/' . $fotoUtama) }}" 
-                                         alt="{{ $barang->nama }}" 
-                                         class="rounded shadow-sm"
-                                         style="max-width:60px;max-height:60px;object-fit:cover;">
+                                @if($barang->hasPhotos())
+                                    <div class="position-relative">
+                                        <img src="{{ Storage::url($barang->main_photo) }}" 
+                                             alt="{{ $barang->nama }}" 
+                                             class="rounded" 
+                                             style="width: 60px; height: 60px; object-fit: cover;">
+                                        @if($barang->photo_count > 1)
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
+                                                  style="font-size: 0.6rem; transform: translate(-50%, -50%);">
+                                                +{{ $barang->photo_count - 1 }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 @else
                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                         style="width:60px;height:60px;">
-                                        <i class="bi bi-image text-muted"></i>
+                                         style="width: 60px; height: 60px;">
+                                        <i class="bi bi-box-seam text-muted"></i>
                                     </div>
                                 @endif
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="fw-semibold text-dark">{{ $barang->nama }}</div>
                             </td>
                             <td class="px-3 py-3">
                                 <span class="badge bg-success rounded-pill fs-6">{{ $barang->stok_tersedia }}</span>
@@ -206,6 +210,10 @@
 
 .btn-sm {
     font-size: 0.875rem;
+}
+
+.table img {
+    border: 1px solid #dee2e6;
 }
 </style>
 @endsection 

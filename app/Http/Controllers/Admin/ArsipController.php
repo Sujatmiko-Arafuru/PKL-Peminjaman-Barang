@@ -45,14 +45,14 @@ class ArsipController extends Controller
 
         $peminjamans = $query->paginate(10);
 
-        // Data untuk summary
-        $terlaris = Barang::withCount(['details' => function($query) {
+        // Data untuk summary - perbaiki relationship yang salah
+        $terlaris = Barang::withCount(['peminjamanDetails' => function($query) {
             $query->whereHas('peminjaman', function($q) {
                 $q->where('status', 'dikembalikan');
             });
-        }])->orderBy('details_count', 'desc')->first();
+        }])->orderBy('peminjaman_details_count', 'desc')->first();
 
-        $tidakPernah = Barang::whereDoesntHave('details.peminjaman', function($query) {
+        $tidakPernah = Barang::whereDoesntHave('peminjamanDetails.peminjaman', function($query) {
             $query->where('status', 'dikembalikan');
         })->get();
 

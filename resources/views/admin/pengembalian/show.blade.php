@@ -32,7 +32,7 @@
     </div>
     @endif
 
-    <div class="row">
+<div class="row">
         <!-- Data Peminjam -->
         <div class="col-md-6 mb-4">
             <div class="card border-0 shadow-sm">
@@ -41,7 +41,7 @@
                         <i class="bi bi-person me-2"></i>Data Peminjam
                     </h6>
                 </div>
-                <div class="card-body">
+            <div class="card-body">
                     <div class="mb-2">
                         <small class="text-muted">Nama</small>
                         <div class="fw-semibold">{{ $peminjaman->nama }}</div>

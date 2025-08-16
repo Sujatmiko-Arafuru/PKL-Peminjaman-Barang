@@ -35,13 +35,10 @@ class KeranjangController extends Controller
                 }
                 $cart[$id]['qty'] = $totalQty;
             } else {
-                // Ambil foto utama (pertama) dari array JSON
-                $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
-                $fotoUtama = $fotoArray && count($fotoArray) > 0 ? $fotoArray[0] : null;
+                // Barang baru, tambahkan ke keranjang
                 $cart[$id] = [
                     'id' => $barang->id,
                     'nama' => $barang->nama,
-                    'foto' => $fotoUtama,
                     'stok' => $barang->stok,
                     'stok_tersedia' => $barang->stok_tersedia,
                     'stok_dipinjam' => $barang->stok_dipinjam,
@@ -167,13 +164,10 @@ class KeranjangController extends Controller
             $barang = Barang::find($item['id']);
             if ($barang && $barang->bisaDipinjam($item['qty'])) {
                 // Update data barang dengan informasi terbaru
-                $fotoArray = $barang->foto ? json_decode($barang->foto, true) : [];
-                $fotoUtama = $fotoArray && count($fotoArray) > 0 ? $fotoArray[0] : null;
                 
                 $cleanedCart[$itemId] = [
                     'id' => $barang->id,
                     'nama' => $barang->nama,
-                    'foto' => $fotoUtama,
                     'stok' => $barang->stok,
                     'stok_tersedia' => $barang->stok_tersedia,
                     'stok_dipinjam' => $barang->stok_dipinjam,

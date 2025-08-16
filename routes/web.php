@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\PeminjamanController as AdminPeminjamanController
 use App\Http\Controllers\Admin\PengembalianController;
 use App\Http\Controllers\Admin\ArsipController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\PhotoController;
 
 Route::get('/', [BarangController::class, 'beranda'])->name('beranda');
 Route::get('/list-barang', [BarangController::class, 'index'])->name('dashboard');
@@ -56,10 +55,6 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
     Route::get('arsip/export/pdf', [ArsipController::class, 'exportPdf'])->name('arsip.export.pdf');
-    
-    // Routes untuk upload foto
-    Route::post('barang/{id}/upload-photo', [PhotoController::class, 'upload'])->name('barang.upload-photo');
-    Route::delete('barang/{id}/delete-photo', [PhotoController::class, 'delete'])->name('barang.delete-photo');
 });
 
 
