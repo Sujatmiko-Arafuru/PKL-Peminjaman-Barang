@@ -6,13 +6,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1 text-primary fw-bold">
-                <i class="bi bi-arrow-clockwise me-2"></i>Detail Pengembalian
+                <i class="bi bi-arrow-return-left me-2"></i>Detail Pengembalian Barang
             </h2>
-            <p class="text-muted mb-0">Detail pengembalian barang peminjaman</p>
+            <p class="text-muted mb-0">Kelola pengembalian barang untuk peminjaman ini</p>
         </div>
         <div>
             <a href="{{ route('admin.pengembalian.index') }}" class="btn btn-outline-primary shadow-sm">
-                <i class="bi bi-arrow-left me-2"></i>Kembali
+                <i class="bi bi-arrow-left me-2"></i>Kembali ke Pengembalian
             </a>
         </div>
     </div>
@@ -24,7 +24,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
@@ -32,156 +31,271 @@
     </div>
     @endif
 
-<div class="row">
-        <!-- Data Peminjam -->
-        <div class="col-md-6 mb-4">
+    <!-- Informasi Peminjaman -->
+    <div class="row mb-4">
+        <div class="col-md-6">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 text-primary">
-                        <i class="bi bi-person me-2"></i>Data Peminjam
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0 text-primary fw-semibold">
+                        <i class="bi bi-person me-2"></i>Informasi Peminjam
                     </h6>
                 </div>
             <div class="card-body">
-                    <div class="mb-2">
-                        <small class="text-muted">Nama</small>
-                        <div class="fw-semibold">{{ $peminjaman->nama }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">No HP</small>
-                        <div class="fw-semibold">{{ $peminjaman->no_telp }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Unit/Jurusan</small>
-                        <div class="fw-semibold">{{ $peminjaman->unit }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Nama Kegiatan</small>
-                        <div class="fw-semibold">{{ $peminjaman->nama_kegiatan }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Periode Peminjaman</small>
-                        <div class="fw-semibold">
-                            {{ format_tanggal($peminjaman->tanggal_mulai) }} - 
-                            {{ format_tanggal($peminjaman->tanggal_selesai) }}
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Kode Peminjaman</small>
-                        <div class="fw-semibold text-primary">{{ $peminjaman->kode_peminjaman }}</div>
-                    </div>
-                    <div class="mb-0">
-                        <small class="text-muted">Status</small>
-                        <div>
-                            @if($peminjaman->status == 'pengembalian_diajukan')
+                    <table class="table table-sm">
+                        <tr>
+                            <td class="fw-bold" style="width: 40%">Kode Peminjaman:</td>
+                            <td><span class="badge bg-dark">{{ $peminjaman->kode_peminjaman }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Nama:</td>
+                            <td><strong>{{ $peminjaman->nama }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">NIM/NIP:</td>
+                            <td><strong>{{ $peminjaman->nim_nip ?? '-' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Unit:</td>
+                            <td>{{ $peminjaman->unit }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">No. HP:</td>
+                            <td>{{ $peminjaman->no_telp }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Status:</td>
+                            <td>
+                                                                    @if($peminjaman->status == 'proses_pengembalian')
                                 <span class="badge bg-warning text-dark rounded-pill">
-                                    <i class="bi bi-clock me-1"></i>Pengembalian Diajukan
+                                            <i class="bi bi-clock me-1"></i>Proses Pengembalian
+                                        </span>
+                                    @elseif($peminjaman->status == 'dipinjam')
+                                        <span class="badge bg-primary rounded-pill">
+                                            <i class="bi bi-box-seam me-1"></i>Dipinjam
                                 </span>
                             @elseif($peminjaman->status == 'disetujui')
                                 <span class="badge bg-success rounded-pill">
                                     <i class="bi bi-check-circle me-1"></i>Disetujui
                                 </span>
+                                    @elseif($peminjaman->status == 'dikembalikan')
+                                        <span class="badge bg-success rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i>Dikembalikan
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary rounded-pill">
+                                            {{ ucfirst($peminjaman->status) }}
+                                        </span>
                             @endif
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <!-- Barang yang Dipinjam -->
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0 text-primary">
-                        <i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0 text-primary fw-semibold">
+                        <i class="bi bi-calendar-event me-2"></i>Informasi Kegiatan
                     </h6>
                 </div>
                 <div class="card-body">
-                    @if($peminjaman->details->count() > 0)
-                        <div class="list-group list-group-flush">
-                            @foreach($peminjaman->details as $detail)
-                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-2">
-                                <div class="flex-grow-1">
-                                    <div class="fw-semibold">{{ $detail->barang->nama ?? '-' }}</div>
-                                    <small class="text-muted">ID: {{ $detail->barang->id ?? '-' }}</small>
-                                    <div class="mt-1">
-                                        <small class="text-muted">Dipinjam: {{ $detail->jumlah }}</small>
-                                        @if($detail->jumlah_dikembalikan)
-                                            <br><small class="text-success">Dikembalikan: {{ $detail->jumlah_dikembalikan }}</small>
-                                        @endif
+                    <table class="table table-sm">
+                        <tr>
+                            <td class="fw-bold" style="width: 40%">Nama Kegiatan:</td>
+                            <td>{{ $peminjaman->nama_kegiatan }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Tanggal Mulai:</td>
+                            <td>{{ \Carbon\Carbon::parse($peminjaman->tanggal_mulai)->format('d/m/Y') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Tanggal Selesai:</td>
+                            <td>{{ \Carbon\Carbon::parse($peminjaman->tanggal_selesai)->format('d/m/Y') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Tanggal Pengajuan:</td>
+                            <td>{{ \Carbon\Carbon::parse($peminjaman->created_at)->format('d/m/Y H:i') }}</td>
+                        </tr>
+                    </table>
                                     </div>
                                 </div>
-                                <div class="text-end">
-                                    @if($peminjaman->status == 'pengembalian_diajukan')
-                                        <div class="mb-2">
-                                            <label class="form-label text-muted small">Jumlah Dikembalikan</label>
-                                            <input type="number" 
-                                                   class="form-control form-control-sm jumlah-dikembalikan" 
-                                                   data-detail-id="{{ $detail->id }}"
-                                                   data-peminjaman-id="{{ $peminjaman->id }}"
-                                                   min="0" 
-                                                   max="{{ $detail->jumlah }}" 
-                                                   value="{{ $detail->jumlah_dikembalikan ?? 0 }}"
-                                                   style="width: 80px;">
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-primary update-detail-btn"
-                                                data-detail-id="{{ $detail->id }}"
-                                                data-peminjaman-id="{{ $peminjaman->id }}">
-                                            <i class="bi bi-check-lg"></i> Update
-                                        </button>
-                                    @else
-                                        <span class="badge bg-primary rounded-pill">{{ $detail->jumlah }}</span>
-                                    @endif
                                 </div>
                             </div>
-                            @endforeach
+
+    <!-- Progress Bar Pengembalian -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0">
+            <h6 class="mb-0 text-primary fw-semibold">
+                <i class="bi bi-graph-up me-2"></i>Progress Pengembalian
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ $peminjaman->percentage_returned }}%"
+                             aria-valuenow="{{ $peminjaman->percentage_returned }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ $peminjaman->percentage_returned }}%
                         </div>
-                    @else
-                        <div class="text-center text-muted py-3">
-                            <i class="bi bi-box-seam fs-1"></i>
-                            <p class="mb-0 mt-2">Tidak ada barang</p>
+                    </div>
+                    <small class="text-muted">
+                        {{ $peminjaman->total_dikembalikan }} dari {{ $peminjaman->total_barang }} barang sudah dikembalikan
+                    </small>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex flex-column">
+                        <span class="badge bg-success fs-6 mb-1">
+                            {{ $peminjaman->total_dikembalikan }} Dikembalikan
+                        </span>
+                        <span class="badge bg-warning text-dark fs-6">
+                            {{ $peminjaman->total_belum_dikembalikan }} Belum Dikembalikan
+                        </span>
                         </div>
-                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Action Buttons -->
-    @if($peminjaman->status == 'pengembalian_diajukan')
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <h6 class="text-primary mb-3">
-                        <i class="bi bi-info-circle me-2"></i>Aksi Pengembalian
-                    </h6>
-                    <div class="d-flex gap-2 justify-content-center">
-                        <form action="{{ route('admin.pengembalian.approve', $peminjaman->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            <button class="btn btn-success shadow-sm" 
-                                    onclick="return confirm('Approve pengembalian ini?')">
-                                <i class="bi bi-check-lg me-2"></i>Approve Pengembalian
-                            </button>
-                        </form>
-                        <form action="{{ route('admin.pengembalian.reject', $peminjaman->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            <button class="btn btn-danger shadow-sm" 
-                                    onclick="return confirm('Tolak pengembalian ini?')">
-                                <i class="bi bi-x-lg me-2"></i>Reject Pengembalian
-                            </button>
-                        </form>
+    <!-- Form Pengembalian Barang -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+            <h6 class="mb-0 text-primary fw-semibold">
+                <i class="bi bi-box-seam me-2"></i>Form Pengembalian Barang
+            </h6>
+        </div>
+        <div class="card-body">
+            @if($peminjaman->details->count() > 0)
+                <form action="{{ route('admin.pengembalian.bulk-update', $peminjaman->id) }}" method="POST">
+                    @csrf
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 px-3 py-3 text-muted small fw-semibold">Barang</th>
+                                    <th class="border-0 px-3 py-3 text-muted small fw-semibold">Stok Tersedia</th>
+                                    <th class="border-0 px-3 py-3 text-muted small fw-semibold">Jumlah Dipinjam</th>
+                                    <th class="border-0 px-3 py-3 text-muted small fw-semibold">Sudah Dikembalikan</th>
+                                    <th class="border-0 px-3 py-3 text-muted small fw-semibold">Jumlah Dikembalikan</th>
+                                    <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($peminjaman->details as $detail)
+                                <tr class="border-bottom">
+                                    <td class="px-3 py-3">
+                                        <div class="fw-semibold text-dark">{{ $detail->barang->nama }}</div>
+                                        <small class="text-muted">{{ $detail->barang->deskripsi }}</small>
+                                    </td>
+                                    <td class="px-3 py-3">
+                                        <span class="badge bg-info fs-6">{{ $detail->barang->stok }}</span>
+                                        <small class="text-muted d-block">Tersedia</small>
+                                    </td>
+                                    <td class="px-3 py-3">
+                                        <span class="badge bg-primary fs-6">{{ $detail->jumlah }}</span>
+                                    </td>
+                                    <td class="px-3 py-3">
+                                        <span class="badge bg-success fs-6">{{ $detail->jumlah_dikembalikan }}</span>
+                                    </td>
+                                    <td class="px-3 py-3">
+                                        @php($sisa = max(0, $detail->jumlah - $detail->jumlah_dikembalikan))
+                                        <input type="number" 
+                                               name="details[{{ $detail->id }}][id]" 
+                                               value="{{ $detail->id }}" 
+                                               hidden>
+                                        <input type="number" 
+                                               name="details[{{ $detail->id }}][jumlah_dikembalikan]" 
+                                               class="form-control" 
+                                               min="0" 
+                                               max="{{ $sisa }}" 
+                                               value="0"
+                                               style="width: 80px;">
+                                        <small class="text-muted d-block">
+                                            Max tambahan: {{ $sisa }}
+                                            @if($detail->jumlah_dikembalikan > 0)
+                                                <br><span class="text-info">Sudah dikembalikan: {{ $detail->jumlah_dikembalikan }}</span>
+                                            @endif
+                                        </small>
+                                    </td>
+                                    <td class="px-3 py-3">
+                                        @if($detail->isAllReturned())
+                                            <span class="badge bg-success rounded-pill">
+                                                <i class="bi bi-check-circle me-1"></i>Lengkap
+                                            </span>
+                                        @elseif($detail->isPartiallyReturned())
+                                            <span class="badge bg-warning text-dark rounded-pill">
+                                                <i class="bi bi-clock me-1"></i>Sebagian
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary rounded-pill">
+                                                <i class="bi bi-x-circle me-1"></i>Belum
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            <i class="bi bi-info-circle me-1"></i>
-                            <strong>Catatan:</strong> Pastikan semua barang sudah dicek dan jumlah yang dikembalikan sudah benar sebelum approve.
-                        </small>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="text-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Update jumlah barang yang dikembalikan sesuai dengan kondisi fisik barang</strong>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-lg me-2"></i>Update Pengembalian
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            @else
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">Tidak ada detail barang untuk peminjaman ini</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Informasi Status Pengembalian -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0">
+            <h6 class="mb-0 text-primary fw-semibold">
+                <i class="bi bi-info-circle me-2"></i>Informasi Status Pengembalian
+            </h6>
+        </div>
+        <div class="card-body">
+    <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-lightbulb me-2"></i>Logika Status
+                    </h6>
+                    <ul class="mb-0">
+                        <li><strong>Disetujui</strong> → <strong>Dipinjam</strong> (setelah acara)</li>
+                        <li><strong>Dipinjam</strong> → <strong>Proses Pengembalian</strong> (sebagian barang dikembalikan)</li>
+                        <li><strong>Proses Pengembalian</strong> → <strong>Dikembalikan</strong> (semua barang dikembalikan)</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-eye me-2"></i>Status yang Dilihat Mahasiswa
+                    </h6>
+                    <div class="mb-2">
+                        <span class="badge bg-warning text-dark">Proses Pengembalian</span>
+                        <small class="text-muted ms-2">- Sedang diproses admin</small>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-success">Dikembalikan</span>
+                        <small class="text-muted ms-2">- Sudah selesai dan diverifikasi</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @endif
 </div>
 
 <style>
@@ -189,117 +303,33 @@
     border-radius: 0.75rem;
 }
 
+.table th {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
 .badge {
     font-size: 0.75rem;
+}
+
+.progress {
+    border-radius: 0.5rem;
+}
+
+.progress-bar {
+    border-radius: 0.5rem;
+}
+
+.form-control {
+    border-radius: 0.5rem;
 }
 
 .btn {
     border-radius: 0.5rem;
 }
-
-.list-group-item {
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.form-control:focus {
-    border-color: #20B2AA;
-    box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
-}
-
-.alert {
-    border-radius: 0.5rem;
-    border: none;
-}
-
-.alert-success {
-    background: linear-gradient(135deg, #2E8B57, #3CB371);
-    color: white;
-}
-
-.alert-danger {
-    background: linear-gradient(135deg, #dc3545, #fd7e14);
-    color: white;
-}
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle update detail pengembalian
-    const updateButtons = document.querySelectorAll('.update-detail-btn');
-    
-    updateButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const detailId = this.getAttribute('data-detail-id');
-            const peminjamanId = this.getAttribute('data-peminjaman-id');
-            const input = document.querySelector(`input[data-detail-id="${detailId}"]`);
-            const jumlahDikembalikan = input.value;
-            
-            if (jumlahDikembalikan < 0 || jumlahDikembalikan > parseInt(input.getAttribute('max'))) {
-                alert('Jumlah yang dikembalikan tidak valid!');
-                return;
-            }
-            
-            // Disable button during request
-            this.disabled = true;
-            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Updating...';
-            
-            // Send AJAX request
-            fetch(`/admin/pengembalian/${peminjamanId}/update-detail`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    detail_id: detailId,
-                    jumlah_dikembalikan: jumlahDikembalikan
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                    alertDiv.innerHTML = `
-                        <i class="bi bi-check-circle me-2"></i>${data.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    `;
-                    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
-                    
-                    // Update button text
-                    this.innerHTML = '<i class="bi bi-check-lg"></i> Updated';
-                    this.classList.remove('btn-outline-primary');
-                    this.classList.add('btn-success');
-                    
-                    // Auto-hide alert after 3 seconds
-                    setTimeout(() => {
-                        alertDiv.remove();
-                    }, 3000);
-                } else {
-                    alert(data.message || 'Terjadi kesalahan saat update');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat update detail pengembalian');
-            })
-            .finally(() => {
-                // Re-enable button
-                this.disabled = false;
-                this.innerHTML = '<i class="bi bi-check-lg"></i> Update';
-            });
-        });
-    });
-    
-    // Add CSRF token meta tag if not exists
-    if (!document.querySelector('meta[name="csrf-token"]')) {
-        const meta = document.createElement('meta');
-        meta.name = 'csrf-token';
-        meta.content = document.querySelector('input[name="_token"]').value;
-        document.head.appendChild(meta);
-    }
-});
-</script>
 @endsection 

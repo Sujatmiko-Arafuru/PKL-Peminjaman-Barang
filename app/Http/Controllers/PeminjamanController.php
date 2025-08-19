@@ -40,6 +40,7 @@ class PeminjamanController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string|max:100|min:3',
+                'nim_nip' => 'required|string|max:50',
                 'foto_peminjam' => 'required|image|mimes:jpg,jpeg,png|max:2048',
                 'unit' => 'required|string|max:100',
                 'no_telp' => 'required|string|max:20',
@@ -51,6 +52,8 @@ class PeminjamanController extends Controller
                 'nama.min' => 'Nama harus minimal 3 karakter untuk generate kode unik.',
                 'nama.required' => 'Nama wajib diisi.',
                 'nama.max' => 'Nama maksimal 100 karakter.',
+                'nim_nip.required' => 'NIM/NIP wajib diisi.',
+                'nim_nip.max' => 'NIM/NIP maksimal 50 karakter.',
                 'foto_peminjam.required' => 'Foto peminjam wajib diupload.',
                 'foto_peminjam.image' => 'File foto harus berupa gambar.',
                 'foto_peminjam.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
@@ -119,6 +122,7 @@ class PeminjamanController extends Controller
                 // Simpan data peminjaman dengan kode peminjaman
                 $peminjaman = \App\Models\Peminjaman::create([
                 'nama' => $formData['nama'],
+                'nim_nip' => $formData['nim_nip'],
                 'foto_peminjam' => $formData['foto_peminjam'],
                 'unit' => $formData['unit'],
                 'no_telp' => $formData['no_telp'],
@@ -326,13 +330,13 @@ class PeminjamanController extends Controller
                 'status' => $peminjaman->status,
                 'foto_peminjam' => $peminjaman->foto_peminjam ? asset('storage/' . $peminjaman->foto_peminjam) : null,
                 'bukti' => $peminjaman->bukti ? asset('storage/' . $peminjaman->bukti) : null,
-                'created_at' => $peminjaman->created_at->format('d/m/Y H:i'),
-                'updated_at' => $peminjaman->updated_at->format('d/m/Y H:i'),
+                'created_at' => $peminjaman->created_at->toISOString(),
+                'updated_at' => $peminjaman->updated_at->toISOString(),
                 'details' => $peminjaman->details->map(function($detail) {
                     return [
                         'id' => $detail->id,
                         'barang_id' => $detail->barang_id,
-                        'qty' => $detail->jumlah,
+                        'jumlah' => $detail->jumlah,
                         'barang' => [
                             'id' => $detail->barang->id,
                             'nama' => $detail->barang->nama,

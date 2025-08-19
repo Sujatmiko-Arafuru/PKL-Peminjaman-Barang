@@ -92,6 +92,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
+                                                        <label class="form-label fw-bold">NIM/NIP</label>
+                                                        <input type="text" name="nim_nip" class="form-control" required value="{{ old('nim_nip') }}" placeholder="Contoh: 2021001234 atau 19850101200101001">
+                                                        <div class="form-text">
+                                                            <i class="bi bi-info-circle me-1"></i>
+                                                            Masukkan NIM untuk mahasiswa atau NIP untuk dosen/staff
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
                                                         <label class="form-label fw-bold">Jurusan / Ormawa</label>
                                                         <input type="text" name="unit" class="form-control" required value="{{ old('unit') }}" placeholder="Contoh: Teknik Informatika">
                                                     </div>

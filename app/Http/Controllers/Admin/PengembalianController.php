@@ -6,89 +6,53 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
-use App\Models\Barang;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class PengembalianController extends Controller
 {
-    public function index(Request $request): \Illuminate\View\View
+    public function index()
     {
-        $peminjaman = null;
-        
-        // Jika ada request POST (form submission), lakukan pencarian
-        if ($request->isMethod('post') || $request->hasAny(['kode_peminjaman', 'nama_peminjam', 'nama_kegiatan', 'no_telp'])) {
-            $query = Peminjaman::query();
-            
-            // Filter berdasarkan status yang bisa dikembalikan
-            $query->whereIn('status', ['disetujui', 'pengembalian_diajukan']);
-            
-            // Pencarian fleksibel - admin bisa mengisi salah satu atau lebih
-            if ($request->filled('kode_peminjaman')) {
-                $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
-            }
-            
-            if ($request->filled('nama_peminjam')) {
-                $query->where('nama', 'like', '%' . $request->nama_peminjam . '%');
-            }
-            
-            if ($request->filled('nama_kegiatan')) {
-                $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
-            }
-            
-            if ($request->filled('no_telp')) {
-                $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
-            }
-            
-            // Ambil data pertama yang cocok
-            $peminjaman = $query->first();
-            
-            // Jika tidak ada data yang cocok, set error message
-            if (!$peminjaman) {
-                session()->flash('error', 'Data peminjaman tidak ditemukan. Silakan cek kembali data yang diinput.');
-            }
-        }
-        
-        return view('admin.pengembalian.index', compact('peminjaman'));
+        $peminjamans = Peminjaman::with(['details.barang'])
+            ->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
+            ->whereHas('details', function($query) {
+                $query->whereRaw('jumlah_dikembalikan < jumlah');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.pengembalian.index', compact('peminjamans'));
     }
 
-    public function show($id): \Illuminate\View\View
+    public function show($id)
     {
-        $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+        $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
+        
+        // Pastikan peminjaman bisa dikembalikan
+        if (!$peminjaman->canBeReturned()) {
+            return back()->with('error', 'Peminjaman ini tidak bisa dikembalikan.');
+        }
+        
         return view('admin.pengembalian.show', compact('peminjaman'));
     }
 
-    public function inputKodePengembalian(Request $request): \Illuminate\Http\RedirectResponse
+    public function inputKodePengembalian(Request $request)
     {
         $request->validate([
-            'kode_peminjaman' => 'nullable|string|max:50',
-            'nama_peminjam' => 'nullable|string|max:100',
-            'nama_kegiatan' => 'nullable|string|max:200',
-            'no_telp' => 'nullable|string|max:20'
+            'kode_peminjaman' => 'nullable|string',
+            'nama' => 'nullable|string',
+            'nama_kegiatan' => 'nullable|string',
+            'no_telp' => 'nullable|string',
         ]);
 
-        try {
-            // Validasi minimal harus ada satu field yang diisi
-            if (!$request->filled('kode_peminjaman') && 
-                !$request->filled('nama_peminjam') && 
-                !$request->filled('nama_kegiatan') && 
-                !$request->filled('no_telp')) {
-                return redirect()->route('admin.pengembalian.index')
-                               ->with('error', 'Minimal harus mengisi salah satu field untuk pencarian.');
-            }
+        $query = Peminjaman::with(['details.barang']);
 
-            $query = Peminjaman::query();
-            
-            // Filter berdasarkan status yang bisa dikembalikan
-            $query->whereIn('status', ['disetujui', 'pengembalian_diajukan']);
-            
-            // Pencarian berdasarkan field yang diisi
+        // Filter berdasarkan input yang diberikan
             if ($request->filled('kode_peminjaman')) {
                 $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
             }
             
-            if ($request->filled('nama_peminjam')) {
-                $query->where('nama', 'like', '%' . $request->nama_peminjam . '%');
+        if ($request->filled('nama')) {
+            $query->where('nama', 'like', '%' . $request->nama . '%');
             }
             
             if ($request->filled('nama_kegiatan')) {
@@ -99,146 +63,138 @@ class PengembalianController extends Controller
                 $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
             }
 
-            // Cari peminjaman yang sesuai
-            $peminjaman = $query->first();
+        $peminjamans = $query->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
+            ->whereHas('details', function($subQuery) {
+                $subQuery->whereRaw('jumlah_dikembalikan < jumlah');
+            })->get();
 
-            if (!$peminjaman) {
-                return redirect()->route('admin.pengembalian.index')
-                               ->with('error', 'Data peminjaman tidak ditemukan atau status tidak sesuai.');
-            }
-
-            // Update status menjadi pengembalian_diajukan jika masih disetujui
-            if ($peminjaman->status == 'disetujui') {
-                $peminjaman->status = 'pengembalian_diajukan';
-                $peminjaman->saveQuietly();
-                
-                return redirect()->route('admin.pengembalian.index')
-                               ->with('success', 'Kode pengembalian berhasil diinput. Status: Pengembalian Diajukan');
-            } else {
-                return redirect()->route('admin.pengembalian.index')
-                               ->with('info', 'Data peminjaman ditemukan dengan status: ' . ucfirst($peminjaman->status));
-            }
-
-        } catch (\Exception $e) {
-            Log::error('Error saat input kode pengembalian: ' . $e->getMessage());
-            return redirect()->route('admin.pengembalian.index')
-                           ->with('error', 'Terjadi kesalahan saat input kode pengembalian.');
+        if ($peminjamans->isEmpty()) {
+            return back()->with('error', 'Tidak ada data peminjaman yang ditemukan.');
         }
+
+        if ($peminjamans->count() == 1) {
+            return redirect()->route('admin.pengembalian.show', $peminjamans->first()->id);
+        }
+
+        return view('admin.pengembalian.search_result', compact('peminjamans'));
     }
 
-    public function approve($id): \Illuminate\Http\RedirectResponse
+    /**
+     * Update detail pengembalian untuk semua detail peminjaman
+     */
+    public function bulkUpdatePengembalian(Request $request, $id)
     {
+        $request->validate([
+            'details' => 'required|array',
+            'details.*.id' => 'required|exists:detail_peminjamans,id',
+            'details.*.jumlah_dikembalikan' => 'required|integer|min:0',
+        ]);
+
+        $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
+        
+        // Pastikan peminjaman bisa dikembalikan
+        if (!$peminjaman->canBeReturned()) {
+            return back()->with('error', 'Peminjaman ini tidak bisa dikembalikan.');
+        }
+
+        DB::beginTransaction();
         try {
-            $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+            $totalStokDikembalikan = 0;
             
-            // Mulai transaction
-            DB::beginTransaction();
-            
-            // Update status peminjaman
-            $peminjaman->status = 'dikembalikan';
-            $peminjaman->saveQuietly();
-            
-            // Batch update stok barang untuk optimasi
-            $barangUpdates = [];
-            foreach ($peminjaman->details as $detail) {
-                $barang = $detail->barang;
-                if ($barang) {
-                    $newStok = $barang->stok + $detail->jumlah;
-                    $barangUpdates[] = [
-                        'id' => $barang->id,
-                        'stok' => $newStok
-                    ];
-                }
-            }
-            
-            // Update stok dalam batch untuk efisiensi
-            foreach ($barangUpdates as $update) {
-                DB::table('barangs')
-                    ->where('id', $update['id'])
-                    ->update(['stok' => $update['stok']]);
+            foreach ($request->details as $detailData) {
+                $detail = DetailPeminjaman::with('barang')->find($detailData['id']);
+                
+                if ($detail && $detail->peminjaman_id == $peminjaman->id) {
+                    $tambahan = (int) $detailData['jumlah_dikembalikan'];
+                    $sisa = max(0, $detail->jumlah - $detail->jumlah_dikembalikan);
                     
-                // Update status secara manual untuk barang yang diupdate
-                $barang = Barang::find($update['id']);
-                if ($barang) {
-                    $barang->updateStatusOtomatis();
+                    if ($tambahan < 0) {
+                        throw new \Exception("Jumlah tambahan pengembalian untuk {$detail->barang->nama} tidak boleh kurang dari 0.");
+                    }
+                    if ($tambahan > $sisa) {
+                        throw new \Exception("Jumlah tambahan pengembalian untuk {$detail->barang->nama} tidak boleh melebihi sisa yang belum dikembalikan ({$sisa}).");
+                    }
+                    
+                    if ($tambahan > 0) {
+                        $detail->jumlah_dikembalikan += $tambahan;
+                        $detail->save();
+                        
+                        $barang = $detail->barang;
+                        $barang->stok += $tambahan;
+                        $barang->save();
+                        
+                        $totalStokDikembalikan += $tambahan;
+                    }
                 }
             }
+
+            // Update status peminjaman berdasarkan jumlah yang dikembalikan
+            $this->updatePeminjamanStatus($peminjaman);
             
             DB::commit();
-            return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian disetujui dan stok barang berhasil diupdate.');
+            
+            $message = 'Pengembalian berhasil diupdate. ';
+            if ($totalStokDikembalikan > 0) {
+                $message .= "Stok barang telah diupdate (+{$totalStokDikembalikan}). ";
+            }
+            
+            if ($peminjaman->status === 'proses_pengembalian') {
+                $message .= 'Status berubah menjadi "Proses Pengembalian".';
+            } elseif ($peminjaman->status === 'dikembalikan') {
+                $message .= 'Status berubah menjadi "Dikembalikan".';
+            }
+            
+            return back()->with('success', $message);
             
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error saat approve pengembalian: ' . $e->getMessage(), [
-                'peminjaman_id' => $id,
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()->route('admin.pengembalian.index')->with('error', 'Terjadi kesalahan saat approve pengembalian. Silakan coba lagi.');
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    public function reject($id): \Illuminate\Http\RedirectResponse
+    /**
+     * Update status peminjaman berdasarkan jumlah barang yang dikembalikan
+     */
+    private function updatePeminjamanStatus(Peminjaman $peminjaman)
     {
-        try {
-            $peminjaman = Peminjaman::findOrFail($id);
-            $peminjaman->status = 'pengembalian ditolak';
-            $peminjaman->saveQuietly();
-            return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian berhasil ditolak.');
-        } catch (\Exception $e) {
-            Log::error('Error saat reject pengembalian: ' . $e->getMessage(), [
-                'peminjaman_id' => $id,
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()->route('admin.pengembalian.index')->with('error', 'Terjadi kesalahan saat menolak pengembalian. Silakan coba lagi.');
+        // Hitung ulang dari database untuk memastikan angka terbaru
+        $totalBarang = \App\Models\DetailPeminjaman::where('peminjaman_id', $peminjaman->id)
+            ->sum('jumlah');
+        $totalDikembalikan = \App\Models\DetailPeminjaman::where('peminjaman_id', $peminjaman->id)
+            ->sum('jumlah_dikembalikan');
+
+        if ($totalDikembalikan == 0) {
+            // Jika belum ada yang dikembalikan, status tetap seperti semula
+            if ($peminjaman->status === 'disetujui') {
+                $peminjaman->status = 'dipinjam';
+            }
+        } elseif ($totalDikembalikan < $totalBarang) {
+            // Jika sebagian dikembalikan, status menjadi proses pengembalian
+            $peminjaman->status = 'proses_pengembalian';
+        } else {
+            // Jika semua dikembalikan, status menjadi dikembalikan
+            $peminjaman->status = 'dikembalikan';
         }
+
+        $peminjaman->save();
     }
 
-    public function updateDetailPengembalian(Request $request, $id): \Illuminate\Http\JsonResponse
+    /**
+     * Get peminjaman yang bisa dikembalikan untuk API
+     */
+    public function getPeminjamanReturnable()
     {
-        try {
-            $request->validate([
-                'detail_id' => 'required|integer|exists:detail_peminjamans,id',
-                'jumlah_dikembalikan' => 'required|integer|min:1'
-            ]);
-
-            $detail = DetailPeminjaman::findOrFail($request->detail_id);
-            $peminjaman = Peminjaman::findOrFail($id);
-
-            // Validasi jumlah yang dikembalikan tidak melebihi yang dipinjam
-            if ($request->jumlah_dikembalikan > $detail->jumlah) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Jumlah yang dikembalikan tidak boleh melebihi yang dipinjam'
-                ], 400);
-            }
-
-            // Update jumlah yang dikembalikan
-            $detail->jumlah_dikembalikan = $request->jumlah_dikembalikan;
-            $detail->save();
-
-            // Update stok barang
-            $barang = $detail->barang;
-            if ($barang) {
-                $barang->stok += $request->jumlah_dikembalikan;
-                $barang->save();
-                $barang->updateStatusOtomatis();
-            }
+        $peminjamans = Peminjaman::with(['details.barang'])
+            ->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
+            ->whereHas('details', function($query) {
+                $query->whereRaw('jumlah_dikembalikan < jumlah');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Detail pengembalian berhasil diupdate',
-                'data' => [
-                    'jumlah_dikembalikan' => $detail->jumlah_dikembalikan,
-                    'stok_barang' => $barang ? $barang->stok : null
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Error saat update detail pengembalian: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat update detail pengembalian'
-            ], 500);
-        }
+            'data' => $peminjamans
+        ]);
     }
 } 
