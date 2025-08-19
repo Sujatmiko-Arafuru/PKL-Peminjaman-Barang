@@ -27,9 +27,14 @@ class PengembalianController extends Controller
     {
         $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
         
-        // Pastikan peminjaman bisa dikembalikan
-        if (!$peminjaman->canBeReturned()) {
-            return back()->with('error', 'Peminjaman ini tidak bisa dikembalikan.');
+        // Cek apakah status sudah dikembalikan
+        if ($peminjaman->status === 'dikembalikan') {
+            return redirect()->route('admin.pengembalian.index')->with('info', 'Peminjaman ini sudah selesai dikembalikan.');
+        }
+        
+        // Cek apakah masih ada barang yang bisa dikembalikan
+        if ($peminjaman->getTotalBelumDikembalianAttribute() <= 0) {
+            return redirect()->route('admin.pengembalian.index')->with('info', 'Semua barang untuk peminjaman ini sudah dikembalikan.');
         }
         
         return view('admin.pengembalian.show', compact('peminjaman'));
@@ -92,9 +97,9 @@ class PengembalianController extends Controller
 
         $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
         
-        // Pastikan peminjaman bisa dikembalikan
-        if (!$peminjaman->canBeReturned()) {
-            return back()->with('error', 'Peminjaman ini tidak bisa dikembalikan.');
+        // Cek apakah masih ada barang yang bisa dikembalikan
+        if ($peminjaman->getTotalBelumDikembalianAttribute() <= 0) {
+            return redirect()->route('admin.pengembalian.index')->with('info', 'Semua barang untuk peminjaman ini sudah dikembalikan.');
         }
 
         DB::beginTransaction();
@@ -142,6 +147,11 @@ class PengembalianController extends Controller
                 $message .= 'Status berubah menjadi "Proses Pengembalian".';
             } elseif ($peminjaman->status === 'dikembalikan') {
                 $message .= 'Status berubah menjadi "Dikembalikan".';
+            }
+            
+            // Jika semua barang sudah dikembalikan, redirect ke index
+            if ($peminjaman->status === 'dikembalikan') {
+                return redirect()->route('admin.pengembalian.index')->with('success', $message);
             }
             
             return back()->with('success', $message);

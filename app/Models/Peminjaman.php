@@ -101,7 +101,12 @@ class Peminjaman extends Model
      */
     public function canBeReturned()
     {
-        return in_array($this->status, ['disetujui', 'dipinjam']);
+        // Bisa dikembalikan jika status disetujui, dipinjam, atau proses pengembalian
+        // Dan masih ada barang yang belum dikembalikan
+        if (in_array($this->status, ['disetujui', 'dipinjam', 'proses_pengembalian'])) {
+            return $this->getTotalBelumDikembalikanAttribute() > 0;
+        }
+        return false;
     }
 
     /**
