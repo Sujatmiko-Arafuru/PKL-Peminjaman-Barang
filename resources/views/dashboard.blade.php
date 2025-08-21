@@ -224,11 +224,23 @@
             </div>
             
             <!-- Search Form -->
-            <form method="GET" action="/" class="mb-4">
+            <form method="GET" action="{{ route('dashboard') }}" class="mb-4">
                 <div class="input-group">
                     <input type="text" name="search" class="form-control" placeholder="Cari nama barang..." value="{{ request('search') }}">
                     <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Cari</button>
+                    @if(request('search'))
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Reset</a>
+                    @endif
                 </div>
+                @if(request('search'))
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-search me-1"></i>
+                            Mencari: "<strong>{{ request('search') }}</strong>" 
+                            ({{ $barangs->total() }} hasil ditemukan)
+                        </small>
+                    </div>
+                @endif
             </form>
             
             <!-- Barang List -->
@@ -308,6 +320,71 @@
                 </div>
                 @endforelse
             </div>
+
+            <!-- Pagination -->
+            @if($barangs->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                <nav aria-label="Navigasi halaman daftar barang">
+                    <ul class="pagination pagination-lg">
+                        {{-- Previous Page Link --}}
+                        @if ($barangs->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <i class="bi bi-chevron-left"></i>
+                                    <span class="d-none d-sm-inline">Sebelumnya</span>
+                                </span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $barangs->previousPageUrl() }}" rel="prev">
+                                    <i class="bi bi-chevron-left"></i>
+                                    <span class="d-none d-sm-inline">Sebelumnya</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @foreach ($barangs->getUrlRange(1, $barangs->lastPage()) as $page => $url)
+                            @if ($page == $barangs->currentPage())
+                                <li class="page-item active">
+                                    <span class="page-link">{{ $page }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                </li>
+                            @endif
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        @if ($barangs->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $barangs->nextPageUrl() }}" rel="next">
+                                    <span class="d-none d-sm-inline">Selanjutnya</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <span class="d-none d-sm-inline">Selanjutnya</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Page Info -->
+            <div class="text-center text-muted mb-3">
+                <small>
+                    Menampilkan {{ $barangs->firstItem() ?? 0 }} - {{ $barangs->lastItem() ?? 0 }} 
+                    dari {{ $barangs->total() }} barang 
+                    (Halaman {{ $barangs->currentPage() }} dari {{ $barangs->lastPage() }})
+                </small>
+            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -495,4 +572,94 @@
         }
     });
 </script>
+
+<style>
+/* Pagination Styling */
+.pagination {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.pagination .page-link {
+    border: none;
+    color: #20c997;
+    padding: 12px 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #e6f7f2;
+    color: #20c997;
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #20c997;
+    border-color: #20c997;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    border-radius: 0;
+}
+
+/* Responsive pagination text */
+@media (max-width: 576px) {
+    .pagination .page-link {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Page info styling */
+.text-muted small {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Grid Layout Optimization for 3x4 */
+.row-cols-lg-3 > .col {
+    flex: 0 0 auto;
+    width: 33.333333%;
+}
+
+@media (max-width: 991.98px) {
+    .row-cols-md-2 > .col {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .row-cols-1 > .col {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+}
+
+/* Ensure consistent card heights */
+.card.h-100 {
+    height: 100% !important;
+}
+
+/* Search form styling */
+.input-group .btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+</style>
 @endsection 

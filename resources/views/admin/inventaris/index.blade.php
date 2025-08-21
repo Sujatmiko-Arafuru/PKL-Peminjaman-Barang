@@ -188,6 +188,71 @@
             </div>
         </div>
     </div>
+
+    <!-- Pagination -->
+    @if($barangs->hasPages())
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Navigasi halaman inventaris barang">
+            <ul class="pagination pagination-lg">
+                {{-- Previous Page Link --}}
+                @if ($barangs->onFirstPage())
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="bi bi-chevron-left"></i>
+                            <span class="d-none d-sm-inline">Sebelumnya</span>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $barangs->previousPageUrl() }}" rel="prev">
+                            <i class="bi bi-chevron-left"></i>
+                            <span class="d-none d-sm-inline">Sebelumnya</span>
+                        </a>
+                    </li>
+                @endif
+
+                {{-- Pagination Elements --}}
+                @foreach ($barangs->getUrlRange(1, $barangs->lastPage()) as $page => $url)
+                    @if ($page == $barangs->currentPage())
+                        <li class="page-item active">
+                            <span class="page-link">{{ $page }}</span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endif
+                @endforeach
+
+                {{-- Next Page Link --}}
+                @if ($barangs->hasMorePages())
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $barangs->nextPageUrl() }}" rel="next">
+                            <span class="d-none d-sm-inline">Selanjutnya</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                @else
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <span class="d-none d-sm-inline">Selanjutnya</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </span>
+                    </li>
+                @endif
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Page Info -->
+    <div class="text-center text-muted mb-3">
+        <small>
+            Menampilkan {{ $barangs->firstItem() ?? 0 }} - {{ $barangs->lastItem() ?? 0 }} 
+            dari {{ $barangs->total() }} barang 
+            (Halaman {{ $barangs->currentPage() }} dari {{ $barangs->lastPage() }})
+        </small>
+    </div>
+    @endif
 </div>
 
 <style>
@@ -214,6 +279,57 @@
 
 .table img {
     border: 1px solid #dee2e6;
+}
+
+/* Pagination Styling */
+.pagination {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.pagination .page-link {
+    border: none;
+    color: #0d6efd;
+    padding: 12px 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    border-radius: 0;
+}
+
+/* Responsive pagination text */
+@media (max-width: 576px) {
+    .pagination .page-link {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Page info styling */
+.text-muted small {
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 </style>
 @endsection 

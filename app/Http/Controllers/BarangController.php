@@ -23,7 +23,7 @@ class BarangController extends Controller
         if ($request->has('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
-        $barangs = $query->orderBy('nama')->get();
+        $barangs = $query->orderBy('nama')->paginate(12); // 12 item per halaman (3x4 grid)
         return view('dashboard', compact('barangs'));
     }
 

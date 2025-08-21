@@ -11,7 +11,7 @@ class InventarisController extends Controller
 {
     public function index(): \Illuminate\View\View
     {
-        $barangs = Barang::orderBy('nama')->get();
+        $barangs = Barang::orderBy('nama')->paginate(12); // 12 item per halaman (3x4 grid)
         return view('admin.inventaris.index', compact('barangs'));
     }
 
